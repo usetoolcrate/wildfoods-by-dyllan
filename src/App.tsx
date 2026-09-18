@@ -1,6 +1,5 @@
 import { AuthStrategyRoutes } from "./auth/AuthStrategyRoutes";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { Toaster } from "./components/ui/sonner";
 import { ViktorSpacePreviewBadge } from "./components/ViktorSpacePreviewBadge";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
@@ -9,7 +8,6 @@ function App() {
     <>
       <ErrorBoundary>
         <ThemeProvider defaultTheme="system" switchable>
-          <Toaster />
           <AuthStrategyRoutes />
         </ThemeProvider>
       </ErrorBoundary>

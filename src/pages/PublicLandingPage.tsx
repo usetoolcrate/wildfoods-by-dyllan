@@ -29,8 +29,8 @@ const PAGE_STYLES = String.raw`
   }
   .stamp-font{font-family:'Special Elite', 'Courier New', monospace;}
   a{color:inherit;}
-  .wrap{max-width:960px;margin:0 auto;padding:0 28px;}
-  .wrap-narrow{max-width:700px;margin:0 auto;padding:0 28px;}
+  .wrap{max-width:960px;margin:0 auto;padding-left:28px;padding-right:28px;}
+  .wrap-narrow{max-width:700px;margin:0 auto;padding-left:28px;padding-right:28px;}
 
   /* torn / deckle divider */
   .deckle{
@@ -118,8 +118,8 @@ const PAGE_STYLES = String.raw`
   .plate-caption{
     position:absolute;
     left:0;right:0;bottom:0;
-    padding:30px 28px 26px;
-    background:linear-gradient(0deg, rgba(15,20,15,0.82), rgba(15,20,15,0));
+    padding:44px 28px 30px;
+    background:linear-gradient(0deg, rgba(10,14,10,0.94) 0%, rgba(10,14,10,0.82) 45%, rgba(10,14,10,0.15) 90%, rgba(10,14,10,0) 100%);
     color:#f1ead8;
   }
   .plate-caption .fig{
@@ -127,8 +127,9 @@ const PAGE_STYLES = String.raw`
     font-size:11px;
     letter-spacing:0.18em;
     text-transform:uppercase;
-    color:#cdb97a;
-    margin-bottom:6px;
+    color:#e0cd8f;
+    margin-bottom:8px;
+    text-shadow:0 1px 6px rgba(0,0,0,0.6);
   }
   .plate-caption blockquote{
     margin:0;
@@ -137,6 +138,7 @@ const PAGE_STYLES = String.raw`
     font-weight:500;
     max-width:640px;
     line-height:1.35;
+    text-shadow:0 1px 8px rgba(0,0,0,0.55);
   }
 
   /* ===== SECTION LABEL ===== */
@@ -488,11 +490,12 @@ const PAGE_STYLES = String.raw`
       width:100%;
     }
     .rate-ledger thead{display:none;}
-    .rate-ledger tr{border-bottom:1px solid var(--line);padding:16px 0;}
+    .rate-ledger tr{border-bottom:1px solid var(--line);padding:20px 18px;}
     .rate-ledger tr:last-child{border-bottom:none;}
-    .rate-ledger td{border-bottom:none;padding:2px 0;}
-    .rate-ledger td.svc{font-size:20px;}
-    .rate-ledger td.rate{font-size:16px;margin-bottom:4px;}
+    .rate-ledger td{border-bottom:none;padding:0;}
+    .rate-ledger td.svc{font-size:19px;line-height:1.25;margin-bottom:6px;}
+    .rate-ledger td.rate{font-size:16px;margin-bottom:8px;display:block;}
+    .rate-ledger td.note{font-size:16px;line-height:1.45;}
   }
   @media (max-width:480px){
     body{font-size:17.5px;}
@@ -690,7 +693,10 @@ const PAGE_BODY = String.raw`<header class="mast">
       </div>
       <div class="rate-ledger">
         <table>
-          <tr><th>Offering</th><th>Rate</th><th>Notes</th></tr>
+          <thead>
+            <tr><th>Offering</th><th>Rate</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
           <tr>
             <td class="svc">Foraging Walk — 2 hr</td>
             <td class="rate">$100 / session</td>
@@ -726,6 +732,7 @@ const PAGE_BODY = String.raw`<header class="mast">
             <td class="rate">$50–$90 / guest</td>
             <td class="note">3 to 6 courses, 20-guest minimum, $250 planning fee. Full staffing and service included — venue keeps ticket revenue.</td>
           </tr>
+          </tbody>
         </table>
       </div>
     </div>
