@@ -104,7 +104,8 @@ const PAGE_STYLES = String.raw`
     grid-template-columns:1.15fr 0.85fr;
     gap:56px;
     align-items:center;
-    padding:56px 0 60px;
+    padding-top:56px;
+    padding-bottom:60px;
   }
   .eyebrow-plate{
     font-family:'Special Elite', monospace;
@@ -535,7 +536,7 @@ const PAGE_STYLES = String.raw`
   }
 
   @media (max-width:900px){
-    .hero-grid{grid-template-columns:1fr;gap:34px;padding:36px 0 44px;}
+    .hero-grid{grid-template-columns:1fr;gap:34px;padding-top:36px;padding-bottom:44px;}
     .mast-nav{display:none;}
     .mast-bar{justify-content:center;padding:18px 0;}
     header.mast .sub{max-width:none;}
@@ -573,7 +574,7 @@ const PAGE_STYLES = String.raw`
   @media (max-width:480px){
     body{font-size:17.5px;}
     .specimens{grid-template-columns:1fr 1fr;}
-    .hero-grid{padding:30px 0 36px;}
+    .hero-grid{padding-top:30px;padding-bottom:36px;}
     .mast-bar .brand-lockup{height:36px;}
   }
 `;
