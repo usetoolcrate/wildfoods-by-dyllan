@@ -74,7 +74,7 @@ const PAGE_STYLES = String.raw`
     border-bottom:1px solid rgba(232,220,194,0.16);
   }
   .mast-bar .brand-lockup{
-    height:44px;
+    height:54px;
     width:auto;
     display:block;
   }
