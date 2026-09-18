@@ -17,11 +17,7 @@ ${renderPageBanner({
         sub: "Every booking starts as a real conversation — call, text, or email and tell him what you're picturing.",
       })}
 
-      <div class="margin-notes" style="margin-top:54px; grid-template-columns:1fr;">
-        <div class="margin-note" style="padding-left:0;">
-          <p style="font-style:normal; font-size:17px;">Chef Dyllan Dale — Wild Foods by Dyllan<br>Springfield, Missouri — serving the Ozarks</p>
-        </div>
-      </div>
+      <p style="margin-top:54px; text-align:center; font-family:'Special Elite', monospace; font-size:13px; color:var(--ink-soft); letter-spacing:0.04em;">Chef Dyllan Dale — Wild Foods by Dyllan<br>Springfield, Missouri — serving the Ozarks</p>
     </div>
   </section>
 </main>
