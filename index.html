@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <!-- Every page load opens a WebSocket to the Convex deployment before
+         anything renders (auth restore, then data). Warming the TCP+TLS
+         connection while the bundle downloads removes that handshake from
+         the critical path. Vite substitutes %VITE_CONVEX_URL% at build time. -->
+    <link rel="preconnect" href="%VITE_CONVEX_URL%" />
+    <title>Wild Foods by Dyllan</title>
+    <meta name="description" content="Private chef, foraging walks, and Ozarks wild-food dinners with Chef Dyllan Dale — Springfield, MO." />
+    <meta property="og:title" content="Wild Foods by Dyllan — Field Notes of an Ozarks Forager" />
+    <meta property="og:description" content="Private chef, foraging walks, and Ozarks wild-food dinners with Chef Dyllan Dale — Springfield, MO." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://wildfoods-by-dyllan.vercel.app/og-image.jpg" />
+    <meta property="og:url" content="https://wildfoods-by-dyllan.vercel.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Wild Foods by Dyllan — Field Notes of an Ozarks Forager" />
+    <meta name="twitter:description" content="Private chef, foraging walks, and Ozarks wild-food dinners with Chef Dyllan Dale — Springfield, MO." />
+    <meta name="twitter:image" content="https://wildfoods-by-dyllan.vercel.app/og-image.jpg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+# The isolated linker: each package is linked once into the per-project
+# virtual store (node_modules/.bun/, hardlinked from the shared cache —
+# /tmp/bun-cache in the sandbox) and everything else is symlinks. On the
+# hot Spaces path (lockfile present, cache warm, node_modules empty —
+# fresh init and post-retention reinstalls) that makes bun install faster
+# (~155 ms warm vs ~200 ms hoisted on the template), and it blocks phantom
+# dependencies: an import that is not declared in package.json fails to
+# resolve instead of riding in through hoisting. Physical disk stays the
+# same either way — the hoisted linker already hardlinks package data from
+# the shared cache, and hardlinks keep the retention janitor's nlink==1
+# cache-sweep rule sound. The existing bun.lock works unchanged
+# (configVersion 0, --frozen-lockfile passes).
+#
+# Deliberately NOT enabling install.globalStore (Bun 1.4's shared symlink
+# store, ~39 ms warm installs) yet: on Bun 1.4.0 it breaks
+# @hookform/resolvers/zod resolution (Bun issue #40243) and tsc type
+# resolution through the realpath'd store — the template build fails.
+# Revisit when the upstream fix lands; prerequisites on our side are a
+# links/-aware retention rule (symlinked store entries defeat the nlink==1
+# referenced-file check) and a store-integrity guard on the install stamp
+# fast path in app_tool_handlers, which skips bun install entirely when
+# manifests are unchanged.
+[install]
+linker = "isolated"
