@@ -15,6 +15,7 @@ const PAGE_STYLES = String.raw`
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
+  #story, #recipes-nav, #rates, #book{scroll-margin-top:24px;}
   body{
     margin:0;
     overflow-x:hidden;
@@ -52,8 +53,6 @@ const PAGE_STYLES = String.raw`
   header.mast{
     background:var(--pine);
     color:var(--paper);
-    padding:56px 0 46px;
-    text-align:center;
     position:relative;
   }
   header.mast::after{
@@ -64,8 +63,45 @@ const PAGE_STYLES = String.raw`
       linear-gradient(225deg, var(--pine) 6px, transparent 0) 0 0;
     background-size:14px 14px;background-repeat:repeat-x;background-color:var(--paper);
   }
-  .mark{
-    width:54px;height:54px;margin:0 auto 18px;opacity:0.92;
+
+  /* slim utility bar: logo + quick anchors */
+  .mast-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:20px 0;
+    border-bottom:1px solid rgba(232,220,194,0.16);
+  }
+  .mast-bar .brand-lockup{
+    height:44px;
+    width:auto;
+    display:block;
+  }
+  .mast-nav{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+  .mast-nav a{
+    color:#c9d3c1;
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    padding-bottom:2px;
+  }
+  .mast-nav a:hover{border-bottom-color:var(--gold);color:var(--paper);}
+
+  /* ===== HERO: copy + photo side by side ===== */
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:56px;
+    align-items:center;
+    padding:56px 0 60px;
   }
   .eyebrow-plate{
     font-family:'Special Elite', monospace;
@@ -73,22 +109,62 @@ const PAGE_STYLES = String.raw`
     letter-spacing:0.32em;
     text-transform:uppercase;
     color:var(--gold);
-    margin-bottom:14px;
+    margin-bottom:16px;
   }
   header.mast h1{
     font-family:'Cormorant Garamond', serif;
     font-weight:600;
-    font-size:clamp(40px,7vw,74px);
-    margin:0 0 10px;
+    font-size:clamp(34px,3.6vw,50px);
+    margin:0 0 14px;
     letter-spacing:0.01em;
+    line-height:1.08;
   }
   header.mast .sub{
-    font-style:italic;
-    font-size:20px;
+    font-size:18px;
     color:#d9d2bc;
-    max-width:520px;
-    margin:0 auto 22px;
+    max-width:460px;
+    margin:0 0 26px;
+    line-height:1.5;
   }
+  .hero-cta{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
+  }
+  .hero-cta a{
+    font-family:'Special Elite', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:14px 22px;
+    border-radius:2px;
+    display:inline-block;
+  }
+  .hero-cta .btn-solid{
+    background:var(--rust);
+    color:#fbf5e6;
+  }
+  .hero-cta .btn-solid:hover{background:var(--rust-deep);}
+  .hero-cta .btn-line{
+    border:1px solid #6d7d68;
+    color:#e8dcc2;
+  }
+  .hero-cta .btn-line:hover{border-color:var(--gold);color:var(--gold);}
+  .hero-facts{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#a9b6a3;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:22px;
+  }
+  .hero-facts .dot{color:var(--gold);}
   .colophon{
     font-family:'Special Elite', monospace;
     font-size:11.5px;
@@ -96,49 +172,36 @@ const PAGE_STYLES = String.raw`
     color:#a9b6a3;
     display:flex;
     gap:26px;
-    justify-content:center;
     flex-wrap:wrap;
-    margin-top:6px;
+    margin-top:0;
   }
 
-  /* ===== PLATE / OPENING PHOTO ===== */
-  .plate-photo{
+  .hero-media{
     position:relative;
-    margin:0;
   }
-  .plate-photo img{
+  .hero-media img{
     width:100%;
     display:block;
-    height:64vh;
-    min-height:420px;
+    aspect-ratio:4/5;
     object-fit:cover;
     object-position:center 20%;
     filter:saturate(0.94) contrast(1.02);
+    border-radius:3px;
   }
-  .plate-caption{
-    position:absolute;
-    left:0;right:0;bottom:0;
-    padding:44px 28px 30px;
-    background:linear-gradient(0deg, rgba(10,14,10,0.94) 0%, rgba(10,14,10,0.82) 45%, rgba(10,14,10,0.15) 90%, rgba(10,14,10,0) 100%);
-    color:#f1ead8;
-  }
-  .plate-caption .fig{
+  .hero-media .fig{
     font-family:'Special Elite', monospace;
-    font-size:11px;
-    letter-spacing:0.18em;
+    font-size:10.5px;
+    letter-spacing:0.14em;
     text-transform:uppercase;
-    color:#e0cd8f;
-    margin-bottom:8px;
-    text-shadow:0 1px 6px rgba(0,0,0,0.6);
+    color:#8c9a86;
+    margin-top:12px;
   }
-  .plate-caption blockquote{
-    margin:0;
+  .hero-media blockquote{
+    margin:6px 0 0;
     font-style:italic;
-    font-size:clamp(20px,3vw,30px);
-    font-weight:500;
-    max-width:640px;
-    line-height:1.35;
-    text-shadow:0 1px 8px rgba(0,0,0,0.55);
+    font-size:16px;
+    color:#d9d2bc;
+    line-height:1.45;
   }
 
   /* ===== SECTION LABEL ===== */
@@ -468,6 +531,13 @@ const PAGE_STYLES = String.raw`
     letter-spacing:0.05em;
   }
 
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;gap:34px;padding:36px 0 44px;}
+    .mast-nav{display:none;}
+    .mast-bar{justify-content:center;padding:18px 0;}
+    header.mast .sub{max-width:none;}
+    .hero-media img{aspect-ratio:16/11;}
+  }
   @media (max-width:820px){
     .entry{grid-template-columns:1fr;gap:8px;}
     .entry .when{display:flex;align-items:baseline;gap:10px;}
@@ -500,42 +570,54 @@ const PAGE_STYLES = String.raw`
   @media (max-width:480px){
     body{font-size:17.5px;}
     .specimens{grid-template-columns:1fr 1fr;}
-    header.mast{padding:44px 0 36px;}
+    .hero-grid{padding:30px 0 36px;}
+    .mast-bar .brand-lockup{height:36px;}
   }
 `;
 
 const PAGE_BODY = String.raw`<header class="mast">
-  <div class="wrap">
-    <svg class="mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M32 6C20 6 12 16 12 26c0 6 3 9 6 9s5-3 6-7c1 5 4 9 8 9s7-4 8-9c1 4 3 7 6 7s6-3 6-9C52 16 44 6 32 6Z" stroke="#e8dcc2" stroke-width="1.4"/>
-      <path d="M32 34V58" stroke="#e8dcc2" stroke-width="1.4"/>
-      <path d="M32 44l-8 6M32 40l9 7" stroke="#e8dcc2" stroke-width="1.2"/>
-    </svg>
-    <div class="eyebrow-plate">Springfield &amp; the Ozarks · Est. field practice</div>
-    <h1>Wild Foods by Dyllan</h1>
-    <p class="sub">Field notes from a chef who never left the woods — hyper-local dinners, foraging walks, and Ozarks wild foods, gathered and plated by hand.</p>
-    <div class="colophon">
-      <span>Chef Dyllan Dale</span>
-      <span>417&#8209;403&#8209;9265</span>
-      <span>dyllan@wildfoodsbydyllan.com</span>
+  <div class="wrap mast-bar">
+    <img class="brand-lockup" src="/images/logo-lockup.webp" alt="Wild Foods by Dyllan">
+    <nav class="mast-nav">
+      <a href="#rates">Rates &amp; Booking</a>
+      <a href="#story">Field Notes</a>
+      <a href="#recipes-nav">Recipes</a>
+      <a href="#book">Contact</a>
+    </nav>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow-plate">Springfield &amp; the Ozarks · Est. field practice</div>
+      <h1>Wild Foods by Dyllan</h1>
+      <p class="sub">Hyper-local dinners, foraging walks, and Ozarks wild foods, gathered and plated by hand by Chef Dyllan Dale.</p>
+      <div class="hero-facts">
+        <span>Foraging Walks</span><span class="dot">·</span>
+        <span>Ticketed Pop-Up Dinners</span><span class="dot">·</span>
+        <span>Private Chef Service</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn-solid" href="#rates">See Rates &amp; Book a Walk</a>
+        <a class="btn-line" href="#story">Read the Field Notes</a>
+      </div>
+      <div class="colophon">
+        <span>Chef Dyllan Dale</span>
+        <span>417&#8209;403&#8209;9265</span>
+        <span>dyllan@wildfoodsbydyllan.com</span>
+      </div>
+    </div>
+    <div class="hero-media">
+      <img src="/images/hero-creek-forage.webp" alt="Chef Dyllan Dale foraging along a creek in the Ozarks with his dog">
+      <div class="fig">Fig. 1 — Wet-weather foraging, a creek crossing near Springfield</div>
+      <blockquote>"I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education."</blockquote>
     </div>
   </div>
 </header>
 
-<div class="plate-photo">
-  <img src="/images/hero-creek-forage.webp" alt="Chef Dyllan Dale foraging along a creek in the Ozarks with his dog">
-  <div class="plate-caption">
-    <div class="wrap" style="padding:0;">
-      <div class="fig">Fig. 1 — Wet-weather foraging, a creek crossing near Springfield</div>
-      <blockquote>"I don't think I will ever leave the Ozarks. I hope to bring the flavors of the forest and field to people through fine dining and education."</blockquote>
-    </div>
-  </div>
-</div>
-
 <main>
 
   <!-- FIELD NOTES / STORY -->
-  <section class="wrap-narrow">
+  <section class="wrap-narrow" id="story">
     <div class="sec-label">
       <div class="num stamp-font">I</div>
       <h2>Field Notes</h2>
@@ -651,7 +733,7 @@ const PAGE_BODY = String.raw`<header class="mast">
   </section>
 
   <!-- SPECIMEN GALLERY -->
-  <section class="wrap">
+  <section class="wrap" id="recipes-nav">
     <div class="sec-label">
       <div class="num stamp-font">III</div>
       <h2>From the Pass</h2>
@@ -684,7 +766,7 @@ const PAGE_BODY = String.raw`<header class="mast">
   <div class="deckle"></div>
 
   <!-- FORAGING / TEACHING / CONSULTING LEDGER -->
-  <section>
+  <section id="rates">
     <div class="wrap">
       <div class="sec-label">
         <div class="num stamp-font">IV</div>
@@ -769,7 +851,7 @@ const PAGE_BODY = String.raw`<header class="mast">
 
 </main>
 
-<div class="colophon-block">
+<div class="colophon-block" id="book">
   <div class="wrap-narrow">
     <div class="stamp"><span>VERIFIED<br>OZARKS<br>FORAGER</span></div>
     <h2>Book Chef Dyllan</h2>
