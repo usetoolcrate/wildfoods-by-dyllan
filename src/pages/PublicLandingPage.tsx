@@ -64,14 +64,17 @@ const PAGE_STYLES = String.raw`
     background-size:14px 14px;background-repeat:repeat-x;background-color:var(--paper);
   }
 
-  /* slim utility bar: logo + quick anchors */
+  /* slim utility bar: logo + quick anchors — fresh paper bar, sits outside the pine hero */
+  .mast-bar-wrap{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
   .mast-bar{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:20px;
-    padding:20px 0;
-    border-bottom:1px solid rgba(232,220,194,0.16);
+    padding:16px 0;
   }
   .mast-bar .brand-lockup{
     height:54px;
@@ -88,12 +91,12 @@ const PAGE_STYLES = String.raw`
     flex-wrap:wrap;
   }
   .mast-nav a{
-    color:#c9d3c1;
+    color:var(--ink-soft);
     text-decoration:none;
     border-bottom:1px solid transparent;
     padding-bottom:2px;
   }
-  .mast-nav a:hover{border-bottom-color:var(--gold);color:var(--paper);}
+  .mast-nav a:hover{border-bottom-color:var(--rust);color:var(--ink);}
 
   /* ===== HERO: copy + photo side by side ===== */
   .hero-grid{
@@ -575,7 +578,7 @@ const PAGE_STYLES = String.raw`
   }
 `;
 
-const PAGE_BODY = String.raw`<header class="mast">
+const PAGE_BODY = String.raw`<div class="mast-bar-wrap">
   <div class="wrap mast-bar">
     <img class="brand-lockup" src="/images/logo-lockup.webp" alt="Wild Foods by Dyllan">
     <nav class="mast-nav">
@@ -585,7 +588,9 @@ const PAGE_BODY = String.raw`<header class="mast">
       <a href="#book">Contact</a>
     </nav>
   </div>
+</div>
 
+<header class="mast">
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <div class="eyebrow-plate">Springfield &amp; the Ozarks · Est. field practice</div>
