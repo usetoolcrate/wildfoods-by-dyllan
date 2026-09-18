@@ -492,9 +492,9 @@ const PAGE_STYLES = String.raw`
     .rate-ledger thead{display:none;}
     .rate-ledger tr{border-bottom:1px solid var(--line);padding:20px 18px;}
     .rate-ledger tr:last-child{border-bottom:none;}
-    .rate-ledger td{border-bottom:none;padding:0;}
-    .rate-ledger td.svc{font-size:19px;line-height:1.25;margin-bottom:6px;}
-    .rate-ledger td.rate{font-size:16px;margin-bottom:8px;display:block;}
+    .rate-ledger td{border-bottom:none;padding:0;width:auto !important;}
+    .rate-ledger td.svc{font-size:18px;line-height:1.3;margin-bottom:6px;white-space:normal;}
+    .rate-ledger td.rate{font-size:16px;margin-bottom:8px;display:block;white-space:normal;}
     .rate-ledger td.note{font-size:16px;line-height:1.45;}
   }
   @media (max-width:480px){
