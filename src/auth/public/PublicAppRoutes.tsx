@@ -1,5 +1,12 @@
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { PublicLandingPage } from "@/pages/PublicLandingPage";
+import { StoryPage } from "@/pages/site/StoryPage";
+import { DineWithUsPage } from "@/pages/site/DineWithUsPage";
+import { PrivateChefPage } from "@/pages/site/PrivateChefPage";
+import { LearnPage } from "@/pages/site/LearnPage";
+import { RecipesPage } from "@/pages/site/RecipesPage";
+import { ShopPage } from "@/pages/site/ShopPage";
+import { ContactPage } from "@/pages/site/ContactPage";
 
 function PublicShell() {
   return (
@@ -16,6 +23,13 @@ export function PublicAppRoutes() {
     <Routes>
       <Route element={<PublicShell />}>
         <Route path="/" element={<PublicLandingPage />} />
+        <Route path="/story" element={<StoryPage />} />
+        <Route path="/dine-with-us" element={<DineWithUsPage />} />
+        <Route path="/private-chef" element={<PrivateChefPage />} />
+        <Route path="/learn" element={<LearnPage />} />
+        <Route path="/recipes" element={<RecipesPage />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
