@@ -7,6 +7,7 @@ import { LearnPage } from "@/pages/site/LearnPage";
 import { RecipesPage } from "@/pages/site/RecipesPage";
 import { ShopPage } from "@/pages/site/ShopPage";
 import { ContactPage } from "@/pages/site/ContactPage";
+import { AdminRecipesPage } from "@/pages/site/AdminRecipesPage";
 
 function PublicShell() {
   return (
@@ -30,6 +31,7 @@ export function PublicAppRoutes() {
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/admin/recipes" element={<AdminRecipesPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

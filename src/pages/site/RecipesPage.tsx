@@ -14,11 +14,39 @@ type Recipe = {
   teaser: string;
   ingredients: string[];
   steps: string[];
+  imageUrl?: string | null;
 };
 
-// Sample data — titles are real dishes from Chef Dyllan's recipe collection.
-// Ingredients/steps below are placeholder scaffolding for the list/filter/print UI,
-// not the chef's actual written recipes. Swap for the real recipe database later.
+type ApiRecipe = {
+  id: number;
+  slug: string;
+  title: string;
+  tag: string;
+  time: string;
+  teaser: string;
+  ingredients: string[];
+  steps: string[];
+  image_url: string | null;
+  published: boolean;
+};
+
+function apiRecipeToRecipe(r: ApiRecipe): Recipe {
+  return {
+    id: r.slug,
+    title: r.title,
+    tag: r.tag,
+    time: r.time,
+    teaser: r.teaser,
+    ingredients: r.ingredients,
+    steps: r.steps,
+    imageUrl: r.image_url,
+  };
+}
+
+// Fallback data shown only if the database is unreachable — titles are real
+// dishes from Chef Dyllan's recipe collection; ingredients/steps below are
+// placeholder scaffolding for the list/filter/print UI. Once the database
+// responds, this array is never used — DB_RECIPES below takes over.
 const RECIPES: Recipe[] = [
   {
     id: "pawpaw-honey-bread",
@@ -215,8 +243,6 @@ const RECIPES: Recipe[] = [
   },
 ];
 
-const TAGS = ["All", ...Array.from(new Set(RECIPES.map((r) => r.tag)))];
-
 function printRecipe(recipe: Recipe) {
   const win = window.open("", "_blank", "width=720,height=900");
   if (!win) return;
@@ -262,21 +288,47 @@ export function RecipesPage() {
   const [activeTag, setActiveTag] = useState("All");
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [dbRecipes, setDbRecipes] = useState<Recipe[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     document.title = "Recipes — Wild Foods by Dyllan";
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/recipes")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load recipes");
+        return res.json();
+      })
+      .then((data: { recipes: ApiRecipe[] }) => {
+        if (cancelled) return;
+        setDbRecipes(data.recipes.map(apiRecipeToRecipe));
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allRecipes = dbRecipes ?? (loadError ? RECIPES : []);
+  const isLoading = dbRecipes === null && !loadError;
+
+  const tags = useMemo(() => ["All", ...Array.from(new Set(allRecipes.map((r) => r.tag)))], [allRecipes]);
+
   const filtered = useMemo(() => {
-    return RECIPES.filter((r) => {
+    return allRecipes.filter((r) => {
       const tagMatch = activeTag === "All" || r.tag === activeTag;
       const q = query.trim().toLowerCase();
       const queryMatch = !q || r.title.toLowerCase().includes(q) || r.teaser.toLowerCase().includes(q);
       return tagMatch && queryMatch;
     });
-  }, [activeTag, query]);
+  }, [activeTag, query, allRecipes]);
 
-  const openRecipe = openId ? RECIPES.find((r) => r.id === openId) ?? null : null;
+  const openRecipe = openId ? allRecipes.find((r) => r.id === openId) ?? null : null;
 
   return (
     <>
@@ -299,9 +351,11 @@ export function RecipesPage() {
       <main>
         <section>
           <div className="wrap">
-            <span className="sample-flag">
-              Sample preview — real recipe write-ups &amp; photos import once the full database is connected
-            </span>
+            {loadError ? (
+              <span className="sample-flag">
+                Sample preview — showing offline placeholder content, live recipe database unreachable right now
+              </span>
+            ) : null}
 
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
               <input
@@ -314,7 +368,7 @@ export function RecipesPage() {
             </div>
 
             <div className="chip-row">
-              {TAGS.map((tag) => (
+              {tags.map((tag) => (
                 <button
                   key={tag}
                   className={`chip${activeTag === tag ? " active" : ""}`}
@@ -330,11 +384,20 @@ export function RecipesPage() {
               {filtered.length} recipe{filtered.length === 1 ? "" : "s"}
             </div>
 
-            {openRecipe ? (
+            {isLoading ? (
+              <div className="recipe-empty">Loading recipes…</div>
+            ) : openRecipe ? (
               <div className="recipe-detail" style={{ marginBottom: 40 }}>
                 <button className="rd-close" onClick={() => setOpenId(null)} type="button">
                   &larr; Back to all recipes
                 </button>
+                {openRecipe.imageUrl ? (
+                  <img
+                    src={openRecipe.imageUrl}
+                    alt={openRecipe.title}
+                    style={{ width: "100%", maxHeight: 340, objectFit: "cover", margin: "16px 0" }}
+                  />
+                ) : null}
                 <h2>{openRecipe.title}</h2>
                 <div className="rd-meta">
                   <span>{openRecipe.tag}</span>
@@ -370,6 +433,13 @@ export function RecipesPage() {
               <div className="recipe-grid">
                 {filtered.map((r) => (
                   <div className="recipe-card" key={r.id}>
+                    {r.imageUrl ? (
+                      <img
+                        src={r.imageUrl}
+                        alt={r.title}
+                        style={{ width: "100%", height: 160, objectFit: "cover", marginBottom: 10 }}
+                      />
+                    ) : null}
                     <div className="rc-tag">{r.tag}</div>
                     <h3>{r.title}</h3>
                     <div className="rc-meta">
