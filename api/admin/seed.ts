@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ensureSchema, getSql } from "../_lib/db";
-import { isAuthedRequest } from "../_lib/auth";
+import { ensureSchema, getSql } from "../_lib/db.js";
+import { isAuthedRequest } from "../_lib/auth.js";
 
 // One-time seed: loads the sample recipe set (real dish titles, placeholder
 // ingredients/steps) as a starting point Dyllan can edit in place from the

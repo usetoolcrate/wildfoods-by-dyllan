@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ensureSchema, getSql } from "../_lib/db";
-import { isAuthedRequest } from "../_lib/auth";
+import { ensureSchema, getSql } from "../_lib/db.js";
+import { isAuthedRequest } from "../_lib/auth.js";
 
 function slugify(title: string): string {
   return title
