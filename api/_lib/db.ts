@@ -28,3 +28,19 @@ export async function ensureSchema() {
     )
   `;
 }
+
+// Answers from one-off questionnaires (e.g. /questions). One row per
+// browser submission; re-sending from the same browser updates the row.
+export async function ensureFormResponsesSchema() {
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS form_responses (
+      id SERIAL PRIMARY KEY,
+      form TEXT NOT NULL,
+      submission_id TEXT UNIQUE NOT NULL,
+      answers JSONB NOT NULL DEFAULT '[]'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+}

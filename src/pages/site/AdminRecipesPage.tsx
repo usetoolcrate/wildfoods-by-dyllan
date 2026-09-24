@@ -38,7 +38,7 @@ const EMPTY_FORM: FormState = {
   published: true,
 };
 
-const wrapStyle: React.CSSProperties = {
+export const wrapStyle: React.CSSProperties = {
   maxWidth: 880,
   margin: "0 auto",
   padding: "48px 24px 80px",
@@ -56,7 +56,7 @@ const inputStyle: React.CSSProperties = {
   marginBottom: 14,
 };
 
-const labelStyle: React.CSSProperties = {
+export const labelStyle: React.CSSProperties = {
   fontFamily: "'Courier New', monospace",
   fontSize: 11,
   letterSpacing: "0.06em",
@@ -66,7 +66,7 @@ const labelStyle: React.CSSProperties = {
   marginBottom: 4,
 };
 
-const buttonStyle: React.CSSProperties = {
+export const buttonStyle: React.CSSProperties = {
   fontFamily: "'Courier New', monospace",
   fontSize: 12,
   letterSpacing: "0.06em",
@@ -78,14 +78,14 @@ const buttonStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-const secondaryButtonStyle: React.CSSProperties = {
+export const secondaryButtonStyle: React.CSSProperties = {
   ...buttonStyle,
   background: "transparent",
   color: "var(--ink)",
   border: "1px solid var(--ink)",
 };
 
-function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
+export function LoginForm({ onLoggedIn, title = "Recipe Admin" }: { onLoggedIn: () => void; title?: string }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -114,7 +114,7 @@ function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
 
   return (
     <div style={{ ...wrapStyle, maxWidth: 380 }}>
-      <h1 style={{ fontSize: 24, marginBottom: 20 }}>Recipe Admin</h1>
+      <h1 style={{ fontSize: 24, marginBottom: 20 }}>{title}</h1>
       <form onSubmit={submit}>
         <label style={labelStyle}>Password</label>
         <input
