@@ -6,11 +6,10 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <!-- Every page load opens a WebSocket to the Convex deployment before
-         anything renders (auth restore, then data). Warming the TCP+TLS
-         connection while the bundle downloads removes that handshake from
-         the critical path. Vite substitutes %VITE_CONVEX_URL% at build time. -->
-    <link rel="preconnect" href="%VITE_CONVEX_URL%" />
+    <!-- The site's typefaces: Cormorant Garamond (text, headings) and Special Elite (labels). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Special+Elite&display=swap" />
     <title>Wild Foods by Dyllan</title>
     <meta name="description" content="Private chef, foraging walks, and Ozarks wild-food dinners with Chef Dyllan Dale — Springfield, MO." />
     <meta property="og:title" content="Wild Foods by Dyllan — Field Notes of an Ozarks Forager" />

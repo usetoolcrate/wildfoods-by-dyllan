@@ -235,8 +235,6 @@ function isAnswered(e: Entry | undefined): boolean {
   return !!e && (e.picked.length > 0 || e.note.trim() !== "");
 }
 
-const FONT_HREF =
-  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Special+Elite&display=swap";
 
 const UPCOMING = [
   { d: "Sep 26", n: "Stonewater Cove dinner", s: "Venue sells (FlyBook)" },
@@ -295,15 +293,6 @@ export function QuestionsPage() {
     robots.name = "robots";
     robots.content = "noindex, nofollow";
     document.head.appendChild(robots);
-    let font = document.querySelector<HTMLLinkElement>(
-      `link[href="${FONT_HREF}"]`,
-    );
-    if (!font) {
-      font = document.createElement("link");
-      font.rel = "stylesheet";
-      font.href = FONT_HREF;
-      document.head.appendChild(font);
-    }
     return () => {
       robots.remove();
     };
