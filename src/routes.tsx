@@ -1,7 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { PublicLandingPage } from "@/pages/PublicLandingPage";
 import { StoryPage } from "@/pages/site/StoryPage";
-import { DineWithUsPage } from "@/pages/site/DineWithUsPage";
+import { FarmToTablePage } from "@/pages/site/FarmToTablePage";
 import { PrivateChefPage } from "@/pages/site/PrivateChefPage";
 import { LearnPage } from "@/pages/site/LearnPage";
 import { RecipesPage } from "@/pages/site/RecipesPage";
@@ -27,7 +27,8 @@ export function PublicAppRoutes() {
       <Route element={<PublicShell />}>
         <Route path="/" element={<PublicLandingPage />} />
         <Route path="/story" element={<StoryPage />} />
-        <Route path="/dine-with-us" element={<DineWithUsPage />} />
+        <Route path="/farm-to-table" element={<FarmToTablePage />} />
+        <Route path="/dine-with-us" element={<Navigate to="/farm-to-table" replace />} />
         <Route path="/private-chef" element={<PrivateChefPage />} />
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/recipes" element={<RecipesPage />} />

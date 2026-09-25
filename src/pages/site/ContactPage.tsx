@@ -6,7 +6,7 @@ const PAGE_BODY = `${renderTopBar("/contact")}
 ${renderPageBanner({
   eyebrow: "Contact",
   title: "Get In Touch",
-  sub: "Pop-ups, private chef nights, foraging walks, classes, or just a question — start here.",
+  sub: "Farm dinners, private chef nights, catering, foraging walks, classes, or just a question — start here.",
 })}
 
 <main>

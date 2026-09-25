@@ -13,7 +13,7 @@ export const SITE_STYLES = String.raw`
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  #story, #table, #recipes-nav, #rates, #book{scroll-margin-top:24px;}
+  #dinners, #story, #table, #recipes-nav, #rates, #book{scroll-margin-top:24px;}
   body{
     margin:0;
     overflow-x:hidden;
@@ -578,6 +578,52 @@ export const SITE_STYLES = String.raw`
   }
 
 
+  /* ===== FARM DINNERS: upcoming dates + host roll ===== */
+  .lede{max-width:640px;color:var(--ink-soft);margin:-24px 0 36px;}
+  .ledger-link{
+    font-family:'Special Elite', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:18px;
+  }
+  .ledger-link a{color:var(--rust-deep);border-bottom:1px solid var(--rust-deep);text-decoration:none;}
+  .rate-ledger td.note a{color:var(--rust-deep);}
+  .host-head{
+    font-family:'Special Elite', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--rust-deep);
+    margin:52px 0 6px;
+  }
+  .host-roll{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:44px;
+    border-top:1px solid var(--ink);
+  }
+  .host-roll li{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:14px 0 13px;
+    border-bottom:1px solid var(--line);
+  }
+  .host-roll .host{font-weight:600;color:var(--pine);font-size:21px;line-height:1.2;}
+  .host-roll .what{
+    font-family:'Special Elite', monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+  }
+  @media (max-width:560px){
+    .host-roll{grid-template-columns:minmax(0,1fr);}
+    .host-head{margin-top:40px;}
+  }
+
   /* ===== SUB-PAGE BANNER (used on every page except home) ===== */
   .page-banner{
     background:var(--pine);
@@ -877,12 +923,12 @@ export const SITE_STYLES = String.raw`
 `;
 
 export const NAV_LINKS: { href: string; label: string }[] = [
-  { href: "/story", label: "Our Story" },
-  { href: "/dine-with-us", label: "Dine With Us" },
+  { href: "/farm-to-table", label: "Farm to Table" },
   { href: "/private-chef", label: "Private Chef" },
   { href: "/learn", label: "Learn" },
   { href: "/recipes", label: "Recipes" },
   { href: "/shop", label: "Shop" },
+  { href: "/story", label: "Our Story" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -925,6 +971,80 @@ export function renderBookCard(opts?: { title?: string; sub?: string }): string 
     <span>Springfield, MO — serving the Ozarks</span>
   </div>
 </div>`;
+}
+
+/* Ticketed dates, soonest first. A date drops off the site the day after it
+   happens, so this list only needs new rows, never cleanup. */
+const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; price: string; note: string }[] = [
+  {
+    date: "2026-10-03",
+    kind: "workshop",
+    name: "Wild Fermentation Workshop",
+    price: "$35 / person",
+    note: "October 3, 2026 · 10am–2pm · vinegars, lacto-ferments &amp; kombucha · hands-on, take home your own ferment.",
+  },
+  {
+    date: "2026-10-10",
+    kind: "dinner",
+    name: "Ozarks Farm Stop to Table Dinner",
+    price: "See listing",
+    note: "October 10, 2026 · 5–7pm · five courses built entirely around Ozarks Farm Stop producers · self-serve bar available.",
+  },
+  {
+    date: "2026-11-06",
+    kind: "dinner",
+    name: "Fall Harvest Dinner with Finley Farms",
+    price: "See listing",
+    note: "November 6, 2026 · 6–8pm · at Finley Farms · farm &amp; foraged ingredients, non-alcoholic pairings included, alcohol pairing add-on available. 18+.",
+  },
+  {
+    date: "2026-11-14",
+    kind: "dinner",
+    name: "Live-Fire Fall Dinner at Bull Mills",
+    price: "$125 / person",
+    note: "Saturday, November 14, 2026 · 5:30–8:30pm · limited to 25 guests · BYOB · communal fireside meal, not a formal coursed dinner.",
+  },
+];
+
+export const BOOKING_URL = "https://wildfoodsbydyllan.com/booking/";
+
+export function renderEventRows(kind?: "dinner" | "workshop"): string {
+  const today = new Date().toLocaleDateString("en-CA");
+  const rows = EVENTS.filter((e) => e.date >= today && (!kind || e.kind === kind)).sort(
+    (a, b) => (a.kind === b.kind ? 0 : a.kind === "dinner" ? -1 : 1) // dinners lead, each group stays by date
+  );
+  if (!rows.length) {
+    return `<tr><td class="note" colspan="3">The next dates are being set with our farm hosts now. Call or email to get on the list, or <a href="${BOOKING_URL}" target="_blank" rel="noopener">check the booking site</a>.</td></tr>`;
+  }
+  return rows
+    .map(
+      (e) => `<tr>
+              <td class="svc">${e.name}</td>
+              <td class="rate">${e.price}</td>
+              <td class="note">${e.note}</td>
+            </tr>`
+    )
+    .join("\n            ");
+}
+
+/* Farms, ranches, and venues that have hosted a dinner, oldest first. */
+const HOSTS: { name: string; what: string }[] = [
+  { name: "Juniper Gardens", what: "Wild Holiday Supper · Dec 2025" },
+  { name: "The Coven Collective", what: "Valentine's Day Dinner · Feb 2026" },
+  { name: "Parmele Ranch Co", what: "Ranch dinner · May 2026" },
+  { name: "Wu Wei Farm", what: "Foraging &amp; cooking intensive · May 2026" },
+  { name: "Stonehorse Ranch", what: "Wild Foods × London Calling · May 2026" },
+  { name: "Regalo Orchard", what: "Orchard dinner series · 2026" },
+  { name: "7C's Winery", what: "Winery dinner" },
+  { name: "Ozarks Farm Stop", what: "Farm Stop to Table · Oct 2026" },
+  { name: "Finley Farms", what: "Fall Harvest Dinner · Nov 2026" },
+  { name: "Bull Mills", what: "Live-Fire Fall Dinner · Nov 2026" },
+];
+
+export function renderHostRoll(): string {
+  return `<ul class="host-roll">
+      ${HOSTS.map((h) => `<li><span class="host">${h.name}</span><span class="what">${h.what}</span></li>`).join("\n      ")}
+    </ul>`;
 }
 
 export const FOOTER_HTML = `<footer>

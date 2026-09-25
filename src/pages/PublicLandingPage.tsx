@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { renderTopBar, FOOTER_HTML, SITE_STYLES } from "@/pages/site-shared";
+import {
+  renderTopBar,
+  renderEventRows,
+  renderHostRoll,
+  FOOTER_HTML,
+  SITE_STYLES,
+} from "@/pages/site-shared";
 
 
 const PAGE_BODY = `${renderTopBar("/")}
@@ -7,17 +13,17 @@ const PAGE_BODY = `${renderTopBar("/")}
 <header class="mast">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow-plate">Springfield &amp; the Ozarks · Est. field practice</div>
+      <div class="eyebrow-plate">Springfield &amp; the Ozarks · Farm-to-table chef</div>
       <h1>Wild Foods by Dyllan</h1>
-      <p class="sub">Hyper-local dinners, foraging walks, and Ozarks wild foods, gathered and plated by hand by Chef Dyllan Dale.</p>
+      <p class="sub">Farm-to-table dinners and private chef service from Chef Dyllan Dale — built on small Ozarks farms and seasonal produce, and finished with wild foods he forages himself.</p>
       <div class="hero-facts">
-        <span>Foraging Walks</span><span class="dot">·</span>
-        <span>Ticketed Pop-Up Dinners</span><span class="dot">·</span>
-        <span>Private Chef Service</span>
+        <span>Farm-to-Table Dinners</span><span class="dot">·</span>
+        <span>Private Chef Service</span><span class="dot">·</span>
+        <span>Foraging Walks &amp; Classes</span>
       </div>
       <div class="hero-cta">
-        <a class="btn-solid" href="#rates">See Rates &amp; Book a Walk</a>
-        <a class="btn-line" href="#table">See the Menu</a>
+        <a class="btn-solid" href="#dinners">See Upcoming Farm Dinners</a>
+        <a class="btn-line" href="#table">Book a Private Chef</a>
       </div>
       <div class="colophon">
         <span>Chef Dyllan Dale</span>
@@ -26,8 +32,8 @@ const PAGE_BODY = `${renderTopBar("/")}
       </div>
     </div>
     <div class="hero-media">
-      <img src="/images/hero-creek-forage.webp" alt="Chef Dyllan Dale foraging along a creek in the Ozarks with his dog">
-      <div class="fig">Fig. 1 — Wet-weather foraging, a creek crossing near Springfield</div>
+      <img src="/images/duo-plating.webp" alt="Chef Dyllan Dale plating a long table of tartlet courses by hand" style="object-position:center 55%;">
+      <div class="fig">Fig. 1 — Plating a dinner course by hand, one tartlet at a time</div>
       <blockquote>"I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education."</blockquote>
     </div>
   </div>
@@ -35,16 +41,42 @@ const PAGE_BODY = `${renderTopBar("/")}
 
 <main>
 
+  <!-- FARM DINNERS -->
+  <section id="dinners">
+    <div class="wrap">
+      <div class="sec-label">
+        <div class="num stamp-font">I</div>
+        <h2>Farm Dinners</h2>
+        <div class="rule"></div>
+      </div>
+      <p class="lede">Ticketed dinners set at the farms, ranches, and orchards that raise the food. Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks.</p>
+
+      <div class="rate-ledger">
+        <table>
+          <thead>
+            <tr><th>Upcoming Dinner</th><th>Price</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            ${renderEventRows("dinner")}
+          </tbody>
+        </table>
+      </div>
+      <p class="ledger-link">Tickets, workshops &amp; the full calendar — <a href="/farm-to-table">see every farm dinner →</a></p>
+
+      <div class="host-head">Where the table's been set</div>
+      ${renderHostRoll()}
+    </div>
+  </section>
 
   <!-- THE TABLE / PRIVATE CHEF MENU -->
   <section id="table" style="background:var(--paper-dark);">
     <div class="wrap">
       <div class="sec-label">
-        <div class="num stamp-font">I</div>
+        <div class="num stamp-font">II</div>
         <h2>The Table</h2>
         <div class="rule"></div>
       </div>
-      <p style="max-width:640px;color:var(--ink-soft);margin-top:-24px;margin-bottom:40px;">Hyper-local, seasonal, crafted with intention. Every private chef menu is built from scratch around a conversation — no templates, no pre-set options. Wild-foraged or entirely non-wild, the choice is yours.</p>
+      <p class="lede" style="margin-bottom:40px;">Private chef dinners, hyper-local and seasonal. Every menu is built from scratch around a conversation, sourced through real relationships with Ozarks growers, ranchers, and makers. Fully farm-to-table, wild-foraged, or a mix of both — the choice is yours.</p>
 
       <div class="menu-block">
         <div class="menu-tier">
@@ -62,6 +94,16 @@ const PAGE_BODY = `${renderTopBar("/")}
 
         <div class="dish-list">
           <div>
+            <h4>Farm-to-Table</h4>
+            <ul>
+              <li>Herb-roasted chicken, pan jus</li>
+              <li>Braised short ribs, garlic mashed potatoes</li>
+              <li>Seared salmon, lemon-herb cream</li>
+              <li>Whipped sweet potatoes, browned butter</li>
+              <li>Elegant tartlets, local fruit</li>
+            </ul>
+          </div>
+          <div>
             <h4>Wild-Inspired</h4>
             <ul>
               <li>Chanterelle velouté with herb oil</li>
@@ -69,16 +111,6 @@ const PAGE_BODY = `${renderTopBar("/")}
               <li>Wild herb–marinated beef or bison</li>
               <li>Rabbit ravioli, brown-butter sage</li>
               <li>Pawpaw or seasonal fruit crème brûlée</li>
-            </ul>
-          </div>
-          <div>
-            <h4>Hyper-Local, Non-Wild</h4>
-            <ul>
-              <li>Herb-roasted chicken, pan jus</li>
-              <li>Braised short ribs, garlic mashed potatoes</li>
-              <li>Seared salmon, lemon-herb cream</li>
-              <li>Whipped sweet potatoes, browned butter</li>
-              <li>Elegant tartlets, local fruit</li>
             </ul>
           </div>
         </div>
@@ -91,7 +123,7 @@ const PAGE_BODY = `${renderTopBar("/")}
   <!-- SPECIMEN GALLERY -->
   <section class="wrap" id="recipes-nav">
     <div class="sec-label">
-      <div class="num stamp-font">II</div>
+      <div class="num stamp-font">III</div>
       <h2>From the Pass</h2>
       <div class="rule"></div>
     </div>
@@ -121,11 +153,11 @@ const PAGE_BODY = `${renderTopBar("/")}
 
   <div class="deckle"></div>
 
-  <!-- FORAGING / TEACHING / CONSULTING LEDGER -->
+  <!-- RATES LEDGER -->
   <section id="rates">
     <div class="wrap">
       <div class="sec-label">
-        <div class="num stamp-font">III</div>
+        <div class="num stamp-font">IV</div>
         <h2>Rates &amp; Services</h2>
         <div class="rule"></div>
       </div>
@@ -136,19 +168,19 @@ const PAGE_BODY = `${renderTopBar("/")}
           </thead>
           <tbody>
           <tr>
-            <td class="svc">Foraging Walk — 2 hr</td>
-            <td class="rate">$100 / session</td>
-            <td class="note">On your land, identifying and using wild edibles. $5 per 10 miles beyond 30 miles of Springfield.</td>
-          </tr>
-          <tr>
-            <td class="svc">Foraging Walk — 4 hr</td>
-            <td class="rate">$200 / session</td>
-            <td class="note">Add a 3-course foraged meal for $30/person. 50% deposit to reserve.</td>
+            <td class="svc">Host a Farm Dinner</td>
+            <td class="rate">$50–$90 / guest</td>
+            <td class="note">For farms, wineries &amp; event spaces. 3 to 6 courses, 20-guest minimum, $250 planning fee. Full staffing and service included — the host keeps ticket revenue.</td>
           </tr>
           <tr>
             <td class="svc">Catering</td>
             <td class="rate">from $25 / head</td>
-            <td class="note">15-person minimum. Wild or "non-wild" menus, 10+ years of professional kitchen experience.</td>
+            <td class="note">15-person minimum. Farm-to-table or wild menus, 10+ years of professional kitchen experience.</td>
+          </tr>
+          <tr>
+            <td class="svc">Teaching &amp; Talks</td>
+            <td class="rate">$100 / hr</td>
+            <td class="note">Half-day $300, full-day $500. Cooking fundamentals, wild foods, fermentation, foraging ethics — for schools, conferences, and community groups.</td>
           </tr>
           <tr>
             <td class="svc">Consultation — 30 min</td>
@@ -161,14 +193,14 @@ const PAGE_BODY = `${renderTopBar("/")}
             <td class="note">In-person available at the same rate + $1/mile round trip.</td>
           </tr>
           <tr>
-            <td class="svc">Teaching &amp; Talks</td>
-            <td class="rate">$100 / hr</td>
-            <td class="note">Half-day $300, full-day $500. Cooking fundamentals, wild foods, fermentation, foraging ethics — for schools, conferences, and community groups.</td>
+            <td class="svc">Foraging Walk — 2 hr</td>
+            <td class="rate">$100 / session</td>
+            <td class="note">On your land, identifying and using wild edibles. $5 per 10 miles beyond 30 miles of Springfield.</td>
           </tr>
           <tr>
-            <td class="svc">Pop-Up Dinner Partnership</td>
-            <td class="rate">$50–$90 / guest</td>
-            <td class="note">3 to 6 courses, 20-guest minimum, $250 planning fee. Full staffing and service included — venue keeps ticket revenue.</td>
+            <td class="svc">Foraging Walk — 4 hr</td>
+            <td class="rate">$200 / session</td>
+            <td class="note">Add a 3-course foraged meal for $30/person. 50% deposit to reserve.</td>
           </tr>
           </tbody>
         </table>
@@ -181,7 +213,7 @@ const PAGE_BODY = `${renderTopBar("/")}
   <!-- FIELD NOTES / STORY -->
   <section class="wrap-narrow" id="story">
     <div class="sec-label">
-      <div class="num stamp-font">IV</div>
+      <div class="num stamp-font">V</div>
       <h2>Field Notes</h2>
       <div class="rule"></div>
     </div>
@@ -232,8 +264,8 @@ const PAGE_BODY = `${renderTopBar("/")}
 
     <div class="duo">
       <figure>
-        <img src="/images/duo-plating.webp" alt="Dyllan plating garnish across a long table of dishes">
-        <figcaption>Fig. 2 — Plating a full pop-up service by hand, one bowl at a time</figcaption>
+        <img src="/images/hero-creek-forage.webp" alt="Chef Dyllan Dale foraging along a creek in the Ozarks with his dog">
+        <figcaption>Fig. 2 — Wet-weather foraging, a creek crossing near Springfield</figcaption>
       </figure>
       <figure>
         <img src="/images/duo-family.webp" alt="Dyllan, his wife, and their newborn son">
@@ -246,26 +278,26 @@ const PAGE_BODY = `${renderTopBar("/")}
   <section style="background:var(--paper-dark);">
     <div class="wrap-narrow">
       <div class="sec-label">
-        <div class="num stamp-font">V</div>
+        <div class="num stamp-font">VI</div>
         <h2>Notes From the Table</h2>
         <div class="rule"></div>
       </div>
       <div class="margin-notes">
         <div class="margin-note">
-          <p>The Wild Foods dinner was a delightful exploration of foraged ingredients. Dyllan's dedication to crafting a meal that honored nature's offerings was evident in every meticulously plated course.</p>
-          <cite>— Amy H.</cite>
+          <p>I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted. A 10 out of 10 night.</p>
+          <cite>— Noah H.</cite>
         </div>
         <div class="margin-note">
           <p>I never liked venison before I had it at one of the pop-ups. Now the flavors are seared in my memory and one I hope to repeat at one of his next pop-up events.</p>
           <cite>— Julie S.</cite>
         </div>
         <div class="margin-note">
-          <p>I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted. A 10 out of 10 night.</p>
-          <cite>— Noah H.</cite>
-        </div>
-        <div class="margin-note">
           <p>A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared, wild foraged, six-course dinner. I will be returning as often as possible.</p>
           <cite>— Jobeth S.</cite>
+        </div>
+        <div class="margin-note">
+          <p>The Wild Foods dinner was a delightful exploration of foraged ingredients. Dyllan's dedication to crafting a meal that honored nature's offerings was evident in every meticulously plated course.</p>
+          <cite>— Amy H.</cite>
         </div>
       </div>
     </div>
@@ -275,9 +307,9 @@ const PAGE_BODY = `${renderTopBar("/")}
 
 <div class="colophon-block" id="book">
   <div class="wrap-narrow">
-    <div class="stamp"><span>VERIFIED<br>OZARKS<br>FORAGER</span></div>
+    <div class="stamp"><span>GROWN &amp;<br>GATHERED<br>IN THE OZARKS</span></div>
     <h2>Book Chef Dyllan</h2>
-    <p class="sub">Private dinners, pop-ups, foraging walks, teaching &amp; consulting — every date starts with a conversation, not a form.</p>
+    <p class="sub">Farm dinners, private chef nights, catering, foraging walks &amp; teaching — every date starts with a conversation, not a form.</p>
     <div class="contact-line">
       <a href="tel:14174039265">417-403-9265</a>
       <a href="mailto:dyllan@wildfoodsbydyllan.com">dyllan@wildfoodsbydyllan.com</a>
@@ -290,7 +322,7 @@ ${FOOTER_HTML}`;
 
 export function PublicLandingPage() {
   useEffect(() => {
-    document.title = "Wild Foods by Dyllan — Field Notes of an Ozarks Forager";
+    document.title = "Wild Foods by Dyllan — Farm-to-Table Dining in the Ozarks";
   }, []);
 
   return (

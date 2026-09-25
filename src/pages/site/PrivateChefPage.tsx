@@ -12,14 +12,14 @@ const PAGE_BODY = `${renderTopBar("/private-chef")}
 ${renderPageBanner({
   eyebrow: "Private Chef",
   title: "Private Chef Services",
-  sub: "Hyper-local, seasonal, crafted with intention — a full restaurant experience, brought to your table.",
+  sub: "Small-farm proteins, seasonal produce, and wild foods when you want them — a full restaurant experience, brought to your table.",
 })}
 
 <main>
   <section>
     <div class="wrap-narrow">
       <p style="font-size:20px; color:var(--ink-soft); line-height:1.55;">Every private chef experience is built around one belief: the best meals come from what's grown, raised, and gathered close to home. Each dinner uses hyper-local ingredients, small-farm proteins, and — when you want it — wild foraged foods that bring depth and a sense of place to every course.</p>
-      <p style="font-size:18px; color:var(--ink-soft);">Whether the menu is fully wild, completely non-wild, or a curated mix of both, your evening is crafted to be personal, memorable, and deeply flavorful. Please send an email to check date availability — <strong>50% is paid up front</strong>.</p>
+      <p style="font-size:18px; color:var(--ink-soft);">Whether the menu is fully farm-to-table, fully wild, or a curated mix of both, your evening is crafted to be personal, memorable, and deeply flavorful. Please send an email to check date availability — <strong>50% is paid up front</strong>.</p>
     </div>
   </section>
 
@@ -42,6 +42,16 @@ ${renderPageBanner({
 
         <div class="dish-list">
           <div>
+            <h4>Farm-to-Table Sample Dishes</h4>
+            <ul>
+              <li>Herb-roasted chicken with pan jus</li>
+              <li>Braised short ribs with garlic mashed potatoes</li>
+              <li>Seared salmon with lemon-herb cream</li>
+              <li>Whipped sweet potatoes with browned butter</li>
+              <li>Elegant tartlets with local fruit</li>
+            </ul>
+          </div>
+          <div>
             <h4>Wild-Inspired Sample Dishes</h4>
             <ul>
               <li>Chanterelle velouté with herb oil</li>
@@ -49,16 +59,6 @@ ${renderPageBanner({
               <li>Wild herb–marinated beef or bison</li>
               <li>Rabbit ravioli with brown-butter sage</li>
               <li>Pawpaw or seasonal fruit crème brûlée</li>
-            </ul>
-          </div>
-          <div>
-            <h4>Non-Wild Hyper-Local Sample Dishes</h4>
-            <ul>
-              <li>Herb-roasted chicken with pan jus</li>
-              <li>Braised short ribs with garlic mashed potatoes</li>
-              <li>Seared salmon with lemon-herb cream</li>
-              <li>Whipped sweet potatoes with browned butter</li>
-              <li>Elegant tartlets with local fruit</li>
             </ul>
           </div>
         </div>
@@ -98,7 +98,7 @@ ${renderPageBanner({
     <div class="wrap-narrow">
       ${renderBookCard({
         title: "Let's Build Your Hyper-Local Dining Experience",
-        sub: "Wild, non-wild, or a blend of both — your dinner is crafted intentionally and uniquely for your event. 5-person minimum, 50% deposit to reserve your date.",
+        sub: "Farm-to-table, wild, or a blend of both — your dinner is crafted intentionally and uniquely for your event. 5-person minimum, 50% deposit to reserve your date.",
       })}
     </div>
   </section>

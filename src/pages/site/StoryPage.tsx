@@ -6,7 +6,7 @@ const PAGE_BODY = `${renderTopBar("/story")}
 ${renderPageBanner({
   eyebrow: "About",
   title: "My Story",
-  sub: "How a kid who never left the woods around Branson became the guy foraging your dinner in the Ozarks.",
+  sub: "How a kid who never left the woods around Branson became the Ozarks chef behind farm-to-table dinners — with a forager's eye on every plate.",
 })}
 
 <main>
@@ -76,8 +76,8 @@ ${renderPageBanner({
 
       <div class="duo">
         <figure>
-          <img src="/images/plating-hands.jpg" alt="Chef Dyllan plating a pop-up dinner course">
-          <figcaption>Plating a pop-up course, course by course, by hand</figcaption>
+          <img src="/images/plating-hands.jpg" alt="Chef Dyllan plating a farm dinner course">
+          <figcaption>Plating a farm dinner, course by course, by hand</figcaption>
         </figure>
         <figure>
           <img src="/images/chef-portrait.jpg" alt="Chef Dyllan Dale, portrait">
@@ -91,7 +91,7 @@ ${renderPageBanner({
 <div class="colophon-block" id="book">
   <div class="wrap-narrow">
     <h2>Come Meet Dyllan at the Table</h2>
-    <p class="sub">Pop-up dinners, private chef nights, and foraging walks — every date starts with a conversation.</p>
+    <p class="sub">Farm dinners, private chef nights, and foraging walks — every date starts with a conversation.</p>
     <div class="contact-line">
       <a href="tel:14174039265">417-403-9265</a>
       <a href="mailto:dyllan@wildfoodsbydyllan.com">dyllan@wildfoodsbydyllan.com</a>
