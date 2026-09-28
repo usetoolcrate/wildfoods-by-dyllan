@@ -975,7 +975,7 @@ export function renderBookCard(opts?: { title?: string; sub?: string }): string 
 
 /* Ticketed dates, soonest first. A date drops off the site the day after it
    happens, so this list only needs new rows, never cleanup. */
-const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; price: string; note: string }[] = [
+export const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; price: string; note: string }[] = [
   {
     date: "2026-10-03",
     kind: "workshop",
@@ -1028,7 +1028,7 @@ export function renderEventRows(kind?: "dinner" | "workshop"): string {
 }
 
 /* Farms, ranches, and venues that have hosted a dinner, oldest first. */
-const HOSTS: { name: string; what: string }[] = [
+export const HOSTS: { name: string; what: string }[] = [
   { name: "Juniper Gardens", what: "Wild Holiday Supper · Dec 2025" },
   { name: "The Coven Collective", what: "Valentine's Day Dinner · Feb 2026" },
   { name: "Parmele Ranch Co", what: "Ranch dinner · May 2026" },
