@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { EVENTS, HOSTS, PARTNERS, BOOKING_URL } from "@/pages/site-shared";
+import { EVENTS, HOSTS, PARTNERS } from "@/pages/site-shared";
 
 /* The site's design system: calm, bright, photo-led, with each section on
    its own surface (paper, white, sand, sage, pine, earth) so the page reads
@@ -155,11 +155,15 @@ export const V2_STYLES = String.raw`
   .v2 .dl p{margin:10px 0 0;color:var(--ink-2);font-size:16px;max-width:36em;}
   .v2 .dl-side{text-align:right;padding-top:4px;}
   .v2 .dl-side .price{display:block;font-size:15px;margin-bottom:12px;}
+  .v2 .dl-side .sold{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:8px;}
+  .v2 .dl-side .sold:empty{display:none;}
+  .v2 .tix{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
   .v2 :is(.s-pine,.s-earth) .dl{border-top-color:rgba(255,255,255,.55);}
   .v2 :is(.s-pine,.s-earth) .dl li{border-bottom-color:rgba(255,255,255,.14);}
   .v2 :is(.s-pine,.s-earth) .dl .m, .v2 :is(.s-pine,.s-earth) .dl p{color:#b3bdb0;}
   .v2 :is(.s-pine,.s-earth) .dl .d{color:var(--gold);}
   .v2 :is(.s-pine,.s-earth) .dl .kind{color:var(--gold);}
+  .v2 :is(.s-pine,.s-earth) .dl-side .sold{color:#b3bdb0;}
   .v2 .after-list{margin-top:40px;}
   .v2 .band{margin:0 0 56px;}
   .v2 .band img{width:100%;aspect-ratio:21/9;object-fit:cover;}
@@ -523,8 +527,9 @@ export const V2_STYLES = String.raw`
     .v2 .dl .m{font-size:11px;letter-spacing:0.12em;}
     .v2 .dl .wd{display:none;}
     .v2 .dl h3{font-size:26px;}
-    .v2 .dl-side{grid-column:2;text-align:left;padding-top:0;display:flex;align-items:baseline;gap:20px;}
-    .v2 .dl-side .price{margin:0;}
+    .v2 .dl-side{grid-column:2;text-align:left;padding-top:0;}
+    .v2 .dl-side .price{margin:0 0 8px;}
+    .v2 .tix{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:10px 18px;}
     .v2 .dish dl div, .v2 .rate{grid-template-columns:minmax(0,1fr);gap:6px;}
     .v2 .rate{padding:22px 0;}
     .v2 .steps figcaption{font-size:14.5px;}
@@ -672,7 +677,8 @@ export function renderRates(rows: { name: string; price: string; note?: string }
     </div>`;
 }
 
-/* Upcoming ticketed dates. Past dates drop off on their own; dinners lead. */
+/* Upcoming dates. Past ones drop off on their own; dinners lead. Partner
+   dinners link straight to the partner's ticket page. */
 export function renderDinnerList(opts?: { dinnersOnly?: boolean }): string {
   const today = new Date().toLocaleDateString("en-CA");
   const rows = EVENTS.filter((e) => e.date >= today && (!opts?.dinnersOnly || e.kind === "dinner")).sort(
@@ -687,15 +693,16 @@ export function renderDinnerList(opts?: { dinnersOnly?: boolean }): string {
             const d = new Date(`${e.date}T12:00:00`);
             const month = d.toLocaleDateString("en-US", { month: "short" });
             const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
-            // The shared note starts with the full date, which the date column already shows.
-            const parts = e.note.split(" · ");
-            const details = /\d{4}/.test(parts[0]) ? parts.slice(1).join(" · ") : e.note;
-            const price = e.price.startsWith("$") ? `<span class="price">${e.price.replace(" / ", " per ")}</span>` : "";
-            const kind = e.kind === "workshop" ? `<span class="kind">Workshop</span>` : "";
+            const kind = e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "";
+            const links = e.tickets
+              .map((t) => `<a class="tlink" href="${t.url}" target="_blank" rel="noopener">${t.label}</a>`)
+              .join("");
             return `<li>
           <div><span class="d">${d.getDate()}</span><span class="m">${month}<span class="wd"> · ${weekday}</span></span></div>
-          <div>${kind}<h3>${e.name}</h3><p>${details}</p></div>
-          <div class="dl-side">${price}<a class="tlink" href="${BOOKING_URL}" target="_blank" rel="noopener">Tickets</a></div>
+          <div>${kind ? `<span class="kind">${kind}</span>` : ""}<h3>${e.name}</h3><p>${e.time} · ${e.about}</p></div>
+          <div class="dl-side">${e.price ? `<span class="price">${e.price}</span>` : ""}<span class="sold">${
+            !e.partner ? "" : e.tickets.length > 1 ? `Tickets from ${e.partner}, by diet:` : `Sold by ${e.partner}`
+          }</span><div class="tix">${links}</div></div>
         </li>`;
           })
           .join("\n        ")}

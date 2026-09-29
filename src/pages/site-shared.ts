@@ -922,40 +922,70 @@ export const SITE_STYLES = String.raw`
   }
 `;
 
-/* Ticketed dates, soonest first. A date drops off the site the day after it
-   happens, so this list only needs new rows, never cleanup. */
-export const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; price: string; note: string }[] = [
+/* Upcoming dates, soonest first. A date drops off the site the day after it
+   happens. Partner dinners are sold by the partner (Dyllan, 2026-09-29), so
+   each entry carries the partner's own ticket link(s). */
+export type SiteEvent = {
+  date: string;
+  kind: "dinner" | "workshop";
+  name: string;
+  partner?: string;
+  time: string;
+  about: string;
+  price?: string;
+  tickets: { label: string; url: string }[];
+};
+
+export const EVENTS: SiteEvent[] = [
   {
     date: "2026-10-03",
     kind: "workshop",
     name: "Wild Fermentation Workshop",
-    price: "$35 / person",
-    note: "October 3, 2026 · 10am–2pm · vinegars, lacto-ferments &amp; kombucha · hands-on, take home your own ferment.",
+    time: "10am–2pm",
+    about: "Homemade vinegars, lacto-fermentation, and kombucha for beginners and home cooks — then make your own seasonal lacto-ferment to take home.",
+    price: "$35 per person",
+    tickets: [{ label: "Tickets", url: "https://wildfoodsbydyllan.com/event/wild-fermentation-workshop-vinegars-lacto-ferments-kombucha-october-3rd-2026/" }],
   },
   {
     date: "2026-10-10",
     kind: "dinner",
     name: "Ozarks Farm Stop to Table Dinner",
-    price: "See listing",
-    note: "October 10, 2026 · 5–7pm · five courses built entirely around Ozarks Farm Stop producers · self-serve bar available.",
+    partner: "Ozarks Farm Stop",
+    time: "5–7pm",
+    about: "Five courses built around ingredients from the farmers and producers behind Ozarks Farm Stop, with a chance to meet the people who grow your food. Self-serve bar available.",
+    tickets: [
+      { label: "No restrictions", url: "https://ozarks-farm-stop.localline.ca/events/product/791403" },
+      { label: "Gluten free", url: "https://ozarks-farm-stop.localline.ca/events/product/791408" },
+      { label: "Vegetarian", url: "https://ozarks-farm-stop.localline.ca/events/product/791404" },
+      { label: "Alpha-gal friendly", url: "https://ozarks-farm-stop.localline.ca/events/product/791407" },
+    ],
+  },
+  {
+    date: "2026-10-23",
+    kind: "dinner",
+    name: "Open Fire Dinner at the Ranch",
+    partner: "Parmele Ranch Co.",
+    time: "6–8pm · Walnut Shade, MO",
+    about: "A family-style dinner cooked over an open fire at Parmele Ranch Co., built around ingredients sourced close to home. Seating is intentionally limited.",
+    price: "$175 per person",
+    tickets: [{ label: "Tickets", url: "https://parmeleranchco.com/open-fire-at-the-ranch/" }],
   },
   {
     date: "2026-11-06",
     kind: "dinner",
-    name: "Fall Harvest Dinner with Finley Farms",
-    price: "See listing",
-    note: "November 6, 2026 · 6–8pm · at Finley Farms · farm &amp; foraged ingredients, non-alcoholic pairings included, alcohol pairing add-on available. 18+.",
-  },
-  {
-    date: "2026-11-14",
-    kind: "dinner",
-    name: "Live-Fire Fall Dinner at Bull Mills",
-    price: "$125 / person",
-    note: "Saturday, November 14, 2026 · 5:30–8:30pm · limited to 25 guests · BYOB · communal fireside meal, not a formal coursed dinner.",
+    name: "Fall Harvest Dinner",
+    partner: "Finley Farms",
+    time: "6–8pm · Ozark, MO",
+    about: "A collaborative dinner in the farmstead, built on the foraged and farm ingredients of late autumn. Non-alcoholic pairings included; an alcohol pairing is available as an add-on. 18+.",
+    tickets: [
+      {
+        label: "Tickets",
+        url: "https://www.sevenrooms.com/experiences/theozarkmillatfinleyfarmsevents/fall-harvest-dinner-with-wild-foods-by-dyllan-6349774408040448?group_venue=theozarkmillatfinleyfarmsevents&venues=theozarkmillatfinleyfarmsevents%2Cthegarrisonatfinleyfarms",
+      },
+    ],
   },
 ];
 
-export const BOOKING_URL = "https://wildfoodsbydyllan.com/booking/";
 
 /* Farms, ranches, and venues that have hosted a dinner, oldest first. */
 export const HOSTS: { name: string; what: string }[] = [

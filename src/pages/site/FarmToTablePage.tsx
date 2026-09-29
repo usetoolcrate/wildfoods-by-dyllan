@@ -9,7 +9,6 @@ import {
   renderRolls,
   renderRates,
 } from "@/pages/v2";
-import { BOOKING_URL } from "@/pages/site-shared";
 
 const BODY = `${renderHeader("/farm-to-table")}
 
@@ -27,10 +26,10 @@ ${renderPageHero({
         <div class="label">Upcoming</div>
         <h2>Dinners &amp; workshops</h2>
       </div>
-      <p>Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks, then served where the food comes from. Tickets and guest counts are handled on the booking site.</p>
+      <p>Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks, then served where the food comes from. Dinners are hosted with a partner farm or venue, and the host sells the tickets — follow the link on each date.</p>
     </div>
     ${renderDinnerList()}
-    <div class="after-list"><a class="tlink" href="${BOOKING_URL}" target="_blank" rel="noopener">Full calendar &amp; tickets</a></div>
+    <div class="after-list"><a class="tlink" href="#catering">Host a dinner with Dyllan</a></div>
   </div>
 </section>
 
