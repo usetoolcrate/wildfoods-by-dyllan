@@ -1041,6 +1041,14 @@ export const HOSTS: { name: string; what: string }[] = [
   { name: "Bull Mills", what: "Live-Fire Fall Dinner · Nov 2026" },
 ];
 
+/* Organizations Dyllan has cooked, taught, or spoken with (not dinner venues). */
+export const PARTNERS: string[] = [
+  "Missouri Conservation Heritage Foundation",
+  "Johnny Morris Foundation",
+  "Springfield Public Schools",
+  "Missouri State University",
+];
+
 export function renderHostRoll(): string {
   return `<ul class="host-roll">
       ${HOSTS.map((h) => `<li><span class="host">${h.name}</span><span class="what">${h.what}</span></li>`).join("\n      ")}

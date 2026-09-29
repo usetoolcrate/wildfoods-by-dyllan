@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { EVENTS, HOSTS, BOOKING_URL } from "@/pages/site-shared";
+import { EVENTS, HOSTS, PARTNERS, BOOKING_URL } from "@/pages/site-shared";
 
 /* Design preview for the home page (unlinked, noindex): calmer, brighter,
    photo-led — the "skill and professionalism" direction Dyllan asked for.
@@ -133,18 +133,18 @@ const STYLES = String.raw`
   .v2 .dish dl div{display:grid;grid-template-columns:132px minmax(0,1fr);gap:24px;padding:22px 0;border-bottom:1px solid var(--line);}
   .v2 .dish dt{font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink);padding-top:4px;}
   .v2 .dish dd{margin:0;color:var(--ink-2);}
-  .v2 .dish dd.todo{font-style:italic;}
-  .v2 .dish dd.todo::before{
-    content:"To come from Dyllan";
-    display:block;
-    font-style:normal;
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--accent);
-    margin-bottom:4px;
+  .v2 .dish-img.slot{
+    aspect-ratio:4/5;
+    background:#efeae0;
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:32px;
   }
+  .v2 .slot-note{font-size:15px;color:var(--ink-2);max-width:16em;}
+  .v2 .slot-note .label{display:block;margin-bottom:8px;}
 
   /* private chef */
   .v2 .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;}
@@ -206,6 +206,7 @@ const STYLES = String.raw`
   }
   .v2 .roll .sep{color:var(--accent);padding:0 12px;}
   .v2 .roll .h{white-space:nowrap;}
+  .v2 .roll-next{margin-top:64px;}
 
   /* also */
   .v2 .also{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;}
@@ -258,6 +259,8 @@ const STYLES = String.raw`
     .v2 .quotes p{font-size:24px;}
     .v2 .roll{font-size:23px;}
     .v2 .roll .sep{padding:0 8px;}
+    .v2 .roll.partners .h{white-space:normal;}
+    .v2 .roll-next{margin-top:48px;}
     .v2 .also a{padding:30px 24px;}
     .v2 .sec, .v2 .book{padding:68px 0;}
   }
@@ -369,16 +372,16 @@ const PAGE_BODY = `<div class="v2">
 
 <section class="sec white">
   <div class="c dish">
-    <figure class="dish-img">
-      <img src="/images/dish-chanterelle-pawpaw.webp" alt="Chicken roulade with chanterelle mushrooms and pawpaw glaze">
+    <figure class="dish-img slot">
+      <div class="slot-note"><span class="label">Photo coming</span>The seared duck, from Dyllan's original file</div>
     </figure>
     <div>
       <div class="label">One plate</div>
-      <h2>Chicken roulade, chanterelle &amp; pawpaw</h2>
+      <h2>Seared duck, wild rice &amp; mugolio apple chutney</h2>
       <dl>
-        <div><dt>The wild</dt><dd>Chanterelles from summer hardwoods, and pawpaw — the Ozarks' native fruit, with a season only a few weeks long.</dd></div>
-        <div><dt>The farm</dt><dd class="todo">Which farm raised the chicken, and why Dyllan cooks with them.</dd></div>
-        <div><dt>The work</dt><dd class="todo">How long the dish took to get right, and what changed along the way.</dd></div>
+        <div><dt>The farms</dt><dd>Duck breast from Redbud Duck Co. in Ava. Wild rice with oyster mushrooms from Mo' Mushrooms and onions from Ozarks Farm Stop. Seared daikon radish with a coconut cream reduction, and baby chard.</dd></div>
+        <div><dt>The chutney</dt><dd>Apple chutney made with mugolio, a syrup of young pine cones — two years in the making.</dd></div>
+        <div><dt>The plate</dt><dd>Dyllan worked on this dish for a year before the plating finally came together. “Duck is a delicate protein to work with, because every cut has to be done just right.”</dd></div>
       </dl>
     </div>
   </div>
@@ -423,8 +426,8 @@ const PAGE_BODY = `<div class="v2">
     <div>
       <div class="label">The chef</div>
       <h2>Dyllan Dale</h2>
-      <p>Dyllan grew up in the woods around Branson and started in restaurant kitchens at sixteen, washing dishes. At twenty-seven he decided he was made for more, and within a year he was managing a kitchen.</p>
-      <p>He learned under his mentor, Rob Connoley of Bulrush in St. Louis, finished his culinary degree, and brings more than a decade in professional kitchens to every menu. He lives in Springfield with his wife and three sons.</p>
+      <p>Dyllan grew up in the Ozarks countryside and started in restaurant kitchens at sixteen, washing dishes and bussing tables. He worked his way up the line and was managing a kitchen by twenty-eight.</p>
+      <p>He learned under his mentor, Rob Connoley of Bulrush in St. Louis, finished his culinary degree, and brings more than a decade in professional kitchens to every menu. He lives in Seymour, Missouri, with his wife and five kids.</p>
       <blockquote>“I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education.”</blockquote>
       <a class="tlink" href="/story">Read his story</a>
     </div>
@@ -451,6 +454,8 @@ const PAGE_BODY = `<div class="v2">
   <div class="c">
     <div class="label center">Dinners hosted at</div>
     <p class="roll">${HOSTS.map((h) => `<span class="h">${h.name}</span>`).join('<span class="sep">·</span> ')}</p>
+    <div class="label center roll-next">In partnership with</div>
+    <p class="roll partners">${PARTNERS.map((p) => `<span class="h">${p}</span>`).join('<span class="sep">·</span> ')}</p>
   </div>
 </section>
 

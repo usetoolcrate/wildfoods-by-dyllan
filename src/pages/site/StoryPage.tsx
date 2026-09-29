@@ -6,7 +6,7 @@ const PAGE_BODY = `${renderTopBar("/story")}
 ${renderPageBanner({
   eyebrow: "About",
   title: "My Story",
-  sub: "How a kid who never left the woods around Branson became the Ozarks chef behind farm-to-table dinners — with a forager's eye on every plate.",
+  sub: "How a kid from the Ozarks countryside became the chef behind farm-to-table dinners — with a forager's eye on every plate.",
 })}
 
 <main>
@@ -72,7 +72,7 @@ ${renderPageBanner({
         </div>
       </div>
 
-      <p class="marginalia">"I have a wife and three wonderful sons, living in Springfield, MO. I don't think I will ever leave the Ozarks. It endlessly fascinates me with its biodiversity, and I hope to bring the flavors of the forest and field to people through fine dining and education."</p>
+      <p class="marginalia">"I have a wife and five wonderful kids, living in Seymour, MO. I don't think I will ever leave the Ozarks. It endlessly fascinates me with its biodiversity, and I hope to bring the flavors of the forest and field to people through fine dining and education."</p>
 
       <div class="duo">
         <figure>

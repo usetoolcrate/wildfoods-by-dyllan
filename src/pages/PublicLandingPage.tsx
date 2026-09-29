@@ -257,7 +257,7 @@ const PAGE_BODY = `${renderTopBar("/")}
         <div class="when">Today</div>
         <div>
           <h3>Two loves, combined</h3>
-          <p>He took his lifelong fascination with the woods and paired it with the kitchen — learning to cook with what the Ozarks actually provides. He studied under mentor <strong>Rob Connoley</strong> of Bulrush in St. Louis, finished the culinary degree he'd started ten years earlier, and now lives in Springfield with his wife and three sons — still, and always, in the Ozarks.</p>
+          <p>He took his lifelong fascination with the woods and paired it with the kitchen — learning to cook with what the Ozarks actually provides. He studied under mentor <strong>Rob Connoley</strong> of Bulrush in St. Louis, finished the culinary degree he'd started ten years earlier, and now lives in Seymour, Missouri, with his wife and five kids — still, and always, in the Ozarks.</p>
         </div>
       </div>
     </div>
@@ -269,7 +269,7 @@ const PAGE_BODY = `${renderTopBar("/")}
       </figure>
       <figure>
         <img src="/images/duo-family.webp" alt="Dyllan, his wife, and their newborn son">
-        <figcaption>Fig. 3 — Dyllan and family, Springfield, MO</figcaption>
+        <figcaption>Fig. 3 — Dyllan and family</figcaption>
       </figure>
     </div>
   </section>
