@@ -503,20 +503,19 @@ const PAGE_BOTTOM = `<section class="sec" id="private-chef">
 <footer class="ft"><div class="c">Wild Foods by Dyllan · Springfield, Missouri</div></footer>`;
 
 /* "One plate" gallery. Each entry is one dish Dyllan has told us about; the
-   arrows only appear once there are two or more. Drop the draft entry as soon
-   as a second real plate arrives. */
+   arrows only appear once there are two or more. Rows marked todo are still
+   waiting on his details. */
 type Plate = {
   name: string;
   image?: { src: string; alt: string; position?: string };
   slot?: string; // shown until the photo arrives
-  rows: { label: string; text: string }[];
-  draft?: boolean;
+  rows: { label: string; text: string; todo?: boolean }[];
 };
 
 const PLATES: Plate[] = [
   {
     name: "Seared duck, wild rice & mugolio apple chutney",
-    slot: "The seared duck, from Dyllan's original file",
+    image: { src: "/images/dish-duck.webp", alt: "Sliced seared duck breast over wild rice with apple chutney, sage, daikon, and baby chard" },
     rows: [
       {
         label: "The farms",
@@ -530,13 +529,12 @@ const PLATES: Plate[] = [
     ],
   },
   {
-    name: "The next signature plate",
-    slot: "The finished plate, shot from above and at table height",
-    draft: true,
+    name: "Chicken roulade, chanterelle & pawpaw",
+    image: { src: "/images/dish-chanterelle-pawpaw.webp", alt: "Chicken roulade with chanterelle mushrooms and a pawpaw glaze", position: "center 45%" },
     rows: [
-      { label: "The farms", text: "Which farms the ingredients come from." },
-      { label: "The wild", text: "What's foraged for it, and where and when." },
-      { label: "The plate", text: "How long it took to get right, and what makes it hard to do well." },
+      { label: "The wild", text: "Chanterelles from summer hardwoods, and pawpaw — the Ozarks' native fruit, with a season only a few weeks long." },
+      { label: "The farm", text: "Which farm raised the chicken, and why Dyllan cooks with them.", todo: true },
+      { label: "The plate", text: "How long the dish took to get right, and what makes it hard to do well.", todo: true },
     ],
   },
 ];
@@ -614,7 +612,7 @@ function PlateGallery() {
               {plate.rows.map((r) => (
                 <div key={r.label}>
                   <dt>{r.label}</dt>
-                  <dd className={plate.draft ? "todo" : undefined}>{r.text}</dd>
+                  <dd className={r.todo ? "todo" : undefined}>{r.text}</dd>
                 </div>
               ))}
             </dl>
