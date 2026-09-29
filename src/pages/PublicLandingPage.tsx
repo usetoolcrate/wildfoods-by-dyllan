@@ -1,334 +1,170 @@
-import { useEffect } from "react";
 import {
-  renderTopBar,
-  renderEventRows,
-  renderHostRoll,
-  FOOTER_HTML,
-  SITE_STYLES,
-} from "@/pages/site-shared";
+  V2Page,
+  Html,
+  renderHeader,
+  renderFooter,
+  renderBook,
+  renderDinnerList,
+  renderRolls,
+  PRIVATE_CHEF_TIERS,
+} from "@/pages/v2";
+import { PlateGallery } from "@/pages/site/PlateGallery";
 
+const TOP = `${renderHeader("/")}
 
-const PAGE_BODY = `${renderTopBar("/")}
-
-<header class="mast">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <div class="eyebrow-plate">Springfield &amp; the Ozarks · Farm-to-table chef</div>
-      <h1>Wild Foods by Dyllan</h1>
-      <p class="sub">Farm-to-table dinners and private chef service from Chef Dyllan Dale — built on small Ozarks farms and seasonal produce, and finished with wild foods he forages himself.</p>
-      <div class="hero-facts">
-        <span>Farm-to-Table Dinners</span><span class="dot">·</span>
-        <span>Private Chef Service</span><span class="dot">·</span>
-        <span>Foraging Walks &amp; Classes</span>
-      </div>
+<section class="hero s-paper">
+  <div class="c hero-in">
+    <div>
+      <div class="label">Chef Dyllan Dale · Springfield, Missouri</div>
+      <h1>The forest and field, served as fine dining.</h1>
+      <p>Farm-to-table dinners and private chef service, built on small Ozarks farms and seasonal produce — and finished with wild foods Dyllan forages himself.</p>
       <div class="hero-cta">
-        <a class="btn-solid" href="#dinners">See Upcoming Farm Dinners</a>
-        <a class="btn-line" href="#table">Book a Private Chef</a>
-      </div>
-      <div class="colophon">
-        <span>Chef Dyllan Dale</span>
-        <span>417&#8209;403&#8209;9265</span>
-        <span>dyllan@wildfoodsbydyllan.com</span>
+        <a class="btn" href="#dinners">Upcoming farm dinners</a>
+        <a class="tlink" href="#private-chef">Book a private chef</a>
       </div>
     </div>
-    <div class="hero-media">
-      <img src="/images/duo-plating.webp" alt="Chef Dyllan Dale plating a long table of tartlet courses by hand" style="object-position:center 55%;">
-      <div class="fig">Fig. 1 — Plating a dinner course by hand, one tartlet at a time</div>
-      <blockquote>"I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education."</blockquote>
-    </div>
+    <figure class="hero-img">
+      <img src="/images/g-chef-plating.jpg" alt="Chef Dyllan Dale plating a long table of courses in black gloves" style="object-position:center 30%;">
+      <figcaption>Plating a full dinner service by hand.</figcaption>
+    </figure>
   </div>
-</header>
+</section>
 
-<main>
-
-  <!-- FARM DINNERS -->
-  <section id="dinners">
-    <div class="wrap">
-      <div class="sec-label">
-        <div class="num stamp-font">I</div>
-        <h2>Farm Dinners</h2>
-        <div class="rule"></div>
+<section class="sec s-pine" id="dinners">
+  <div class="c">
+    <div class="sh split">
+      <div>
+        <div class="label">Farm dinners</div>
+        <h2>At the table this season</h2>
       </div>
-      <p class="lede">Ticketed dinners set at the farms, ranches, and orchards that raise the food. Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks.</p>
-
-      <div class="rate-ledger">
-        <table>
-          <thead>
-            <tr><th>Upcoming Dinner</th><th>Price</th><th>Details</th></tr>
-          </thead>
-          <tbody>
-            ${renderEventRows("dinner")}
-          </tbody>
-        </table>
-      </div>
-      <p class="ledger-link">Tickets, workshops &amp; the full calendar — <a href="/farm-to-table">see every farm dinner →</a></p>
-
-      <div class="host-head">Where the table's been set</div>
-      ${renderHostRoll()}
+      <p>Ticketed dinners set at the farms, ranches, and orchards that raise the food. Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks.</p>
     </div>
-  </section>
+    <figure class="band">
+      <img src="/images/g-dinner-dusk.jpg" alt="Dyllan speaking to guests at an outdoor dinner at dusk, under string lights" style="object-position:center 40%;">
+    </figure>
+    ${renderDinnerList({ dinnersOnly: true })}
+    <div class="after-list"><a class="tlink" href="/farm-to-table">All dates, workshops &amp; catering</a></div>
+  </div>
+</section>
 
-  <!-- THE TABLE / PRIVATE CHEF MENU -->
-  <section id="table" style="background:var(--paper-dark);">
-    <div class="wrap">
-      <div class="sec-label">
-        <div class="num stamp-font">II</div>
-        <h2>The Table</h2>
-        <div class="rule"></div>
-      </div>
-      <p class="lede" style="margin-bottom:40px;">Private chef dinners, hyper-local and seasonal. Every menu is built from scratch around a conversation, sourced through real relationships with Ozarks growers, ranchers, and makers. Fully farm-to-table, wild-foraged, or a mix of both — the choice is yours.</p>
-
-      <div class="menu-block">
-        <div class="menu-tier">
-          <h3 class="tier"><span>Harvest Buffet</span><span class="leader"></span><span class="price">$90 / guest</span></h3>
-          <p class="tier-desc">A thoughtfully curated buffet of seasonal, hyper-local dishes — a relaxed, abundant spread for casual celebrations and larger groups.</p>
-        </div>
-        <div class="menu-tier">
-          <h3 class="tier"><span>Gathered Family Style</span><span class="leader"></span><span class="price">$120 / guest</span></h3>
-          <p class="tier-desc">A dedicated server presents and serves each dish at the table — warmth and elegance together, built for connection over the meal.</p>
-        </div>
-        <div class="menu-tier">
-          <h3 class="tier"><span>Chef's Table Plated</span><span class="leader"></span><span class="price">$150 / guest</span></h3>
-          <p class="tier-desc">The full restaurant experience, brought home: every course individually plated by the chef, presented at its highest level.</p>
-        </div>
-
-        <div class="dish-list">
-          <div>
-            <h4>Farm-to-Table</h4>
-            <ul>
-              <li>Herb-roasted chicken, pan jus</li>
-              <li>Braised short ribs, garlic mashed potatoes</li>
-              <li>Seared salmon, lemon-herb cream</li>
-              <li>Whipped sweet potatoes, browned butter</li>
-              <li>Elegant tartlets, local fruit</li>
-            </ul>
-          </div>
-          <div>
-            <h4>Wild-Inspired</h4>
-            <ul>
-              <li>Chanterelle velouté with herb oil</li>
-              <li>Citrus-smoked trout, seasonal produce</li>
-              <li>Wild herb–marinated beef or bison</li>
-              <li>Rabbit ravioli, brown-butter sage</li>
-              <li>Pawpaw or seasonal fruit crème brûlée</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<section class="sec s-paper">
+  <div class="c">
+    <div class="sh center">
+      <div class="label">The work</div>
+      <h2>What goes into every plate</h2>
+      <p>Wild ingredients are foraged by hand. Farm ingredients come through real relationships with Ozarks growers, ranchers, and makers. Every menu is built from scratch around the season, and every plate is finished by hand before it leaves the kitchen.</p>
     </div>
-  </section>
-
-  <div class="deckle"></div>
-
-  <!-- SPECIMEN GALLERY -->
-  <section class="wrap" id="recipes-nav">
-    <div class="sec-label">
-      <div class="num stamp-font">III</div>
-      <h2>From the Pass</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="specimens specimens-5">
-      <div class="specimen">
-        <img src="/images/dish-beet-carpaccio.webp" alt="Beet carpaccio plate">
-        <div class="tag"><div class="no">No. 01</div><div class="name">Beet Carpaccio</div></div>
-      </div>
-      <div class="specimen">
-        <img src="/images/dish-chanterelle-pawpaw.webp" alt="Chicken roulade with chanterelle mushrooms and pawpaw glaze">
-        <div class="tag"><div class="no">No. 02</div><div class="name">Chicken Roulade, Chanterelle &amp; Pawpaw</div></div>
-      </div>
-      <div class="specimen">
-        <img src="/images/dish-short-rib.webp" alt="Wild plum braised beef short rib">
-        <div class="tag"><div class="no">No. 03</div><div class="name">Wild Plum Braised Short Rib</div></div>
-      </div>
-      <div class="specimen">
-        <img src="/images/dish-carrot-gravlax.webp" alt="Cured carrot gravlax crostini, donor dinner">
-        <div class="tag"><div class="no">No. 04</div><div class="name">Cured Carrot &ldquo;Gravlax&rdquo; Crostini</div></div>
-      </div>
-      <div class="specimen">
-        <img src="/images/dish-seared-course.webp" alt="A finished seared course with pan sauce and a crisp potato cake">
-        <div class="tag"><div class="no">No. 05</div><div class="name">A Course From the Pass</div></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="deckle"></div>
-
-  <!-- RATES LEDGER -->
-  <section id="rates">
-    <div class="wrap">
-      <div class="sec-label">
-        <div class="num stamp-font">IV</div>
-        <h2>Rates &amp; Services</h2>
-        <div class="rule"></div>
-      </div>
-      <div class="rate-ledger">
-        <table>
-          <thead>
-            <tr><th>Offering</th><th>Rate</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td class="svc">Host a Farm Dinner</td>
-            <td class="rate">$50–$90 / guest</td>
-            <td class="note">For farms, wineries &amp; event spaces. 3 to 6 courses, 20-guest minimum, $250 planning fee. Full staffing and service included — the host keeps ticket revenue.</td>
-          </tr>
-          <tr>
-            <td class="svc">Catering</td>
-            <td class="rate">from $25 / head</td>
-            <td class="note">15-person minimum. Farm-to-table or wild menus, 10+ years of professional kitchen experience.</td>
-          </tr>
-          <tr>
-            <td class="svc">Teaching &amp; Talks</td>
-            <td class="rate">$100 / hr</td>
-            <td class="note">Half-day $300, full-day $500. Cooking fundamentals, wild foods, fermentation, foraging ethics — for schools, conferences, and community groups.</td>
-          </tr>
-          <tr>
-            <td class="svc">Consultation — 30 min</td>
-            <td class="rate">$30</td>
-            <td class="note">Phone or Zoom. Restaurants moving toward zero-waste/farm-to-table, or home foragers wanting 1:1 coaching.</td>
-          </tr>
-          <tr>
-            <td class="svc">Consultation — 1 hr</td>
-            <td class="rate">$50</td>
-            <td class="note">In-person available at the same rate + $1/mile round trip.</td>
-          </tr>
-          <tr>
-            <td class="svc">Foraging Walk — 2 hr</td>
-            <td class="rate">$100 / session</td>
-            <td class="note">On your land, identifying and using wild edibles. $5 per 10 miles beyond 30 miles of Springfield.</td>
-          </tr>
-          <tr>
-            <td class="svc">Foraging Walk — 4 hr</td>
-            <td class="rate">$200 / session</td>
-            <td class="note">Add a 3-course foraged meal for $30/person. 50% deposit to reserve.</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <div class="deckle"></div>
-
-  <!-- FIELD NOTES / STORY -->
-  <section class="wrap-narrow" id="story">
-    <div class="sec-label">
-      <div class="num stamp-font">V</div>
-      <h2>Field Notes</h2>
-      <div class="rule"></div>
-    </div>
-
-    <div class="ledger">
-      <div class="entry">
-        <div class="when"><span class="age">10</span>Branson, MO</div>
-        <div>
-          <h3>The copperhead</h3>
-          <p>Caught and skinned his first copperhead to bring to a friend the snake had bitten days before. He's never feared nature since — only respected what it can do.</p>
-        </div>
-      </div>
-      <div class="entry">
-        <div class="when"><span class="age">11</span>An empty house</div>
-        <div>
-          <h3>Good Eats, on a 14-inch TV</h3>
-          <p>Home alone after school, he found Alton Brown breaking down the science of cooking. That was the moment he decided he wanted to be a chef.</p>
-        </div>
-      </div>
-      <div class="entry">
-        <div class="when"><span class="age">15</span>His own backyard</div>
-        <div>
-          <h3>A piece of candy on the ground</h3>
-          <p>A bright red-and-white mushroom in the yard turned out to be <em>Amanita muscaria</em> — a species most sources at the time insisted didn't grow in Missouri. He's since documented multiple Ozarks occurrences on the national mycological database. Mushrooms have held his attention ever since.</p>
-        </div>
-      </div>
-      <div class="entry">
-        <div class="when"><span class="age">16</span>Thai Thai Cuisine, Branson</div>
-        <div>
-          <h3>A box of mangos</h3>
-          <p>His first restaurant job, dishwasher and busboy. Told to peel a box of mangos, he called it done — until the chef pulled the peels from the trash. "Look at all this meat wasted." He re-fileted every peel. Don't waste; every detail matters.</p>
-        </div>
-      </div>
-      <div class="entry">
-        <div class="when"><span class="age">27</span>A turning point</div>
-        <div>
-          <p>Ten hard years followed — addiction, depression, divorce, the sweaty grind of line cook life. At 27, he decided he was made for more. Within a year he was asked to manage a kitchen — "me, a good dishwasher?" — and pushed himself toward obsession with the food he made.</p>
-        </div>
-      </div>
-      <div class="entry">
-        <div class="when">Today</div>
-        <div>
-          <h3>Two loves, combined</h3>
-          <p>He took his lifelong fascination with the woods and paired it with the kitchen — learning to cook with what the Ozarks actually provides. He studied under mentor <strong>Rob Connoley</strong> of Bulrush in St. Louis, finished the culinary degree he'd started ten years earlier, and now lives in Seymour, Missouri, with his wife and five kids — still, and always, in the Ozarks.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="duo">
+    <div class="steps">
       <figure>
-        <img src="/images/hero-creek-forage.webp" alt="Chef Dyllan Dale foraging along a creek in the Ozarks with his dog">
-        <figcaption>Fig. 2 — Wet-weather foraging, a creek crossing near Springfield</figcaption>
+        <img src="/images/creek-foraging.jpg" alt="Dyllan foraging along an Ozarks creek with his dog">
+        <figcaption><span class="n">01</span><strong>Gathered</strong>Wild foods foraged by hand, only in season.</figcaption>
       </figure>
       <figure>
-        <img src="/images/duo-family.webp" alt="Dyllan, his wife, and their newborn son">
-        <figcaption>Fig. 3 — Dyllan and family</figcaption>
+        <img src="/images/g-hands-plating.jpg" alt="Hands placing garnish on a long row of plated courses" style="object-position:center 55%;">
+        <figcaption><span class="n">02</span><strong>Finished</strong>Every plate completed by hand at the pass.</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/g-teal-course.jpg" alt="A composed first course of beets, cured fish, and greens on a teal plate">
+        <figcaption><span class="n">03</span><strong>Composed</strong>One course, built around what the season gave that week.</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/dish-short-rib.webp" alt="A braised short rib course carried out to the table" style="object-position:40% center;">
+        <figcaption><span class="n">04</span><strong>Served</strong>Course by course, at the farm or in your home.</figcaption>
       </figure>
     </div>
-  </section>
+  </div>
+</section>`;
 
-  <!-- TESTIMONIALS -->
-  <section style="background:var(--paper-dark);">
-    <div class="wrap-narrow">
-      <div class="sec-label">
-        <div class="num stamp-font">VI</div>
-        <h2>Notes From the Table</h2>
-        <div class="rule"></div>
+const BOTTOM = `<section class="menu-sec" id="private-chef">
+  <img class="menu-bg" src="/images/g-plating-lamp.jpg" alt="">
+  <div class="c">
+    <div class="menu-card">
+      <div class="label">Private chef</div>
+      <h2>A restaurant-level dinner, in your home</h2>
+      <p class="intro">Every menu starts with a conversation about your tastes, your guests, and the season, then is built from scratch. Farm-to-table, wild, or a blend of both.</p>
+      <div class="menu-list">
+        ${PRIVATE_CHEF_TIERS.map(
+          (t) => `<div class="course">
+          <div class="price">${t.price}</div>
+          <h3>${t.name}</h3>
+          <p>${t.short}</p>
+        </div>`
+        ).join("\n        ")}
       </div>
-      <div class="margin-notes">
-        <div class="margin-note">
-          <p>I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted. A 10 out of 10 night.</p>
-          <cite>— Noah H.</cite>
-        </div>
-        <div class="margin-note">
-          <p>I never liked venison before I had it at one of the pop-ups. Now the flavors are seared in my memory and one I hope to repeat at one of his next pop-up events.</p>
-          <cite>— Julie S.</cite>
-        </div>
-        <div class="margin-note">
-          <p>A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared, wild foraged, six-course dinner. I will be returning as often as possible.</p>
-          <cite>— Jobeth S.</cite>
-        </div>
-        <div class="margin-note">
-          <p>The Wild Foods dinner was a delightful exploration of foraged ingredients. Dyllan's dedication to crafting a meal that honored nature's offerings was evident in every meticulously plated course.</p>
-          <cite>— Amy H.</cite>
-        </div>
+      <div class="menu-foot">
+        Five-guest minimum · 50% deposit reserves your date<br>
+        Menu, sourcing, cooking, service &amp; cleanup included
+        <div><a class="tlink" href="/private-chef">Plan a private dinner</a></div>
       </div>
-    </div>
-  </section>
-
-</main>
-
-<div class="colophon-block" id="book">
-  <div class="wrap-narrow">
-    <div class="stamp"><span>GROWN &amp;<br>GATHERED<br>IN THE OZARKS</span></div>
-    <h2>Book Chef Dyllan</h2>
-    <p class="sub">Farm dinners, private chef nights, catering, foraging walks &amp; teaching — every date starts with a conversation, not a form.</p>
-    <div class="contact-line">
-      <a href="tel:14174039265">417-403-9265</a>
-      <a href="mailto:dyllan@wildfoodsbydyllan.com">dyllan@wildfoodsbydyllan.com</a>
-      <span>Springfield, MO — serving the Ozarks</span>
     </div>
   </div>
-</div>
+</section>
 
-${FOOTER_HTML}`;
+<section class="sec s-sand">
+  <div class="c split rev">
+    <figure>
+      <img src="/images/g-chef-standing.jpg" alt="Chef Dyllan Dale in a black chef coat, standing in a kitchen before service" style="object-position:center 35%;">
+    </figure>
+    <div>
+      <div class="label">The chef</div>
+      <h2>Dyllan Dale</h2>
+      <p>Dyllan grew up in the Ozarks countryside and started in restaurant kitchens at sixteen, washing dishes and bussing tables. He worked his way up the line and was managing a kitchen by twenty-eight.</p>
+      <p>He learned under his mentor, Rob Connoley of Bulrush in St. Louis, finished his culinary degree, and brings more than a decade in professional kitchens to every menu. He lives in Seymour, Missouri, with his wife and five kids.</p>
+      <blockquote>“I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education.”</blockquote>
+      <a class="tlink" href="/story">Read his story</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec s-sage">
+  <div class="c">
+    <div class="qmark" aria-hidden="true">“</div>
+    <div class="label center">From the table</div>
+    <div class="quotes">
+      <blockquote>
+        <p>“I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted. A 10 out of 10 night.”</p>
+        <cite>Noah H.</cite>
+      </blockquote>
+      <blockquote>
+        <p>“A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared, wild foraged, six-course dinner. I will be returning as often as possible.”</p>
+        <cite>Jobeth S.</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="sec s-white">
+  <div class="c">
+    ${renderRolls()}
+  </div>
+</section>
+
+<section class="sec s-paper">
+  <div class="c cards">
+    <a href="/learn">
+      <div class="label">Learn</div>
+      <h3>Foraging walks &amp; classes</h3>
+      <p>Two- and four-hour walks on your land, one-on-one consultations, and teaching for schools, conferences, and community groups.</p>
+      <span class="tlink">Rates &amp; booking</span>
+    </a>
+    <a href="/recipes">
+      <div class="label">Recipes</div>
+      <h3>From Dyllan's kitchen</h3>
+      <p>Foraged fruits, ferments, nuts, and preserves — searchable and ready to print for the kitchen counter.</p>
+      <span class="tlink">Browse recipes</span>
+    </a>
+  </div>
+</section>
+
+${renderBook()}
+${renderFooter()}`;
 
 export function PublicLandingPage() {
-  useEffect(() => {
-    document.title = "Wild Foods by Dyllan — Farm-to-Table Dining in the Ozarks";
-  }, []);
-
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: SITE_STYLES }} />
-      <div dangerouslySetInnerHTML={{ __html: PAGE_BODY }} />
-    </>
+    <V2Page title="Wild Foods by Dyllan — Farm-to-Table Dining in the Ozarks">
+      <Html html={TOP} />
+      <PlateGallery />
+      <Html html={BOTTOM} />
+    </V2Page>
   );
 }

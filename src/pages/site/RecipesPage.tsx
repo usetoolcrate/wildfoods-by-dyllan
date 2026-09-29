@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  renderTopBar,
-  renderPageBanner,
-  FOOTER_HTML,
-  SITE_STYLES,
-} from "@/pages/site-shared";
+import { V2Page, Html, renderHeader, renderFooter, renderPageHero } from "@/pages/v2";
+
+const HEAD = `${renderHeader("/recipes")}
+${renderPageHero({
+  label: "Recipes",
+  title: "Wild recipes, Ozarks-style",
+  sub: "Foraged fruits, ferments, nuts, and preserves — searchable, filterable, and ready to print for the kitchen counter.",
+  surface: "s-sage",
+})}`;
 
 type Recipe = {
   id: string;
@@ -251,15 +254,15 @@ function printRecipe(recipe: Recipe) {
       <head>
         <title>${recipe.title} — Wild Foods by Dyllan</title>
         <style>
-          body{font-family:Georgia,serif;color:#1f2e22;max-width:640px;margin:40px auto;padding:0 20px;}
-          h1{font-size:28px;margin-bottom:4px;}
-          .meta{font-family:'Courier New',monospace;font-size:12px;color:#3c4a3c;margin-bottom:24px;text-transform:uppercase;letter-spacing:0.06em;}
-          h2{font-size:16px;text-transform:uppercase;letter-spacing:0.08em;color:#a85a22;border-bottom:1px solid #c9bb9a;padding-bottom:6px;}
-          ul,ol{padding-left:20px;}
+          body{font-family:Georgia,serif;color:#18211b;max-width:640px;margin:40px auto;padding:0 20px;}
+          h1{font-size:30px;font-weight:400;margin-bottom:4px;}
+          .meta{font-family:-apple-system,Helvetica,sans-serif;font-size:11px;color:#7a4424;margin-bottom:28px;text-transform:uppercase;letter-spacing:0.14em;}
+          h2{font-family:-apple-system,Helvetica,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.16em;border-bottom:1px solid #18211b;padding-bottom:8px;}
+          ul,ol{padding-left:20px;color:#3d443e;}
           li{margin-bottom:8px;}
           .cols{display:flex;gap:36px;}
           .cols > div{flex:1;}
-          footer{margin-top:36px;font-size:11px;color:#3c4a3c;font-family:'Courier New',monospace;}
+          footer{margin-top:40px;font-family:-apple-system,Helvetica,sans-serif;font-size:11px;color:#555c55;}
         </style>
       </head>
       <body>
@@ -275,7 +278,7 @@ function printRecipe(recipe: Recipe) {
             <ol>${recipe.steps.map((s) => `<li>${s}</li>`).join("")}</ol>
           </div>
         </div>
-        <footer>Wild Foods by Dyllan — wildfoodsbydyllan.com — sample recipe card</footer>
+        <footer>Wild Foods by Dyllan · wildfoodsbydyllan.com</footer>
       </body>
     </html>
   `);
@@ -290,10 +293,6 @@ export function RecipesPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [dbRecipes, setDbRecipes] = useState<Recipe[] | null>(null);
   const [loadError, setLoadError] = useState(false);
-
-  useEffect(() => {
-    document.title = "Recipes — Wild Foods by Dyllan";
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -331,43 +330,27 @@ export function RecipesPage() {
   const openRecipe = openId ? allRecipes.find((r) => r.id === openId) ?? null : null;
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: SITE_STYLES }} />
-      <div
-        dangerouslySetInnerHTML={{
-          __html: renderTopBar("/recipes"),
-        }}
-      />
-      <div
-        dangerouslySetInnerHTML={{
-          __html: renderPageBanner({
-            eyebrow: "Recipes",
-            title: "Wild Recipes, Ozarks-Style",
-            sub: "Foraged fruits, ferments, nuts, and preserves — searchable, filterable, and ready to print for the kitchen counter.",
-          }),
-        }}
-      />
-
+    <V2Page title="Recipes — Wild Foods by Dyllan">
+      <Html html={HEAD} />
       <main>
-        <section>
-          <div className="wrap">
+        <section className="sec s-paper">
+          <div className="c">
             {loadError ? (
               <span className="sample-flag">
                 Sample preview — showing offline placeholder content, live recipe database unreachable right now
               </span>
             ) : null}
 
-            <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
+            <div className="rx-tools">
               <input
                 className="recipe-search"
-                type="text"
+                type="search"
                 placeholder="Search recipes…"
+                aria-label="Search recipes"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-            </div>
-
-            <div className="chip-row">
+              <div className="chip-row">
               {tags.map((tag) => (
                 <button
                   key={tag}
@@ -378,6 +361,7 @@ export function RecipesPage() {
                   {tag}
                 </button>
               ))}
+              </div>
             </div>
 
             <div className="recipe-count">
@@ -387,16 +371,12 @@ export function RecipesPage() {
             {isLoading ? (
               <div className="recipe-empty">Loading recipes…</div>
             ) : openRecipe ? (
-              <div className="recipe-detail" style={{ marginBottom: 40 }}>
+              <div className="recipe-detail">
                 <button className="rd-close" onClick={() => setOpenId(null)} type="button">
                   &larr; Back to all recipes
                 </button>
                 {openRecipe.imageUrl ? (
-                  <img
-                    src={openRecipe.imageUrl}
-                    alt={openRecipe.title}
-                    style={{ width: "100%", maxHeight: 340, objectFit: "cover", margin: "16px 0" }}
-                  />
+                  <img className="rd-img" src={openRecipe.imageUrl} alt={openRecipe.title} />
                 ) : null}
                 <h2>{openRecipe.title}</h2>
                 <div className="rd-meta">
@@ -421,8 +401,8 @@ export function RecipesPage() {
                     </ol>
                   </div>
                 </div>
-                <div style={{ marginTop: 28 }}>
-                  <button className="rc-print" onClick={() => printRecipe(openRecipe)} type="button">
+                <div className="rd-print">
+                  <button className="rc-view" onClick={() => printRecipe(openRecipe)} type="button">
                     Print This Recipe
                   </button>
                 </div>
@@ -434,11 +414,7 @@ export function RecipesPage() {
                 {filtered.map((r) => (
                   <div className="recipe-card" key={r.id}>
                     {r.imageUrl ? (
-                      <img
-                        src={r.imageUrl}
-                        alt={r.title}
-                        style={{ width: "100%", height: 160, objectFit: "cover", marginBottom: 10 }}
-                      />
+                      <img className="rc-img" src={r.imageUrl} alt={r.title} />
                     ) : null}
                     <div className="rc-tag">{r.tag}</div>
                     <h3>{r.title}</h3>
@@ -448,22 +424,7 @@ export function RecipesPage() {
                     <div className="rc-body">
                       <p>{r.teaser}</p>
                       <div className="rc-actions">
-                        <button
-                          type="button"
-                          onClick={() => setOpenId(r.id)}
-                          style={{
-                            fontFamily: "'Special Elite', monospace",
-                            fontSize: 11,
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                            background: "none",
-                            border: "none",
-                            color: "var(--rust-deep)",
-                            cursor: "pointer",
-                            padding: 0,
-                            borderBottom: "1px solid var(--rust-deep)",
-                          }}
-                        >
+                        <button className="rc-view" type="button" onClick={() => setOpenId(r.id)}>
                           View Recipe
                         </button>
                         <button className="rc-print" type="button" onClick={() => printRecipe(r)}>
@@ -479,7 +440,7 @@ export function RecipesPage() {
         </section>
       </main>
 
-      <div dangerouslySetInnerHTML={{ __html: FOOTER_HTML }} />
-    </>
+      <Html html={renderFooter()} />
+    </V2Page>
   );
 }

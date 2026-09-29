@@ -922,57 +922,6 @@ export const SITE_STYLES = String.raw`
   }
 `;
 
-export const NAV_LINKS: { href: string; label: string }[] = [
-  { href: "/farm-to-table", label: "Farm to Table" },
-  { href: "/private-chef", label: "Private Chef" },
-  { href: "/learn", label: "Learn" },
-  { href: "/recipes", label: "Recipes" },
-  { href: "/shop", label: "Shop" },
-  { href: "/story", label: "Our Story" },
-  { href: "/contact", label: "Contact" },
-];
-
-export function renderTopBar(activeHref: string): string {
-  const links = NAV_LINKS.map(
-    (l) =>
-      `<a href="${l.href}"${l.href === activeHref ? ' class="active"' : ""}>${l.label}</a>`
-  ).join("\n      ");
-  return `<div class="mast-bar-wrap">
-  <div class="wrap mast-bar">
-    <a href="/" style="display:block;"><img class="brand-lockup" src="/images/logo-lockup.webp" alt="Wild Foods by Dyllan"></a>
-    <nav class="mast-nav">
-      ${links}
-    </nav>
-  </div>
-</div>`;
-}
-
-export function renderPageBanner(opts: { eyebrow: string; title: string; sub: string }): string {
-  return `<div class="page-banner">
-  <div class="wrap">
-    <a class="crumb" href="/">&larr; Wild Foods by Dyllan</a>
-    <h1>${opts.title}</h1>
-    <p>${opts.sub}</p>
-  </div>
-</div>`;
-}
-
-export function renderBookCard(opts?: { title?: string; sub?: string }): string {
-  const title = opts?.title ?? "Ready to Book?";
-  const sub =
-    opts?.sub ??
-    "Every date starts with a conversation, not a form. Reach out directly and Chef Dyllan will get back to you.";
-  return `<div class="book-card">
-  <h3>${title}</h3>
-  <p>${sub}</p>
-  <div class="contact-line">
-    <a href="tel:14174039265">417-403-9265</a>
-    <a href="mailto:dyllan@wildfoodsbydyllan.com">dyllan@wildfoodsbydyllan.com</a>
-    <span>Springfield, MO — serving the Ozarks</span>
-  </div>
-</div>`;
-}
-
 /* Ticketed dates, soonest first. A date drops off the site the day after it
    happens, so this list only needs new rows, never cleanup. */
 export const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; price: string; note: string }[] = [
@@ -1008,25 +957,6 @@ export const EVENTS: { date: string; kind: "dinner" | "workshop"; name: string; 
 
 export const BOOKING_URL = "https://wildfoodsbydyllan.com/booking/";
 
-export function renderEventRows(kind?: "dinner" | "workshop"): string {
-  const today = new Date().toLocaleDateString("en-CA");
-  const rows = EVENTS.filter((e) => e.date >= today && (!kind || e.kind === kind)).sort(
-    (a, b) => (a.kind === b.kind ? 0 : a.kind === "dinner" ? -1 : 1) // dinners lead, each group stays by date
-  );
-  if (!rows.length) {
-    return `<tr><td class="note" colspan="3">The next dates are being set with our farm hosts now. Call or email to get on the list, or <a href="${BOOKING_URL}" target="_blank" rel="noopener">check the booking site</a>.</td></tr>`;
-  }
-  return rows
-    .map(
-      (e) => `<tr>
-              <td class="svc">${e.name}</td>
-              <td class="rate">${e.price}</td>
-              <td class="note">${e.note}</td>
-            </tr>`
-    )
-    .join("\n            ");
-}
-
 /* Farms, ranches, and venues that have hosted a dinner, oldest first. */
 export const HOSTS: { name: string; what: string }[] = [
   { name: "Juniper Gardens", what: "Wild Holiday Supper · Dec 2025" },
@@ -1048,13 +978,3 @@ export const PARTNERS: string[] = [
   "Springfield Public Schools",
   "Missouri State University",
 ];
-
-export function renderHostRoll(): string {
-  return `<ul class="host-roll">
-      ${HOSTS.map((h) => `<li><span class="host">${h.name}</span><span class="what">${h.what}</span></li>`).join("\n      ")}
-    </ul>`;
-}
-
-export const FOOTER_HTML = `<footer>
-  Wild Foods by Dyllan — Springfield, Missouri
-</footer>`;

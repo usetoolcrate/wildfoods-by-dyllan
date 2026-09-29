@@ -1,120 +1,104 @@
-import { useEffect } from "react";
-import {
-  renderTopBar,
-  renderPageBanner,
-  renderBookCard,
-  FOOTER_HTML,
-  SITE_STYLES,
-} from "@/pages/site-shared";
+import { V2Page, Html, renderHeader, renderFooter, renderPageHero, renderBook, PRIVATE_CHEF_TIERS } from "@/pages/v2";
 
-const PAGE_BODY = `${renderTopBar("/private-chef")}
+const BODY = `${renderHeader("/private-chef")}
 
-${renderPageBanner({
-  eyebrow: "Private Chef",
-  title: "Private Chef Services",
-  sub: "Small-farm proteins, seasonal produce, and wild foods when you want them — a full restaurant experience, brought to your table.",
+${renderPageHero({
+  label: "Private chef",
+  title: "A restaurant-level dinner, in your home",
+  sub: "Small-farm proteins, seasonal produce, and wild foods when you want them — every course cooked, plated, and served at your table.",
+  image: { src: "/images/g-private-residence.jpg", alt: "Dyllan plating a wild game dinner in a private home kitchen", position: "center 35%" },
+  surface: "s-sand",
 })}
 
-<main>
-  <section>
-    <div class="wrap-narrow">
-      <p style="font-size:20px; color:var(--ink-soft); line-height:1.55;">Every private chef experience is built around one belief: the best meals come from what's grown, raised, and gathered close to home. Each dinner uses hyper-local ingredients, small-farm proteins, and — when you want it — wild foraged foods that bring depth and a sense of place to every course.</p>
-      <p style="font-size:18px; color:var(--ink-soft);">Whether the menu is fully farm-to-table, fully wild, or a curated mix of both, your evening is crafted to be personal, memorable, and deeply flavorful. Please send an email to check date availability — <strong>50% is paid up front</strong>.</p>
+<section class="sec s-white">
+  <div class="c narrow">
+    <p class="big-quote" style="font-style:normal;">Every private dinner is built around one belief: the best meals come from what's grown, raised, and gathered close to home.</p>
+  </div>
+</section>
+
+<section class="menu-sec">
+  <img class="menu-bg" src="/images/g-roulade-counter.jpg" alt="">
+  <div class="c">
+    <div class="menu-card">
+      <div class="label">Choose your experience</div>
+      <h2>Three ways to dine</h2>
+      <p class="intro">Fully farm-to-table, fully wild, or a curated mix of both. Please email to check date availability.</p>
+      <div class="menu-list">
+        ${PRIVATE_CHEF_TIERS.map(
+          (t) => `<div class="course">
+          <div class="price">${t.price}</div>
+          <h3>${t.name}</h3>
+          <p>${t.long}</p>
+        </div>`
+        ).join("\n        ")}
+      </div>
+      <div class="menu-foot">Five-guest minimum · 50% deposit reserves your date</div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section style="background:var(--paper-dark);">
-    <div class="wrap">
-      <div class="sec-label">
-        <div class="num stamp-font">I</div>
-        <h2>Choose Your Experience</h2>
-        <div class="rule"></div>
-      </div>
-      <div class="menu-block">
-        <h3 class="tier"><span>Harvest Buffet</span><span class="leader"></span><span class="price">$90 / person</span></h3>
-        <p class="tier-desc">A thoughtfully curated buffet of seasonal, hyper-local dishes. Guests serve themselves — relaxed, abundant, perfect for casual celebrations and larger groups.</p>
-
-        <h3 class="tier"><span>Gathered Family Style</span><span class="leader"></span><span class="price">$120 / person</span></h3>
-        <p class="tier-desc">A guided family-style meal — a dedicated server presents and serves each dish at the table. Warmth and elegance, encouraging connection while elevating the experience.</p>
-
-        <h3 class="tier"><span>Chef's Table Plated</span><span class="leader"></span><span class="price">$150 / person</span></h3>
-        <p class="tier-desc">Our most refined offering — every course individually plated and presented at its highest level. Technique, storytelling, and presentation for an intimate, restaurant-level meal in your home.</p>
-
-        <div class="dish-list">
-          <div>
-            <h4>Farm-to-Table Sample Dishes</h4>
-            <ul>
-              <li>Herb-roasted chicken with pan jus</li>
-              <li>Braised short ribs with garlic mashed potatoes</li>
-              <li>Seared salmon with lemon-herb cream</li>
-              <li>Whipped sweet potatoes with browned butter</li>
-              <li>Elegant tartlets with local fruit</li>
-            </ul>
-          </div>
-          <div>
-            <h4>Wild-Inspired Sample Dishes</h4>
-            <ul>
-              <li>Chanterelle velouté with herb oil</li>
-              <li>Citrus-smoked trout with seasonal produce</li>
-              <li>Wild herb–marinated beef or bison</li>
-              <li>Rabbit ravioli with brown-butter sage</li>
-              <li>Pawpaw or seasonal fruit crème brûlée</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<section class="sec s-paper">
+  <div class="c">
+    <div class="sh center">
+      <div class="label">Sample dishes</div>
+      <h2>A taste of the menu</h2>
+      <p>No templates and no pre-set menus — these show the range. Yours is written from scratch.</p>
     </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <div class="sec-label">
-        <div class="num stamp-font">II</div>
-        <h2>Everything Is Handled</h2>
-        <div class="rule"></div>
+    <div class="menus">
+      <div>
+        <h3>Farm-to-table</h3>
+        <ul>
+          <li>Herb-roasted chicken with pan jus</li>
+          <li>Braised short ribs with garlic mashed potatoes</li>
+          <li>Seared salmon with lemon-herb cream</li>
+          <li>Whipped sweet potatoes with browned butter</li>
+          <li>Elegant tartlets with local fruit</li>
+        </ul>
       </div>
-      <div class="feature-pair rev">
-        <div class="feature-photo">
-          <img src="/images/plated-tartare.jpg" alt="A plated course from a Wild Foods private chef dinner">
-        </div>
-        <div>
-          <h3>No templates, no pre-set menus</h3>
-          <p style="color:var(--ink-soft);">Every experience starts with a conversation about your tastes, dietary needs, and event style — then a custom menu is built from scratch. That includes:</p>
-          <div class="dish-list" style="columns:1; margin-top:20px; padding-top:20px;">
-            <ul>
-              <li>Menu development</li>
-              <li>Ingredient sourcing — real relationships with growers, ranchers, and makers</li>
-              <li>On-site cooking</li>
-              <li>Plating &amp; service</li>
-              <li>Complete cleanup</li>
-            </ul>
-          </div>
-        </div>
+      <div>
+        <h3>Wild-inspired</h3>
+        <ul>
+          <li>Chanterelle velouté with herb oil</li>
+          <li>Citrus-smoked trout with seasonal produce</li>
+          <li>Wild herb–marinated beef or bison</li>
+          <li>Rabbit ravioli with brown-butter sage</li>
+          <li>Pawpaw or seasonal fruit crème brûlée</li>
+        </ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section style="background:var(--paper-dark);">
-    <div class="wrap-narrow">
-      ${renderBookCard({
-        title: "Let's Build Your Hyper-Local Dining Experience",
-        sub: "Farm-to-table, wild, or a blend of both — your dinner is crafted intentionally and uniquely for your event. 5-person minimum, 50% deposit to reserve your date.",
-      })}
+<section class="sec s-sage">
+  <div class="c split">
+    <figure>
+      <img src="/images/g-duck.jpg" alt="Sliced seared duck breast over wild rice with apple chutney, sage, and baby chard">
+    </figure>
+    <div>
+      <div class="label">Everything is handled</div>
+      <h2>You host. Dyllan does the rest.</h2>
+      <p>Every experience starts with a conversation about your tastes, dietary needs, and event style — then a custom menu is built from scratch. That includes:</p>
+      <ol class="ticks">
+        <li><span>01</span>Menu development</li>
+        <li><span>02</span>Ingredient sourcing — real relationships with growers, ranchers, and makers</li>
+        <li><span>03</span>On-site cooking</li>
+        <li><span>04</span>Plating &amp; service</li>
+        <li><span>05</span>Complete cleanup</li>
+      </ol>
     </div>
-  </section>
-</main>
+  </div>
+</section>
 
-${FOOTER_HTML}`;
+${renderBook({
+  title: "Let's plan your dinner.",
+  sub: "Farm-to-table, wild, or a blend of both — crafted for your table. Five-guest minimum, 50% deposit to reserve your date.",
+})}
+${renderFooter()}`;
 
 export function PrivateChefPage() {
-  useEffect(() => {
-    document.title = "Private Chef Services — Wild Foods by Dyllan";
-  }, []);
-
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: SITE_STYLES }} />
-      <div dangerouslySetInnerHTML={{ __html: PAGE_BODY }} />
-    </>
+    <V2Page title="Private Chef Services — Wild Foods by Dyllan">
+      <Html html={BODY} />
+    </V2Page>
   );
 }
