@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { EVENTS, HOSTS, PARTNERS } from "@/pages/site-shared";
 
 /* The site's design system: calm, bright, photo-led, with each section on
@@ -461,6 +461,61 @@ export const V2_STYLES = String.raw`
   .v2 .recipe-detail li{margin-bottom:10px;}
   .v2 .rd-print{margin-top:36px;}
 
+  /* ---------- tickets & gift certificates ---------- */
+  .v2 .testbar{background:#f3e3a8;color:#43360a;font-size:13.5px;text-align:center;padding:9px 16px;}
+  .v2 .tk{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:72px;align-items:start;}
+  .v2 .tk h1{font-size:clamp(40px,5vw,66px);line-height:1.02;margin:22px 0 22px;}
+  .v2 .tk-meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--ink-2);margin:0 0 26px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .v2 .tk-about{color:var(--ink-2);max-width:34em;margin:0;white-space:pre-line;}
+  .v2 .tk-card{background:var(--white);border:1px solid var(--line);padding:34px 32px 30px;}
+  .v2 .tk-price{font-family:'Cormorant Garamond', Georgia, serif;font-size:44px;line-height:1;}
+  .v2 .tk-price small{font-family:'Hanken Grotesk', sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin-left:10px;}
+  .v2 .tk-left{font-size:13.5px;color:var(--accent);margin:10px 0 22px;}
+  .v2 .tk-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-top:1px solid var(--line);}
+  .v2 .tk-row .what{font-size:16px;line-height:1.35;}
+  .v2 .tk-row .what small{display:block;color:var(--ink-2);font-size:13px;margin-top:2px;}
+  .v2 .stepper{display:inline-flex;align-items:center;border:1px solid var(--ink);flex-shrink:0;}
+  .v2 .stepper button{width:40px;height:40px;background:none;border:0;font:inherit;font-size:18px;line-height:1;cursor:pointer;color:var(--ink);}
+  .v2 .stepper button:disabled{opacity:.25;cursor:default;}
+  .v2 .stepper span{min-width:34px;text-align:center;font-variant-numeric:tabular-nums;}
+  .v2 .tk-total{display:flex;justify-content:space-between;align-items:baseline;padding:20px 0 24px;border-top:1px solid var(--ink);font-size:18px;}
+  .v2 .tk-total strong{font-family:'Cormorant Garamond', Georgia, serif;font-size:32px;font-weight:500;}
+  .v2 button.btn{font-family:inherit;border:0;cursor:pointer;}
+  .v2 .btn.full{width:100%;text-align:center;}
+  .v2 .btn[disabled]{opacity:.5;cursor:default;}
+  .v2 .tk-note{font-size:13.5px;color:var(--ink-2);margin:14px 0 0;line-height:1.5;}
+  .v2 .notice{background:var(--sand);border-left:3px solid var(--accent);padding:12px 16px;font-size:14.5px;margin:0 0 24px;}
+  .v2 .notice.err{background:#f7e2dc;border-left-color:#a33a22;}
+  .v2 .field{display:block;margin-bottom:18px;}
+  .v2 .field > span{display:block;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin-bottom:7px;}
+  .v2 .field input, .v2 .field textarea{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);background:var(--white);color:var(--ink);border-radius:0;}
+  .v2 .field input:focus, .v2 .field textarea:focus{outline:none;border-color:var(--ink);}
+  .v2 .amounts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .v2 .amounts button{font:inherit;font-size:15px;padding:10px 16px;border:1px solid var(--line);background:var(--white);color:var(--ink);cursor:pointer;}
+  .v2 .amounts button.on{background:var(--ink);border-color:var(--ink);color:var(--white);}
+  .v2 .summary{list-style:none;margin:0 0 8px;padding:0;border-top:1px solid var(--ink);}
+  .v2 .summary li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:16px;}
+  .v2 .summary li span:last-child{text-align:right;}
+  .v2 .guest{display:grid;grid-template-columns:28px minmax(0,2fr) minmax(0,3fr);gap:14px;align-items:start;padding:16px 0;border-top:1px solid var(--line);}
+  .v2 .guest .num{font-family:'Cormorant Garamond', Georgia, serif;font-style:italic;font-size:26px;color:var(--accent);line-height:1.6;}
+  .v2 .guest .field{margin:0;}
+  .v2 .cert{
+    max-width:640px;
+    margin:0 auto;
+    background:var(--white);
+    text-align:center;
+    padding:56px 48px 48px;
+    outline:1px solid var(--line);
+    outline-offset:-14px;
+    border:1px solid var(--line);
+  }
+  .v2 .cert img{height:64px;width:auto;margin:0 auto 26px;}
+  .v2 .cert .amt{font-family:'Cormorant Garamond', Georgia, serif;font-size:72px;line-height:1;margin:14px 0 20px;}
+  .v2 .cert .to{font-size:16px;color:var(--ink-2);}
+  .v2 .cert .msg{font-family:'Cormorant Garamond', Georgia, serif;font-style:italic;font-size:22px;line-height:1.4;margin:18px auto 0;max-width:26em;}
+  .v2 .cert .code{display:inline-block;margin:30px 0 14px;padding:12px 22px;border:1px dashed var(--ink);font-size:24px;font-weight:600;letter-spacing:0.16em;}
+  .v2 .cert .how{font-size:13.5px;color:var(--ink-2);max-width:30em;margin:0 auto;}
+
   /* ---------- booking band + footer ---------- */
   .v2 .book{padding:120px 0;text-align:center;}
   .v2 .book h2{margin:18px auto 22px;max-width:15em;}
@@ -515,6 +570,7 @@ export const V2_STYLES = String.raw`
     .v2 .band img{aspect-ratio:16/10;}
     .v2 .reach{grid-template-columns:minmax(0,1fr);}
     .v2 .rd-cols{grid-template-columns:minmax(0,1fr);gap:32px;}
+    .v2 .tk{grid-template-columns:minmax(0,1fr);gap:40px;}
     .v2 .ft-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
     .v2 .ft-in > div:first-child{grid-column:1 / -1;}
     .v2 .sec, .v2 .book, .v2 .menu-sec{padding:84px 0;}
@@ -551,11 +607,17 @@ export const V2_STYLES = String.raw`
     .v2 .pair{grid-template-columns:minmax(0,1fr);}
     .v2 .products, .v2 .recipe-grid{grid-template-columns:minmax(0,1fr);}
     .v2 .recipe-detail{padding:32px 22px;}
+    .v2 .tk-card{padding:28px 22px 24px;}
+    .v2 .guest{grid-template-columns:24px minmax(0,1fr);}
+    .v2 .guest .field:last-child{grid-column:2;}
+    .v2 .cert{padding:44px 22px 36px;}
+    .v2 .cert .amt{font-size:56px;}
     .v2 .ft-in{grid-template-columns:minmax(0,1fr);gap:32px;}
     .v2 .sec, .v2 .book, .v2 .menu-sec{padding:68px 0;}
   }
 
   @media print{
+    .v2 .no-print, .v2 .testbar{display:none !important;}
     .v2 .hd, .v2 .ft, .v2 .ph, .v2 .book, .v2 .rx-tools, .v2 .recipe-count, .v2 .rc-actions, .v2 .sample-flag, .v2 .rd-close, .v2 .rd-print{display:none !important;}
     .v2 .sec{padding:0;}
     .v2 .recipe-detail{border:0;padding:0;}
@@ -678,12 +740,57 @@ export function renderRates(rows: { name: string; price: string; note?: string }
 }
 
 /* Upcoming dates. Past ones drop off on their own; dinners lead. Partner
-   dinners link straight to the partner's ticket page. */
-export function renderDinnerList(opts?: { dinnersOnly?: boolean }): string {
+   dinners link straight to the partner's ticket page; Dyllan's own ticketed
+   events (from /api/tickets) link to their ticket page on this site. */
+export type OwnEvent = {
+  slug: string;
+  name: string;
+  date: string;
+  time: string;
+  location: string;
+  about: string;
+  priceCents: number;
+  status: "on_sale" | "closed";
+  seatsLeft: number;
+};
+
+type Row = {
+  date: string;
+  dinner: boolean;
+  kind: string;
+  name: string;
+  details: string;
+  price: string;
+  sold: string;
+  links: { label: string; url: string; external: boolean }[];
+};
+
+export function renderDinnerList(opts?: { dinnersOnly?: boolean; own?: OwnEvent[] }): string {
   const today = new Date().toLocaleDateString("en-CA");
-  const rows = EVENTS.filter((e) => e.date >= today && (!opts?.dinnersOnly || e.kind === "dinner")).sort(
-    (a, b) => (a.kind === b.kind ? 0 : a.kind === "dinner" ? -1 : 1)
-  );
+  const partner: Row[] = EVENTS.filter((e) => e.date >= today && (!opts?.dinnersOnly || e.kind === "dinner")).map((e) => ({
+    date: e.date,
+    dinner: e.kind === "dinner",
+    kind: e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "",
+    name: e.name,
+    details: `${e.time} · ${e.about}`,
+    price: e.price ?? "",
+    sold: !e.partner ? "" : e.tickets.length > 1 ? `Tickets from ${e.partner}, by diet:` : `Sold by ${e.partner}`,
+    links: e.tickets.map((t) => ({ ...t, external: true })),
+  }));
+  const own: Row[] = (opts?.own ?? []).map((e) => {
+    const out = e.status !== "on_sale" || e.seatsLeft < 1;
+    return {
+      date: e.date,
+      dinner: true,
+      kind: "Hosted by Dyllan",
+      name: e.name,
+      details: [e.time, e.location, e.about].filter(Boolean).join(" · "),
+      price: `$${(e.priceCents / 100).toLocaleString("en-US")} per person`,
+      sold: out ? (e.seatsLeft < 1 ? "Sold out" : "Sales closed") : e.seatsLeft <= 10 ? `${e.seatsLeft} seat${e.seatsLeft === 1 ? "" : "s"} left` : "",
+      links: [{ label: out ? "Details" : "Buy tickets", url: `/tickets/${e.slug}`, external: false }],
+    };
+  });
+  const rows = [...partner, ...own].sort((a, b) => (a.dinner === b.dinner ? a.date.localeCompare(b.date) : a.dinner ? -1 : 1));
   if (!rows.length) {
     return `<ol class="dl"><li><div></div><div><h3>New dates coming soon</h3><p>The next dinners are being set with our farm hosts. Call or email to hear first.</p></div></li></ol>`;
   }
@@ -693,20 +800,33 @@ export function renderDinnerList(opts?: { dinnersOnly?: boolean }): string {
             const d = new Date(`${e.date}T12:00:00`);
             const month = d.toLocaleDateString("en-US", { month: "short" });
             const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
-            const kind = e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "";
-            const links = e.tickets
-              .map((t) => `<a class="tlink" href="${t.url}" target="_blank" rel="noopener">${t.label}</a>`)
+            const links = e.links
+              .map((t) => `<a class="tlink" href="${t.url}"${t.external ? ' target="_blank" rel="noopener"' : ""}>${t.label}</a>`)
               .join("");
             return `<li>
           <div><span class="d">${d.getDate()}</span><span class="m">${month}<span class="wd"> · ${weekday}</span></span></div>
-          <div>${kind ? `<span class="kind">${kind}</span>` : ""}<h3>${e.name}</h3><p>${e.time} · ${e.about}</p></div>
-          <div class="dl-side">${e.price ? `<span class="price">${e.price}</span>` : ""}<span class="sold">${
-            !e.partner ? "" : e.tickets.length > 1 ? `Tickets from ${e.partner}, by diet:` : `Sold by ${e.partner}`
-          }</span><div class="tix">${links}</div></div>
+          <div>${e.kind ? `<span class="kind">${e.kind}</span>` : ""}<h3>${e.name}</h3><p>${e.details}</p></div>
+          <div class="dl-side">${e.price ? `<span class="price">${e.price}</span>` : ""}<span class="sold">${e.sold}</span><div class="tix">${links}</div></div>
         </li>`;
           })
           .join("\n        ")}
       </ol>`;
+}
+
+// The same list, plus Dyllan's own on-sale events once they load.
+export function DinnerList({ dinnersOnly }: { dinnersOnly?: boolean }) {
+  const [own, setOwn] = useState<OwnEvent[]>([]);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/tickets?action=events")
+      .then((r) => (r.ok ? r.json() : { events: [] }))
+      .then((d) => live && setOwn(d.events ?? []))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return <Html html={renderDinnerList({ dinnersOnly, own })} />;
 }
 
 export function renderRolls(): string {

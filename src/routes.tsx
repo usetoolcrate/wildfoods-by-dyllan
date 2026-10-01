@@ -10,6 +10,9 @@ import { ContactPage } from "@/pages/site/ContactPage";
 import { AdminRecipesPage } from "@/pages/site/AdminRecipesPage";
 import { QuestionsPage } from "@/pages/site/QuestionsPage";
 import { AdminQuestionsPage } from "@/pages/site/AdminQuestionsPage";
+import { AdminTicketsPage } from "@/pages/site/AdminTicketsPage";
+import { TicketPage, TicketThanksPage } from "@/pages/site/TicketPages";
+import { GiftPage, GiftThanksPage } from "@/pages/site/GiftPages";
 
 function PublicShell() {
   return (
@@ -38,6 +41,11 @@ export function PublicAppRoutes() {
         <Route path="/questions" element={<QuestionsPage />} />
         <Route path="/preview" element={<Navigate to="/" replace />} />
         <Route path="/admin/questions" element={<AdminQuestionsPage />} />
+        <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+        <Route path="/tickets/thanks" element={<TicketThanksPage />} />
+        <Route path="/tickets/:slug" element={<TicketPage />} />
+        <Route path="/gift-certificates" element={<GiftPage />} />
+        <Route path="/gift-certificates/thanks" element={<GiftThanksPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

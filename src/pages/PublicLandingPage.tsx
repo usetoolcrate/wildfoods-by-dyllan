@@ -4,13 +4,13 @@ import {
   renderHeader,
   renderFooter,
   renderBook,
-  renderDinnerList,
+  DinnerList,
   renderRolls,
   PRIVATE_CHEF_TIERS,
 } from "@/pages/v2";
 import { PlateGallery } from "@/pages/site/PlateGallery";
 
-const TOP = `${renderHeader("/")}
+const HERO = `${renderHeader("/")}
 
 <section class="hero s-paper">
   <div class="c hero-in">
@@ -28,11 +28,9 @@ const TOP = `${renderHeader("/")}
       <figcaption>Plating a full dinner service by hand.</figcaption>
     </figure>
   </div>
-</section>
+</section>`;
 
-<section class="sec s-pine" id="dinners">
-  <div class="c">
-    <div class="sh split">
+const DINNERS_HEAD = `    <div class="sh split">
       <div>
         <div class="label">Farm dinners</div>
         <h2>At the table this season</h2>
@@ -41,13 +39,11 @@ const TOP = `${renderHeader("/")}
     </div>
     <figure class="band">
       <img src="/images/g-dinner-dusk.jpg" alt="Dyllan speaking to guests at an outdoor dinner at dusk, under string lights" style="object-position:center 40%;">
-    </figure>
-    ${renderDinnerList({ dinnersOnly: true })}
-    <div class="after-list"><a class="tlink" href="/farm-to-table">All dates, workshops &amp; catering</a></div>
-  </div>
-</section>
+    </figure>`;
 
-<section class="sec s-paper">
+const DINNERS_AFTER = `<div class="after-list"><a class="tlink" href="/farm-to-table">All dates, workshops &amp; catering</a></div>`;
+
+const WORK = `<section class="sec s-paper">
   <div class="c">
     <div class="sh center">
       <div class="label">The work</div>
@@ -162,7 +158,15 @@ ${renderFooter()}`;
 export function PublicLandingPage() {
   return (
     <V2Page title="Wild Foods by Dyllan — Farm-to-Table Dining in the Ozarks">
-      <Html html={TOP} />
+      <Html html={HERO} />
+      <section className="sec s-pine" id="dinners">
+        <div className="c">
+          <Html html={DINNERS_HEAD} />
+          <DinnerList dinnersOnly />
+          <Html html={DINNERS_AFTER} />
+        </div>
+      </section>
+      <Html html={WORK} />
       <PlateGallery />
       <Html html={BOTTOM} />
     </V2Page>

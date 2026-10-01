@@ -5,35 +5,31 @@ import {
   renderFooter,
   renderPageHero,
   renderBook,
-  renderDinnerList,
+  DinnerList,
   renderRolls,
   renderRates,
 } from "@/pages/v2";
 
-const BODY = `${renderHeader("/farm-to-table")}
+const TOP = `${renderHeader("/farm-to-table")}
 
 ${renderPageHero({
   label: "Farm to Table",
   title: "Dinners set where the food is grown",
   sub: "Ticketed dinners at Ozarks farms, ranches, orchards, and wineries — menus built from what the host grows and raises, with wild foods foraged close by.",
   image: { src: "/images/g-dinner-brick.jpg", alt: "Dyllan introducing a course to dinner guests in a brick-walled venue", position: "center 40%" },
-})}
+})}`;
 
-<section class="sec s-pine" id="dates">
-  <div class="c">
-    <div class="sh split">
+const DATES_HEAD = `    <div class="sh split">
       <div>
         <div class="label">Upcoming</div>
         <h2>Dinners &amp; workshops</h2>
       </div>
       <p>Each menu is crafted from farm-fresh ingredients, seasonal produce, and wild foods foraged throughout the Ozarks, then served where the food comes from. Dinners are hosted with a partner farm or venue, and the host sells the tickets — follow the link on each date.</p>
-    </div>
-    ${renderDinnerList()}
-    <div class="after-list"><a class="tlink" href="#catering">Host a dinner with Dyllan</a></div>
-  </div>
-</section>
+    </div>`;
 
-<section class="sec s-white">
+const DATES_AFTER = `<div class="after-list"><a class="tlink" href="#catering">Host a dinner with Dyllan</a></div>`;
+
+const REST = `<section class="sec s-white">
   <div class="c">
     <div class="sh">
       <div class="label">Recent dinners</div>
@@ -110,7 +106,15 @@ ${renderFooter()}`;
 export function FarmToTablePage() {
   return (
     <V2Page title="Farm-to-Table Dinners — Wild Foods by Dyllan">
-      <Html html={BODY} />
+      <Html html={TOP} />
+      <section className="sec s-pine" id="dates">
+        <div className="c">
+          <Html html={DATES_HEAD} />
+          <DinnerList />
+          <Html html={DATES_AFTER} />
+        </div>
+      </section>
+      <Html html={REST} />
     </V2Page>
   );
 }
