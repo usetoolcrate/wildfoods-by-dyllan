@@ -998,7 +998,6 @@ export const HOSTS: { name: string; what: string }[] = [
   { name: "7C's Winery", what: "Winery dinner" },
   { name: "Ozarks Farm Stop", what: "Farm Stop to Table · Oct 2026" },
   { name: "Finley Farms", what: "Fall Harvest Dinner · Nov 2026" },
-  { name: "Bull Mills", what: "Live-Fire Fall Dinner · Nov 2026" },
 ];
 
 /* Organizations Dyllan has cooked, taught, or spoken with (not dinner venues). */
