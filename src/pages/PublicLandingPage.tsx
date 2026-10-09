@@ -139,17 +139,13 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
   <div class="c area">
     <div>
       <div class="label">Service area</div>
-      <h2>Cooking across the Ozarks</h2>
-      <p>Based in Seymour and serving Springfield and southwest Missouri — private dinners, catering, farm dinners, and foraging walks. Planning something farther out? Ask; travel is quoted with your date.</p>
+      <h2>Cooking across Missouri and the Ozarks</h2>
+      <p>Private dinners, catering, farm dinners, and foraging walks — anywhere in Missouri, plus Northwest Arkansas and Eastern Oklahoma.</p>
     </div>
     <ul class="towns">
-      <li>Springfield</li>
-      <li>Seymour</li>
-      <li>Ozark</li>
-      <li>Nixa</li>
-      <li>Branson</li>
-      <li>Walnut Shade</li>
-      <li class="more">and the surrounding Ozarks</li>
+      <li><span class="region">All of Missouri</span><span class="incl">Including Springfield, Branson, Lake of the Ozarks, St. Louis, and Kansas City</span></li>
+      <li><span class="region">Northwest Arkansas</span></li>
+      <li><span class="region">Eastern Oklahoma</span></li>
     </ul>
   </div>
 </section>

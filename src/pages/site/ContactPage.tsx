@@ -12,7 +12,7 @@ const BODY = `${renderHeader("/contact")}
     <div class="reach">
       <div><div class="label">Call or text</div><a href="${PHONE_HREF}">${PHONE}</a></div>
       <div><div class="label">Email</div><a href="mailto:${EMAIL}">${EMAIL}</a></div>
-      <div><div class="label">Based in</div><span class="big">Springfield, Missouri — serving the Ozarks</span></div>
+      <div><div class="label">Serving</div><span class="big">All of Missouri, Northwest Arkansas &amp; Eastern Oklahoma</span></div>
     </div>
   </div>
 </section>

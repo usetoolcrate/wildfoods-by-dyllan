@@ -320,9 +320,10 @@ export const V2_STYLES = String.raw`
   .v2 .area{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:80px;align-items:center;}
   .v2 .area h2{margin:18px 0 22px;}
   .v2 .area p{color:var(--ink-2);margin:0;max-width:32em;}
-  .v2 .towns{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;border-top:1px solid var(--ink);}
-  .v2 .towns li{font-family:'Cormorant Garamond', Georgia, serif;font-size:28px;line-height:1.2;padding:14px 0;border-bottom:1px solid var(--line);}
-  .v2 .towns li.more{grid-column:1 / -1;font-style:italic;color:var(--ink-2);font-size:22px;}
+  .v2 .towns{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink);}
+  .v2 .towns li{padding:20px 0;border-bottom:1px solid var(--line);}
+  .v2 .towns .region{display:block;font-family:'Cormorant Garamond', Georgia, serif;font-size:32px;line-height:1.15;}
+  .v2 .towns .incl{display:block;margin-top:6px;font-size:15px;color:var(--ink-2);}
 
   /* ---------- link cards ---------- */
   .v2 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;}
@@ -608,7 +609,7 @@ export const V2_STYLES = String.raw`
     .v2 .roll-next{margin-top:48px;}
     .v2 .cards a, .v2 .cards .card{padding:30px 24px;}
     .v2 .menus{grid-template-columns:minmax(0,1fr);gap:40px;}
-    .v2 .towns li{font-size:24px;}
+    .v2 .towns .region{font-size:27px;}
     .v2 .topics{grid-template-columns:minmax(0,1fr);}
     .v2 .tl-e{grid-template-columns:minmax(0,1fr);gap:14px;padding:36px 0;}
     .v2 .tl-age{font-size:52px;}
@@ -684,7 +685,7 @@ export function renderFooter(): string {
     <div class="ft-in">
       <div>
         <div class="ft-brand">Wild Foods by Dyllan</div>
-        <p>Farm-to-table dinners, private chef service, and wild foods from Chef Dyllan Dale — serving Springfield and the Ozarks.</p>
+        <p>Farm-to-table dinners, private chef service, and wild foods from Chef Dyllan Dale — serving Missouri, Northwest Arkansas, and Eastern Oklahoma.</p>
       </div>
       <nav>${NAV.map(([href, label]) => `<a href="${href}">${label}</a>`).join("")}</nav>
       <div class="ft-contact">
@@ -733,7 +734,7 @@ export function renderBook(opts?: { title?: string; sub?: string; surface?: "s-e
       <a href="${PHONE_HREF}">${PHONE}</a>
       <a href="mailto:${EMAIL}">${EMAIL}</a>
     </div>
-    <p class="where">Springfield, Missouri · serving the Ozarks</p>
+    <p class="where">Serving all of Missouri, Northwest Arkansas &amp; Eastern Oklahoma</p>
   </div>
 </section>`;
 }
