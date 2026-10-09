@@ -153,18 +153,21 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
 <section class="sec s-paper">
   <div class="c cards three">
     <a href="/learn">
+      <img class="card-img" src="/images/creek-foraging.jpg" alt="Dyllan foraging along an Ozarks creek with his dog">
       <div class="label">Learn</div>
       <h3>Foraging walks &amp; classes</h3>
       <p>Two- and four-hour walks on your land, one-on-one consultations, and teaching for schools, conferences, and community groups.</p>
       <span class="tlink">Rates &amp; booking</span>
     </a>
     <a href="/recipes">
+      <img class="card-img" src="/images/g-raspberry-tart.jpg" alt="A raspberry tart topped with meringue kisses and mint">
       <div class="label">Recipes</div>
       <h3>From Dyllan's kitchen</h3>
       <p>Foraged fruits, ferments, nuts, and preserves — searchable and ready to print for the kitchen counter.</p>
       <span class="tlink">Browse recipes</span>
     </a>
     <a href="https://mogrown.com/products/forage-the-ozarks-t-shirt-with-wild-foods-by-dyllan-t-shirt-only" target="_blank" rel="noopener">
+      <img class="card-img" src="/images/mogrown-tee.jpg" alt="The Forage the Ozarks t-shirt, worn with a woven foraging basket">
       <div class="label">Wear it</div>
       <h3>Forage the Ozarks tee</h3>
       <p>A Wild Foods by Dyllan collaboration with MOGROWN. From $35, sizes S–3XL.</p>

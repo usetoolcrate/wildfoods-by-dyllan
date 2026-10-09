@@ -331,6 +331,7 @@ export const V2_STYLES = String.raw`
   .v2 .cards a, .v2 .cards .card{display:block;background:var(--white);border:1px solid var(--line);padding:40px;transition:border-color .2s;}
   .v2 .cards a:hover{border-color:var(--ink);}
   .v2 .cards h3{font-size:32px;line-height:1.1;margin:14px 0 12px;}
+  .v2 .cards .card-img{width:calc(100% + 80px);max-width:none;margin:-40px -40px 26px;aspect-ratio:4/3;object-fit:cover;}
   .v2 .cards p{margin:0 0 24px;color:var(--ink-2);font-size:16px;}
 
   /* ---------- rates ---------- */
@@ -608,6 +609,7 @@ export const V2_STYLES = String.raw`
     .v2 .roll.wrap-names .h{white-space:normal;}
     .v2 .roll-next{margin-top:48px;}
     .v2 .cards a, .v2 .cards .card{padding:30px 24px;}
+    .v2 .cards .card-img{width:calc(100% + 48px);margin:-30px -24px 22px;}
     .v2 .menus{grid-template-columns:minmax(0,1fr);gap:40px;}
     .v2 .towns .region{font-size:27px;}
     .v2 .topics{grid-template-columns:minmax(0,1fr);}
