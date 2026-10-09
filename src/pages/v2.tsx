@@ -316,6 +316,14 @@ export const V2_STYLES = String.raw`
   .v2 .roll .h{white-space:nowrap;}
   .v2 .roll-next{margin-top:64px;}
 
+  /* ---------- service area ---------- */
+  .v2 .area{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:80px;align-items:center;}
+  .v2 .area h2{margin:18px 0 22px;}
+  .v2 .area p{color:var(--ink-2);margin:0;max-width:32em;}
+  .v2 .towns{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;border-top:1px solid var(--ink);}
+  .v2 .towns li{font-family:'Cormorant Garamond', Georgia, serif;font-size:28px;line-height:1.2;padding:14px 0;border-bottom:1px solid var(--line);}
+  .v2 .towns li.more{grid-column:1 / -1;font-style:italic;color:var(--ink-2);font-size:22px;}
+
   /* ---------- link cards ---------- */
   .v2 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;}
   .v2 .cards.three{grid-template-columns:repeat(3,minmax(0,1fr));}
@@ -556,7 +564,7 @@ export const V2_STYLES = String.raw`
     .v2 .c{padding-left:28px;padding-right:28px;}
     .v2 .hd-in{flex-direction:column;justify-content:center;gap:14px;padding:18px 0;}
     .v2 .hd nav{justify-content:center;gap:6px 20px;}
-    .v2 .hero-in, .v2 .ph-in, .v2 .dish, .v2 .split, .v2 .split.rev{grid-template-columns:minmax(0,1fr);gap:48px;}
+    .v2 .hero-in, .v2 .ph-in, .v2 .dish, .v2 .split, .v2 .split.rev, .v2 .area{grid-template-columns:minmax(0,1fr);gap:48px;}
     .v2 .split.rev > figure{order:0;}
     .v2 .hero-in{padding-top:56px;padding-bottom:80px;}
     .v2 .ph{padding:56px 0 72px;}
@@ -600,6 +608,7 @@ export const V2_STYLES = String.raw`
     .v2 .roll-next{margin-top:48px;}
     .v2 .cards a, .v2 .cards .card{padding:30px 24px;}
     .v2 .menus{grid-template-columns:minmax(0,1fr);gap:40px;}
+    .v2 .towns li{font-size:24px;}
     .v2 .topics{grid-template-columns:minmax(0,1fr);}
     .v2 .tl-e{grid-template-columns:minmax(0,1fr);gap:14px;padding:36px 0;}
     .v2 .tl-age{font-size:52px;}

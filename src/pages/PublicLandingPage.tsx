@@ -48,12 +48,12 @@ const WORK = `<section class="sec s-paper">
     <div class="sh center">
       <div class="label">The work</div>
       <h2>What goes into every plate</h2>
-      <p>Wild ingredients are foraged by hand. Farm ingredients come through real relationships with Ozarks growers, ranchers, and makers. Every menu is built from scratch around the season, and every plate is finished by hand before it leaves the kitchen.</p>
+      <p>Ingredients are curated from local farms, through real relationships with Ozarks growers, ranchers, and makers — with wild foods foraged by hand when the season allows. Every menu is built from scratch, and every plate is finished by hand before it leaves the kitchen.</p>
     </div>
     <div class="steps">
       <figure>
-        <img src="/images/creek-foraging.jpg" alt="Dyllan foraging along an Ozarks creek with his dog">
-        <figcaption><span class="n">01</span><strong>Gathered</strong>Wild foods foraged by hand, only in season.</figcaption>
+        <img src="/images/g-local-produce.jpg" alt="Pawpaws and tomatoes in a linen-lined basket at an orchard dinner">
+        <figcaption><span class="n">01</span><strong>Sourced</strong>Curated from local farms, orchards, and growers at the peak of their season.</figcaption>
       </figure>
       <figure>
         <img src="/images/g-hands-plating.jpg" alt="Hands placing garnish on a long row of plated courses" style="object-position:center 55%;">
@@ -105,7 +105,7 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
       <div class="label">The chef</div>
       <h2>Dyllan Dale</h2>
       <p>Dyllan grew up in the Ozarks countryside and started in restaurant kitchens at sixteen, washing dishes and bussing tables. He worked his way up the line and was managing a kitchen by twenty-eight.</p>
-      <p>He learned under his mentor, Rob Connoley of Bulrush in St. Louis, finished his culinary degree, and brings more than a decade in professional kitchens to every menu. He lives in Seymour, Missouri, with his wife and five kids.</p>
+      <p>He learned under his mentor, Rob Connoley of Bulrush in St. Louis, and attended culinary school before starting a family and launching Wild Foods by Dyllan as a private chef in the Ozarks. He brings more than a decade in professional kitchens to every menu, and lives in Seymour, Missouri, with his wife and five kids.</p>
       <blockquote>“I don't think I will ever leave the Ozarks — I hope to bring the flavors of the forest and field to people through fine dining and education.”</blockquote>
       <a class="tlink" href="/story">Read his story</a>
     </div>
@@ -135,8 +135,27 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
   </div>
 </section>
 
+<section class="sec s-sand" id="service-area">
+  <div class="c area">
+    <div>
+      <div class="label">Service area</div>
+      <h2>Cooking across the Ozarks</h2>
+      <p>Based in Seymour and serving Springfield and southwest Missouri — private dinners, catering, farm dinners, and foraging walks. Planning something farther out? Ask; travel is quoted with your date.</p>
+    </div>
+    <ul class="towns">
+      <li>Springfield</li>
+      <li>Seymour</li>
+      <li>Ozark</li>
+      <li>Nixa</li>
+      <li>Branson</li>
+      <li>Walnut Shade</li>
+      <li class="more">and the surrounding Ozarks</li>
+    </ul>
+  </div>
+</section>
+
 <section class="sec s-paper">
-  <div class="c cards">
+  <div class="c cards three">
     <a href="/learn">
       <div class="label">Learn</div>
       <h3>Foraging walks &amp; classes</h3>
@@ -148,6 +167,12 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
       <h3>From Dyllan's kitchen</h3>
       <p>Foraged fruits, ferments, nuts, and preserves — searchable and ready to print for the kitchen counter.</p>
       <span class="tlink">Browse recipes</span>
+    </a>
+    <a href="https://mogrown.com/products/forage-the-ozarks-t-shirt-with-wild-foods-by-dyllan-t-shirt-only" target="_blank" rel="noopener">
+      <div class="label">Wear it</div>
+      <h3>Forage the Ozarks tee</h3>
+      <p>A Wild Foods by Dyllan collaboration with MOGROWN. From $35, sizes S–3XL.</p>
+      <span class="tlink">Shop on MOGROWN</span>
     </a>
   </div>
 </section>

@@ -53,10 +53,10 @@ const ENTRIES: { age: string; place: string; title: string; body: string[] }[] =
   },
   {
     age: "28+",
-    place: "Mentorship &amp; degree",
-    title: "Bulrush, and finishing what I started",
+    place: "Mentorship &amp; culinary school",
+    title: "Bulrush, culinary school, and a family",
     body: [
-      "I found a mentor in Rob Connoley of Bulrush in St. Louis — a restaurant built on Ozarks cuisine with contemporary technique and foraged, hunted ingredients. I went back and completed the culinary degree I'd started ten years earlier: classical French and contemporary technique, applied to wild foods.",
+      "I found a mentor in Rob Connoley of Bulrush in St. Louis — a restaurant built on Ozarks cuisine with contemporary technique and foraged, hunted ingredients. I attended culinary school before starting a family and launching Wild Foods by Dyllan as a private chef in the Ozarks.",
     ],
   },
 ];
