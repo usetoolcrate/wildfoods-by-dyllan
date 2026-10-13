@@ -1,7 +1,7 @@
 // The /admin/how walkthroughs: one per admin page, drawn with the admin's own style
 // objects (AdminKit, AdminRecipesPage) so they look like the real screens. Each is a pure
 // function of t. If an admin screen's labels or layout change, update its demo here.
-// Names, dates and the new review are examples.
+// Names, dates and the new reviews are examples.
 
 import type { CSSProperties, ReactNode } from "react";
 import { Banner, Bubble, Caret, Scene, Screen, Scroll, Sheet } from "@/demos/kit";
@@ -10,6 +10,7 @@ import type { Demo } from "@/demos/DemoPlayer";
 import { badge, card, field, muted, small } from "@/pages/site/AdminKit";
 import { buttonStyle, inputStyle, labelStyle, secondaryButtonStyle, wrapStyle } from "@/pages/site/AdminRecipesPage";
 import { renderDinnerList, type SiteEvent } from "@/pages/v2";
+import { excerpt, sentences } from "@/lib/sentences";
 
 const HOST = "wildfoods-by-dyllan.vercel.app";
 const PAPER = "var(--paper)";
@@ -672,185 +673,182 @@ export const PLATES: Demo = {
 
 // ---------- 5. Reviews ----------
 
-type Rev = { name: string; text: string; stars?: number; src: string; shown: boolean };
-const NEW_REVIEW = "We booked Dyllan for our parents' anniversary. Every course was a surprise, and he made the night feel easy.";
-const REVIEWS: Rev[] = [
-  { name: "Noah H.", text: "I was skeptical at first — I couldn't pronounce any of the dishes on the menu…", src: "Old website", shown: true },
-  { name: "Jobeth S.", text: "A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared…", src: "Old website", shown: true },
-  { name: "Julie S.", text: "I never liked venison before I had it at one of the pop-ups…", src: "Old website", shown: false },
+type Rev = { name: string; text: string; stars?: number; date: string; shown: boolean; isNew?: boolean; short?: boolean };
+const SARAH = "We found Dyllan through a friend of a friend. He cooked for our parents' anniversary and every course was a surprise. He made the whole night feel easy.";
+const SARAH_PARTS = sentences(SARAH);
+const SARAH_SHORT = excerpt(SARAH_PARTS, [1, 2]);
+const MIKE = "Best meal we've had in the Ozarks. The venison was unreal.";
+const SHOWING: Rev[] = [
+  { name: "Noah H.", text: "I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted…", date: "Old website", shown: true },
+  { name: "Jobeth S.", text: "A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared, wild foraged, six-course dinner…", date: "Old website", shown: true },
 ];
 
-function ReviewCard({ r, tap, style }: { r: Rev; tap?: string; style?: CSSProperties }) {
+function ReviewCard({ r, tapShow, tapShorten, style, children }: { r: Rev; tapShow?: string; tapShorten?: string; style?: CSSProperties; children?: ReactNode }) {
   return (
-    <div style={{ ...card, opacity: r.shown ? 1 : 0.6, ...style }}>
+    <div style={{ ...card, opacity: r.shown || children ? 1 : 0.75, ...style }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <strong>
           {r.stars ? `${"★".repeat(r.stars)} ` : ""}
           {r.name}
+          {r.isNew ? <span style={badge("#a85a22")}>new</span> : null}
           <span style={badge(r.shown ? "#3a5a40" : "#7a7a7a")}>{r.shown ? "showing" : "hidden"}</span>
         </strong>
-        <span style={muted}>{r.src}</span>
+        <span style={muted}>{r.date}</span>
       </div>
-      <p style={{ margin: "8px 0 12px", fontSize: 15 }}>{r.text}</p>
-      <div style={{ display: "flex", gap: 6 }}>
-        <span style={btn(small)}>↑</span>
-        <span style={btn(small)}>↓</span>
-        <span data-tap={tap} style={btn(small)}>
-          {r.shown ? "Hide" : "Show"}
-        </span>
-        <span style={btn(small)}>Edit</span>
-        <span style={btn(small)}>Delete</span>
-      </div>
+      <p style={{ margin: "8px 0 4px", fontSize: 15 }}>{r.text}</p>
+      {r.short ? <div style={{ ...muted, fontSize: 13, marginBottom: 8 }}>Shortened from the full review</div> : <div style={{ height: 8 }} />}
+      {children ?? (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <span style={btn(small)}>↑</span>
+          <span style={btn(small)}>↓</span>
+          <span data-tap={tapShow} style={btn(small, r.shown ? undefined : { background: "var(--pine)", color: "#fff", borderColor: "var(--pine)" })}>
+            {r.shown ? "Hide" : "Show on site"}
+          </span>
+          <span data-tap={tapShorten} style={btn(small)}>
+            Shorten
+          </span>
+        </div>
+      )}
     </div>
   );
 }
 
-function GoogleLinkCard({ v, focus, saved, bubble }: { v: string; focus: boolean; saved: boolean; bubble: number }) {
-  return (
-    <div style={{ ...card, padding: 18 }}>
-      <Label>Link to your Google reviews (from "Share" on your Google Business Profile)</Label>
-      <div style={{ display: "flex", gap: 10, position: "relative" }}>
-        <Bubble p={bubble} label="Paste" tap="paste2" style={{ left: 10, top: -38 }} />
-        <Box tap="glink" ph="https://g.page/r/…" v={v} focus={focus} style={{ marginBottom: 0, whiteSpace: "nowrap" }} />
-        <span data-tap="save-link" style={btn(small, { alignSelf: "center" })}>
-          {saved ? "Saved" : "Save"}
-        </span>
-      </div>
-      <div style={{ ...muted, marginTop: 6 }}>Adds a "Read all reviews on Google" link under the reviews.</div>
+/** The sentence picker, with sentence 0 struck once `dropped`. */
+const Picker = ({ dropped, saving }: { dropped: boolean; saving: boolean }) => (
+  <div style={{ borderTop: "1px solid var(--line)", marginTop: 12, paddingTop: 12 }}>
+    <Label>Tap a sentence to leave it out</Label>
+    <div style={{ display: "grid", gap: 6, marginBottom: 12 }}>
+      {SARAH_PARTS.map((s, i) => {
+        const on = !(dropped && i === 0);
+        return (
+          <div
+            key={s}
+            data-tap={i === 0 ? "s0" : undefined}
+            style={{ font: "15px/1.45 Georgia, serif", padding: "8px 10px", border: on ? "1px solid var(--ink)" : "1px dashed var(--line)", background: on ? "#fff" : "transparent", color: on ? "var(--ink)" : "#9a958a", textDecoration: on ? "none" : "line-through" }}
+          >
+            {s}
+          </div>
+        );
+      })}
     </div>
-  );
-}
+    <Label>On the site</Label>
+    <p style={{ margin: "0 0 12px", fontSize: 15, fontStyle: "italic" }}>“{dropped ? SARAH_SHORT : SARAH}”</p>
+    <span data-tap="save" style={btn(buttonStyle)}>
+      {saving ? "Saving…" : "Save"}
+    </span>{" "}
+    <span style={btn(secondaryButtonStyle)}>Use the whole review</span>
+  </div>
+);
 
 const ReviewsHead = () => (
   <>
     <Bar />
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
       <h1 style={{ fontSize: 28, margin: 0 }}>Reviews</h1>
-      <span data-tap="add" style={btn(buttonStyle)}>
-        Add a review
-      </span>
+      <span style={btn(secondaryButtonStyle)}>Add one by hand</span>
     </div>
-    <p style={{ ...muted, marginBottom: 22 }}>"From the table" on the home page shows the first 4 reviews marked to show. Copy a favorite from Google, paste it in, and move it up.</p>
+    <p style={{ ...muted, marginBottom: 22 }}>"From the table" on the home page shows the first 4 reviews marked Showing. Showing a review puts it first; use the arrows to fine-tune the order.</p>
+    <div style={{ ...card, padding: 18 }}>
+      <div style={{ fontSize: 18, marginBottom: 6 }}>Google reviews</div>
+      <div style={{ fontSize: 15 }}>
+        From <strong>Wild Foods by Dyllan</strong> · 23 reviews
+      </div>
+      <div style={{ ...muted, margin: "4px 0 10px" }}>Checked this morning. New reviews arrive by themselves every morning.</div>
+      <span style={btn(small)}>Check now</span>
+    </div>
   </>
 );
+
+function Filters({ on, counts }: { on: string; counts: [number, number] }) {
+  const items: [string, string][] = [
+    ["new", `New from Google (${counts[0]})`],
+    ["showing", `Showing (${counts[1]})`],
+    ["hidden", "Hidden (17)"],
+  ];
+  return (
+    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "8px 0 18px" }}>
+      {items
+        .filter(([k]) => k !== "new" || counts[0] > 0)
+        .map(([k, v]) => (
+          <span key={k} data-tap={`f-${k}`} style={btn(small, { background: on === k ? "var(--ink)" : "transparent", color: on === k ? "#fff" : "var(--ink)" })}>
+            {v}
+          </span>
+        ))}
+    </div>
+  );
+}
 
 export const REVIEWS_DEMO: Demo = {
   id: "reviews",
   title: "Choosing reviews",
-  text: "Copy a favorite review from Google, paste it in, and choose which ones show on your home page. Add your Google reviews link once so visitors can read them all.",
-  duration: 20,
+  text: "Your Google reviews come in by themselves every morning and wait, hidden, until you show them. Show the ones you love, and shorten a long one to its best sentences. The words always stay the reviewer's own.",
+  duration: 19.5,
   chapters: [
-    { at: 0, label: "Copy a review from Google" },
-    { at: 3.6, label: "Paste it in" },
-    { at: 9.8, label: "Pick which ones show" },
-    { at: 14.4, label: "Add your Google link once" },
+    { at: 0, label: "New reviews arrive from Google" },
+    { at: 4.2, label: "Show the ones you love" },
+    { at: 8.6, label: "Shorten to its best lines" },
+    { at: 14.6, label: "It's on your home page" },
   ],
   taps: [
-    [1.3, "rtext"],
-    [2.7, "copy"],
-    [4.3, "add"],
-    [5.1, "name"],
-    [6.5, "text"],
-    [7.2, "paste"],
-    [8.9, "save"],
-    [11.2, "hide"],
-    [12.6, "show"],
-    [15.0, "glink"],
-    [15.7, "paste2"],
-    [16.6, "save-link"],
+    [5.0, "show1"],
+    [6.6, "f-showing"],
+    [9.2, "shorten"],
+    [10.6, "s0"],
+    [12.2, "save"],
   ],
   render: (t) => {
-    const formOpen = t >= 4.45;
-    const name = typing(t, "Sarah M.", 5.1);
-    const text = pasting(t, NEW_REVIEW, 6.5, 7.2);
-    const glink = pasting(t, "https://g.page/r/CW1ld2ZvbWRz", 15.0, 15.7);
-    const list: Rev[] = [
-      { name: "Sarah M.", text: NEW_REVIEW, stars: 5, src: "Google", shown: true },
-      { ...REVIEWS[0] },
-      { ...REVIEWS[1], shown: t < 11.3 },
-      { ...REVIEWS[2], shown: t >= 12.7 },
-    ];
+    const shown = t >= 5.1;
+    const onShowing = t >= 6.7;
+    const picking = t >= 9.3 && t < 12.4;
+    const short = t >= 12.4;
+    const sarah: Rev = { name: "Sarah M.", stars: 5, date: "Google · Oct 2", text: short ? SARAH_SHORT : SARAH, shown, isNew: !shown, short };
+    const mike: Rev = { name: "Mike R.", stars: 5, date: "Google · Oct 9", text: MIKE, shown: false, isNew: true };
+    const leaving = shown && !onShowing ? prog(t, 5.3, 0.4) : 0;
     return (
-      <Screen url={t < 3.6 ? "google.com/maps" : `${ADMIN_URL}/reviews`} background={t < 3.6 ? "#fff" : PAPER}>
-        <Scene t={t} from={0} to={3.6} style={{ fontFamily: "-apple-system, BlinkMacSystemFont, system-ui, sans-serif", color: "#1c1c1e" }}>
-          <div style={{ padding: "18px 18px" }}>
-            <div style={{ fontSize: 20, fontWeight: 600 }}>Wild Foods by Dyllan</div>
-            <div style={{ color: "#6e6e73", fontSize: 14, marginBottom: 18 }}>Reviews</div>
-            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
-              <span style={{ width: 34, height: 34, borderRadius: "50%", background: "#7b8f6a", color: "#fff", display: "grid", placeItems: "center", fontWeight: 600 }}>S</span>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>Sarah M.</div>
-                <div style={{ fontSize: 13, color: "#6e6e73" }}>
-                  <span style={{ color: "#e5a50a" }}>★★★★★</span> a week ago
-                </div>
+      <Screen url={t < 14.6 ? `${ADMIN_URL}/reviews` : `${HOST}/`} background={t < 14.6 ? PAPER : "#e5e9df"}>
+        <Scene t={t} from={0} to={14.6}>
+          <Scroll y={keyed(t, [[0, 0], [1.2, 300], [9.3, 330], [11.2, 520], [12.6, 330]], 0.8)}>
+            <div style={page}>
+              <ReviewsHead />
+              {onShowing ? (
+                <>
+                  <Filters on="showing" counts={[1, 5]} />
+                  <ReviewCard r={sarah} tapShorten="shorten" style={{ ...enter(prog(t, 6.75)), ...glow(t, 6.9, 1.4) }}>
+                    {picking ? <Picker dropped={t >= 10.65} saving={t >= 12.25} /> : undefined}
+                  </ReviewCard>
+                  {SHOWING.map((r) => (
+                    <ReviewCard key={r.name} r={r} style={enter(prog(t, 6.85))} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  <Filters on="new" counts={[shown ? 1 : 2, shown ? 5 : 4]} />
+                  {leaving < 1 ? <ReviewCard r={sarah} tapShow="show1" style={{ ...enter(prog(t, 1.6)), opacity: 1 - leaving }} /> : null}
+                  <ReviewCard r={mike} style={enter(prog(t, 1.75))} />
+                </>
+              )}
+            </div>
+          </Scroll>
+        </Scene>
+        <Scene t={t} from={14.6} to={99}>
+          <div className="v2 demo-v2" style={{ background: "transparent" }}>
+            <div style={{ padding: "30px 24px" }}>
+              <div className="qmark" aria-hidden="true">
+                “
+              </div>
+              <div className="label center">From the table</div>
+              <div className="quotes">
+                <blockquote style={{ ...enter(prog(t, 15.1)), ...glow(t, 15.4, 2.2), padding: 10, margin: -10 }}>
+                  <div className="stars">★★★★★</div>
+                  <p>“{SARAH_SHORT}”</p>
+                  <cite>Sarah M. · Google review</cite>
+                </blockquote>
+                <blockquote style={enter(prog(t, 15.3))}>
+                  <p>“I was skeptical at first — I couldn't pronounce any of the dishes on the menu…”</p>
+                  <cite>Noah H.</cite>
+                </blockquote>
               </div>
             </div>
-            <div style={{ position: "relative" }}>
-              <Bubble p={win(t, 1.85, 2.95, 0.2)} label="Copy" tap="copy" style={{ left: 120, top: -40 }} />
-              <p data-tap="rtext" style={{ fontSize: 15, lineHeight: 1.5, margin: 0, background: t >= 1.7 ? "rgba(47,111,221,.18)" : "transparent" }}>
-                {NEW_REVIEW}
-              </p>
-            </div>
-            <div style={{ borderTop: "1px solid #e5e5ea", marginTop: 18, paddingTop: 14, color: "#8e8e93", fontSize: 14 }}>More reviews…</div>
-          </div>
-        </Scene>
-        <Scene t={t} from={3.6} to={9.8}>
-          <Scroll y={keyed(t, [[0, 0], [4.6, 340], [7.9, 560]], 0.9)}>
-            <div style={page}>
-              <ReviewsHead />
-              <GoogleLinkCard v="" focus={false} saved={false} bubble={0} />
-              {formOpen ? (
-                <div style={{ ...card, padding: 20, marginBottom: 28, ...enter(prog(t, 4.45)) }}>
-                  <h2 style={{ fontSize: 22, marginTop: 0 }}>Add a review</h2>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 14px" }}>
-                    <div>
-                      <Label>Name (as shown)</Label>
-                      <Box tap="name" ph="Sarah M." {...name} />
-                    </div>
-                    <div>
-                      <Label>Stars</Label>
-                      <Box v="5 stars" select />
-                    </div>
-                    <div>
-                      <Label>From</Label>
-                      <Box v="Google" select />
-                    </div>
-                    <div>
-                      <Label>Date (optional)</Label>
-                      <Box ph="mm/dd/yyyy" />
-                    </div>
-                  </div>
-                  <Label>Review</Label>
-                  <div style={{ position: "relative" }}>
-                    <Bubble p={text.bubble} label="Paste" tap="paste" style={{ left: 10, top: -38 }} />
-                    <Box tap="text" h={110} v={text.v} focus={text.focus} />
-                  </div>
-                  <Check on>Show on the site</Check>
-                  <span data-tap="save" style={btn(buttonStyle)}>
-                    Save review
-                  </span>{" "}
-                  <span style={btn(secondaryButtonStyle)}>Cancel</span>
-                </div>
-              ) : null}
-            </div>
-          </Scroll>
-        </Scene>
-        <Scene t={t} from={9.8} to={14.4}>
-          <Scroll y={keyed(t, [[0, 330], [11.7, 560]], 0.8)}>
-            <div style={page}>
-              <ReviewsHead />
-              <GoogleLinkCard v="" focus={false} saved={false} bubble={0} />
-              {list.map((r, i) => (
-                <ReviewCard key={r.name} r={r} tap={i === 2 ? "hide" : i === 3 ? "show" : undefined} style={i === 0 ? glow(t, 10.1, 1.4) : undefined} />
-              ))}
-            </div>
-          </Scroll>
-        </Scene>
-        <Scene t={t} from={14.4} to={99}>
-          <div style={page}>
-            <ReviewsHead />
-            <GoogleLinkCard v={glink.v} focus={glink.focus} saved={t >= 16.7} bubble={glink.bubble} />
-            <ReviewCard r={list[0]} />
           </div>
         </Scene>
       </Screen>

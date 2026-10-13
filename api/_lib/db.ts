@@ -172,6 +172,13 @@ export async function ensureContentSchema() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  // Google sync: google_id links a row to its Google review, original_text keeps the
+  // reviewer's full words, keep lists the sentence numbers shown (null = all of them),
+  // is_new marks reviews that arrived from Google and haven't been looked at yet.
+  await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS google_id TEXT`;
+  await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS original_text TEXT`;
+  await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS keep JSONB`;
+  await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_new BOOLEAN NOT NULL DEFAULT false`;
   await sql`
     CREATE TABLE IF NOT EXISTS inquiries (
       id SERIAL PRIMARY KEY,

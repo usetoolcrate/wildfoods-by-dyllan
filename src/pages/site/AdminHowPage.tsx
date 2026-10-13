@@ -31,6 +31,9 @@ ${V2_STYLES}
 .v2.demo-v2 .dl-side .price{margin:0 0 8px;}
 .v2.demo-v2 .tix{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:10px 18px;}
 .v2.demo-v2 .dl li:nth-child(3){opacity:var(--new);background:rgba(168,90,34,calc(var(--new) * .1));}
+.v2.demo-v2 .quotes{grid-template-columns:minmax(0,1fr);gap:30px;margin-top:22px;}
+.v2.demo-v2 .quotes p{font-size:23px;margin-bottom:12px;}
+.v2.demo-v2 .qmark{font-size:110px;height:46px;}
 `;
 
 export function AdminHowPage() {

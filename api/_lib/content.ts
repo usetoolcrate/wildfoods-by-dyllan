@@ -7,7 +7,20 @@ import { ensureContentSchema, ensureEventExtras, getSql } from "./db.js";
    everything. */
 
 export type PlateRow = { id: number; name: string; image_url: string | null; image_alt: string; rows: { label: string; text: string }[]; position: number; published: boolean };
-export type ReviewRow = { id: number; name: string; text: string; rating: number | null; source: string; review_date: string | null; shown: boolean; position: number };
+export type ReviewRow = {
+  id: number;
+  name: string;
+  text: string;
+  rating: number | null;
+  source: string;
+  review_date: string | null;
+  shown: boolean;
+  position: number;
+  google_id: string | null;
+  original_text: string | null;
+  keep: number[] | null;
+  is_new: boolean;
+};
 export type InquiryRow = {
   id: number;
   name: string;

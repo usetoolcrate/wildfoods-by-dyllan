@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { buttonStyle, secondaryButtonStyle } from "@/pages/site/AdminRecipesPage";
 import { AdminShell, adminPost, badge, card, field, labelStyle, muted, small, uploadImage } from "@/pages/site/AdminKit";
+import { excerpt } from "@/lib/sentences";
 
 /* /admin and the content pages Dyllan edits himself:
    signature plates, reviews, and private dining inquiries. */
@@ -22,7 +23,7 @@ function useArea<T>(area: string) {
 
 /* ---------------- /admin ---------------- */
 
-type Summary = { new_inquiries: number; plates: number; reviews: number; upcoming: number };
+type Summary = { new_inquiries: number; plates: number; reviews: number; new_reviews: number; upcoming: number };
 
 function SummaryCards() {
   const { data } = useArea<Summary>("summary");
@@ -30,7 +31,7 @@ function SummaryCards() {
     ["/admin/inquiries", "Inquiries", data ? (data.new_inquiries ? `${data.new_inquiries} new` : "None new") : "…"],
     ["/admin/tickets", "Dinners & tickets", data ? `${data.upcoming} upcoming` : "…"],
     ["/admin/plates", "Signature plates", data ? `${data.plates} on the site` : "…"],
-    ["/admin/reviews", "Reviews", data ? `${data.reviews} on the site` : "…"],
+    ["/admin/reviews", "Reviews", data ? `${data.reviews} on the site${data.new_reviews ? ` · ${data.new_reviews} new from Google` : ""}` : "…"],
     ["/admin/recipes", "Recipes", "Add and edit recipes"],
     ["/admin/questions", "Questionnaire", "Answers from setup"],
     ["/admin/how", "How-to videos", "Short walkthroughs of each page"],
@@ -231,15 +232,196 @@ export function AdminPlatesPage() {
 
 /* ---------------- /admin/reviews ---------------- */
 
-type Review = { id: number; name: string; text: string; rating: number | null; source: string; review_date: string | null; shown: boolean };
+type Review = {
+  id: number;
+  name: string;
+  text: string;
+  rating: number | null;
+  source: string;
+  review_date: string | null;
+  shown: boolean;
+  keep: number[] | null;
+  is_new: boolean;
+  fromGoogle: boolean;
+  sentences: string[];
+};
 type ReviewDraft = { id?: number; name: string; text: string; rating: string; source: string; date: string; shown: boolean };
+type GoogleLoc = { account: string; location: string; title: string; address: string };
+type GoogleStatus = {
+  configured: boolean;
+  connected: boolean;
+  email: string;
+  location: GoogleLoc | null;
+  lastSync: { at: string; total: number; added: number; updated: number; removed: number; average: number | null; error: string } | null;
+};
 
-const NEW_REVIEW: ReviewDraft = { name: "", text: "", rating: "5", source: "google", date: "", shown: true };
+const NEW_REVIEW: ReviewDraft = { name: "", text: "", rating: "5", source: "site", date: "", shown: true };
 const SOURCE_LABEL: Record<string, string> = { google: "Google", site: "Old website", email: "Email / message" };
+const when = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+/** Where the reviews come from: the Google connection, its last check, and "Check now". */
+function GoogleCard({ google, reload, setError }: { google: GoogleStatus; reload: () => void; setError: (e: string) => void }) {
+  const [busy, setBusy] = useState("");
+  const [locations, setLocations] = useState<GoogleLoc[] | null>(null);
+  const q = new URLSearchParams(window.location.search);
+  const sync = google.lastSync;
+
+  async function run(label: string, body: object, after?: (data: Record<string, unknown>) => void) {
+    setBusy(label);
+    setError("");
+    const r = await adminPost(body);
+    setBusy("");
+    if (!r.ok) setError(r.error ?? "Couldn't reach Google.");
+    else after?.(r.data ?? {});
+    reload();
+  }
+
+  return (
+    <div style={{ ...card, padding: 18 }}>
+      <div style={{ fontSize: 18, marginBottom: 6 }}>Google reviews</div>
+      {q.get("google") === "error" ? <p style={{ color: "var(--rust-deep)", margin: "0 0 8px" }}>{q.get("message")}</p> : null}
+      {!google.configured ? (
+        <p style={{ ...muted, margin: 0 }}>Coming soon: your Google reviews will arrive here by themselves, ready for you to pick from.</p>
+      ) : !google.connected ? (
+        <>
+          <p style={{ ...muted, marginTop: 0 }}>Once connected, your Google reviews arrive here by themselves every day. New ones wait, hidden, until you choose to show them.</p>
+          <button type="button" style={buttonStyle} disabled={Boolean(busy)} onClick={() => run("connect", { action: "googleConnect" }, (d) => (window.location.href = String(d.url)))}>
+            {busy ? "Opening Google…" : "Connect Google"}
+          </button>
+          <div style={{ ...muted, marginTop: 6 }}>One-time setup, signed in as a manager of the Business Profile.</div>
+        </>
+      ) : !google.location ? (
+        <>
+          <p style={{ ...muted, marginTop: 0 }}>Connected as {google.email || "your Google account"}. Which Business Profile is yours?</p>
+          {locations === null ? (
+            <button
+              type="button"
+              style={small}
+              disabled={Boolean(busy)}
+              onClick={async () => {
+                setBusy("find");
+                const res = await fetch("/api/admin/content?area=google-locations");
+                const d = await res.json().catch(() => ({}));
+                setBusy("");
+                if (!res.ok) return setError(d.error ?? "Couldn't reach Google.");
+                setLocations(d.locations ?? []);
+              }}
+            >
+              {busy === "find" ? "Looking…" : "Find my profiles"}
+            </button>
+          ) : locations.length === 0 ? (
+            <p style={muted}>This Google account doesn't manage any Business Profiles yet.</p>
+          ) : (
+            locations.map((l) => (
+              <div key={l.location} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+                <span>
+                  {l.title}
+                  {l.address ? <span style={muted}> · {l.address}</span> : null}
+                </span>
+                <button type="button" style={small} disabled={Boolean(busy)} onClick={() => run("pick", { action: "googleSetLocation", account: l.account, location: l.location })}>
+                  {busy === "pick" ? "Bringing them in…" : "Use this one"}
+                </button>
+              </div>
+            ))
+          )}
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: 15 }}>
+            From <strong>{google.location.title}</strong>
+            {sync && !sync.error ? ` · ${sync.total} reviews${sync.average ? ` · ${sync.average.toFixed(1)}★` : ""}` : ""}
+          </div>
+          <div style={{ ...muted, margin: "4px 0 10px" }}>
+            {sync ? `Checked ${when(sync.at)}. ` : ""}New reviews arrive by themselves every morning.
+          </div>
+          {sync?.error ? <p style={{ color: "var(--rust-deep)", fontSize: 14, margin: "0 0 10px" }}>Last check didn't work: {sync.error}</p> : null}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={small} disabled={Boolean(busy)} onClick={() => run("sync", { action: "googleSync" })}>
+              {busy === "sync" ? "Checking…" : "Check now"}
+            </button>
+            <button
+              type="button"
+              style={{ ...small, borderColor: "transparent", color: "var(--ink-soft)" }}
+              disabled={Boolean(busy)}
+              onClick={() => window.confirm("Disconnect Google? Reviews already here stay, but new ones stop coming in.") && run("disconnect", { action: "googleDisconnect" })}
+            >
+              Disconnect
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Shorten a review: tap sentences to leave them out. The words stay the reviewer's. */
+function SentencePicker({ review, onDone, setError }: { review: Review; onDone: () => void; setError: (e: string) => void }) {
+  const all = review.sentences;
+  const [keep, setKeep] = useState<Set<number>>(() => new Set(review.keep ?? all.map((_, i) => i)));
+  const [busy, setBusy] = useState(false);
+  const list = [...keep].sort((a, b) => a - b);
+
+  async function save(next: number[] | null) {
+    setBusy(true);
+    const r = await adminPost({ action: "keepSentences", id: review.id, keep: next });
+    setBusy(false);
+    if (!r.ok) return setError(r.error ?? "Couldn't save.");
+    onDone();
+  }
+
+  return (
+    <div style={{ borderTop: "1px solid var(--line)", marginTop: 12, paddingTop: 12 }}>
+      <div style={labelStyle}>Tap a sentence to leave it out</div>
+      <div style={{ display: "grid", gap: 6, marginBottom: 12 }}>
+        {all.map((s, i) => {
+          const on = keep.has(i);
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-pressed={on}
+              onClick={() => {
+                const next = new Set(keep);
+                if (on) next.delete(i);
+                else next.add(i);
+                if (next.size) setKeep(next);
+              }}
+              style={{
+                textAlign: "left",
+                font: "15px/1.45 Georgia, serif",
+                padding: "8px 10px",
+                cursor: "pointer",
+                border: on ? "1px solid var(--ink)" : "1px dashed var(--line)",
+                background: on ? "#fff" : "transparent",
+                color: on ? "var(--ink)" : "#9a958a",
+                textDecoration: on ? "none" : "line-through",
+              }}
+            >
+              {s}
+            </button>
+          );
+        })}
+      </div>
+      <div style={labelStyle}>On the site</div>
+      <p style={{ margin: "0 0 12px", fontSize: 15, fontStyle: "italic" }}>“{excerpt(all, list)}”</p>
+      <button type="button" style={buttonStyle} disabled={busy} onClick={() => save(list.length === all.length ? null : list)}>
+        {busy ? "Saving…" : "Save"}
+      </button>{" "}
+      <button type="button" style={secondaryButtonStyle} disabled={busy} onClick={() => save(null)}>
+        Use the whole review
+      </button>{" "}
+      <button type="button" style={{ ...secondaryButtonStyle, borderColor: "transparent" }} onClick={onDone}>
+        Cancel
+      </button>
+    </div>
+  );
+}
 
 export function AdminReviewsPage() {
-  const { data, error, load, setError } = useArea<{ reviews: Review[]; googleUrl: string }>("reviews");
+  const { data, error, load, setError } = useArea<{ reviews: Review[]; googleUrl: string; google: GoogleStatus }>("reviews");
   const [editing, setEditing] = useState<ReviewDraft | null>(null);
+  const [shortening, setShortening] = useState<number | null>(null);
+  const [filter, setFilter] = useState<string | null>(null);
   const [googleUrl, setGoogleUrl] = useState<string | null>(null);
   const [savedUrl, setSavedUrl] = useState(false);
 
@@ -250,24 +432,30 @@ export function AdminReviewsPage() {
     load();
   }
 
-  const shownCount = data?.reviews.filter((r) => r.shown).length ?? 0;
+  const reviews = data?.reviews ?? [];
+  const counts = { new: reviews.filter((r) => r.is_new).length, showing: reviews.filter((r) => r.shown).length, hidden: reviews.filter((r) => !r.shown).length };
+  // Open on the new arrivals when there are some, otherwise on what's showing.
+  const current = filter ?? (counts.new ? "new" : "showing");
+  const list = reviews.filter((r) => (current === "new" ? r.is_new : current === "showing" ? r.shown : current === "hidden" ? !r.shown : true));
 
   return (
     <AdminShell title="Reviews" help="reviews">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 28, margin: 0 }}>Reviews</h1>
-        <button type="button" style={buttonStyle} onClick={() => setEditing({ ...NEW_REVIEW })}>
-          Add a review
+        <button type="button" style={secondaryButtonStyle} onClick={() => setEditing({ ...NEW_REVIEW })}>
+          Add one by hand
         </button>
       </div>
       <p style={{ ...muted, marginBottom: 22 }}>
-        "From the table" on the home page shows the first 4 reviews marked to show ({shownCount} right now). Copy a favorite from Google, paste it in,
-        and move it up.
+        "From the table" on the home page shows the first 4 reviews marked Showing. Showing a review puts it first; use the arrows to fine-tune the order.
+        You can shorten a review to its best sentences, but the words stay the reviewer's own.
       </p>
       {error ? <p style={{ color: "var(--rust-deep)" }}>{error}</p> : null}
 
+      {data ? <GoogleCard google={data.google} reload={load} setError={setError} /> : null}
+
       <div style={{ ...card, padding: 18 }}>
-        <label style={labelStyle}>Link to your Google reviews (from "Share" on your Google Business Profile)</label>
+        <label style={labelStyle}>Link to your Google reviews (filled in for you once Google is connected)</label>
         <div style={{ display: "flex", gap: 10 }}>
           <input
             style={{ ...field, marginBottom: 0 }}
@@ -304,7 +492,8 @@ export function AdminReviewsPage() {
             load();
           }}
         >
-          <h2 style={{ fontSize: 22, marginTop: 0 }}>{editing.id ? "Edit review" : "Add a review"}</h2>
+          <h2 style={{ fontSize: 22, marginTop: 0 }}>{editing.id ? "Edit review" : "Add a review by hand"}</h2>
+          <p style={{ ...muted, marginTop: -6 }}>For reviews from your old website, emails or messages. Google reviews come in by themselves.</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: "0 14px" }}>
             <div>
               <label style={labelStyle}>Name (as shown)</label>
@@ -333,7 +522,7 @@ export function AdminReviewsPage() {
               <input type="date" style={field} value={editing.date} onChange={(e) => setEditing({ ...editing, date: e.target.value })} />
             </div>
           </div>
-          <label style={labelStyle}>Review</label>
+          <label style={labelStyle}>Review, exactly as written</label>
           <textarea style={{ ...field, minHeight: 110 }} value={editing.text} onChange={(e) => setEditing({ ...editing, text: e.target.value })} required />
           <label style={{ display: "block", fontSize: 14, marginBottom: 18 }}>
             <input type="checkbox" checked={editing.shown} onChange={(e) => setEditing({ ...editing, shown: e.target.checked })} /> Show on the site
@@ -347,13 +536,29 @@ export function AdminReviewsPage() {
         </form>
       ) : null}
 
-      {!data ? <p>Loading…</p> : data.reviews.length === 0 ? <p>No reviews yet.</p> : null}
-      {data?.reviews.map((r, i) => (
-        <div key={r.id} style={{ ...card, opacity: r.shown ? 1 : 0.6 }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "8px 0 18px" }}>
+        {(
+          [
+            ...(counts.new ? [["new", `New from Google (${counts.new})`]] : []),
+            ["showing", `Showing (${counts.showing})`],
+            ["hidden", `Hidden (${counts.hidden})`],
+            ["all", `All (${reviews.length})`],
+          ] as [string, string][]
+        ).map(([k, v]) => (
+          <button key={k} type="button" style={{ ...small, background: current === k ? "var(--ink)" : "transparent", color: current === k ? "#fff" : "var(--ink)" }} onClick={() => setFilter(k)}>
+            {v}
+          </button>
+        ))}
+      </div>
+
+      {!data ? <p>Loading…</p> : list.length === 0 ? <p>Nothing here.</p> : null}
+      {list.map((r, i) => (
+        <div key={r.id} style={{ ...card, opacity: r.shown || shortening === r.id ? 1 : 0.75 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
             <strong>
               {r.rating ? `${"★".repeat(r.rating)} ` : ""}
               {r.name}
+              {r.is_new ? <span style={badge("#a85a22")}>new</span> : null}
               <span style={badge(r.shown ? "#3a5a40" : "#7a7a7a")}>{r.shown ? "showing" : "hidden"}</span>
             </strong>
             <span style={muted}>
@@ -361,32 +566,49 @@ export function AdminReviewsPage() {
               {r.review_date ? ` · ${r.review_date}` : ""}
             </span>
           </div>
-          <p style={{ margin: "8px 0 12px", fontSize: 15 }}>{r.text}</p>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button type="button" style={small} disabled={i === 0} onClick={() => act({ action: "moveReview", id: r.id, dir: -1 })} aria-label="Move up">
-              ↑
-            </button>
-            <button type="button" style={small} disabled={i === (data?.reviews.length ?? 0) - 1} onClick={() => act({ action: "moveReview", id: r.id, dir: 1 })} aria-label="Move down">
-              ↓
-            </button>
-            <button
-              type="button"
-              style={small}
-              onClick={() => act({ action: "saveReview", id: r.id, review: { name: r.name, text: r.text, rating: r.rating ?? "", source: r.source, date: r.review_date ?? "", shown: !r.shown } })}
-            >
-              {r.shown ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              style={small}
-              onClick={() => setEditing({ id: r.id, name: r.name, text: r.text, rating: r.rating ? String(r.rating) : "", source: r.source, date: r.review_date ?? "", shown: r.shown })}
-            >
-              Edit
-            </button>
-            <button type="button" style={small} onClick={() => act({ action: "deleteReview", id: r.id }, `Delete the review from ${r.name}?`)}>
-              Delete
-            </button>
-          </div>
+          <p style={{ margin: "8px 0 4px", fontSize: 15 }}>{r.text}</p>
+          {r.keep ? <div style={{ ...muted, fontSize: 13, marginBottom: 8 }}>Shortened from the full review</div> : <div style={{ height: 8 }} />}
+          {shortening === r.id ? (
+            <SentencePicker
+              review={r}
+              setError={setError}
+              onDone={() => {
+                setShortening(null);
+                load();
+              }}
+            />
+          ) : (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <button type="button" style={small} disabled={i === 0} onClick={() => act({ action: "moveReview", id: r.id, dir: -1 })} aria-label="Move up">
+                ↑
+              </button>
+              <button type="button" style={small} disabled={i === list.length - 1} onClick={() => act({ action: "moveReview", id: r.id, dir: 1 })} aria-label="Move down">
+                ↓
+              </button>
+              <button type="button" style={r.shown ? small : { ...small, background: "var(--pine)", color: "#fff", borderColor: "var(--pine)" }} onClick={() => act({ action: "setReviewShown", id: r.id, shown: !r.shown })}>
+                {r.shown ? "Hide" : "Show on site"}
+              </button>
+              {r.sentences.length > 1 ? (
+                <button type="button" style={small} onClick={() => setShortening(r.id)}>
+                  Shorten
+                </button>
+              ) : null}
+              {r.fromGoogle ? null : (
+                <>
+                  <button
+                    type="button"
+                    style={small}
+                    onClick={() => setEditing({ id: r.id, name: r.name, text: r.sentences.join(" "), rating: r.rating ? String(r.rating) : "", source: r.source, date: r.review_date ?? "", shown: r.shown })}
+                  >
+                    Edit
+                  </button>
+                  <button type="button" style={small} onClick={() => act({ action: "deleteReview", id: r.id }, `Delete the review from ${r.name}?`)}>
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </AdminShell>

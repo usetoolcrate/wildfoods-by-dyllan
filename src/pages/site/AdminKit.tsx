@@ -37,10 +37,10 @@ export function HowLink({ to }: { to: string }) {
   );
 }
 
-export async function adminPost(body: unknown): Promise<{ ok: boolean; error?: string }> {
+export async function adminPost(body: unknown): Promise<{ ok: boolean; error?: string; data?: Record<string, unknown> }> {
   const res = await fetch("/api/admin/content", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
-  return res.ok ? { ok: true } : { ok: false, error: data.error || "Couldn't save." };
+  return res.ok ? { ok: true, data } : { ok: false, error: data.error || "Couldn't save." };
 }
 
 // Longest side 1800px, JPEG — a 12 MB phone photo comes out around 400 KB.
