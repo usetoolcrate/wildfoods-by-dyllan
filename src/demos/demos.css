@@ -1,0 +1,118 @@
+/* Walkthrough demos: a phone-sized stage with its title, steps and play button beside it
+   (stacked on phones). Theme it by setting these on .demo or any parent. */
+.demo {
+  --demo-ink: #1c1e21;
+  --demo-muted: #5c6066;
+  --demo-accent: #b8742a;
+  --demo-line: #d9d4c7;
+  --demo-card: #ffffff;
+  --demo-wash: #f1ece2;
+  --demo-font: inherit;
+
+  margin: 0;
+  display: grid;
+  gap: 0 40px;
+  align-items: start;
+  grid-template-columns: minmax(0, min(380px, calc((100svh - 120px) * 0.54))) minmax(0, 420px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "stage head" "stage nav";
+  font-family: var(--demo-font);
+  scroll-margin-top: 24px;
+}
+.demo-head { grid-area: head; }
+.demo-head h2 { margin: 0 0 8px; }
+.demo-head p { margin: 0 0 18px; color: var(--demo-muted); line-height: 1.5; }
+.demo-stage {
+  grid-area: stage; position: relative; width: calc(100% - 16px); overflow: hidden; border-radius: 28px;
+  background: var(--demo-card); border: 8px solid var(--demo-ink); box-sizing: content-box;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+}
+.demo-canvas { position: absolute; top: 0; left: 0; transform-origin: top left; pointer-events: none; overflow: hidden; }
+.demo-scene { position: absolute; inset: 0; }
+
+.demo-nav { grid-area: nav; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.demo-chapters { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; width: 100%; }
+.demo-chapters button {
+  width: 100%; display: grid; grid-template-columns: 26px 1fr; gap: 7px 12px; align-items: center;
+  padding: 9px 12px 10px; border: 1px solid transparent; border-radius: 10px; background: none;
+  font: inherit; font-size: 15px; color: var(--demo-muted); text-align: left; cursor: pointer;
+}
+.demo-chapters button:hover { background: var(--demo-card); }
+.demo-chapters .n {
+  grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; background: var(--demo-wash); color: var(--demo-ink);
+  display: grid; place-items: center; font-size: 12px; font-weight: 700;
+}
+.demo-chapters .label { line-height: 1.3; }
+.demo-chapters .bar { height: 4px; border-radius: 2px; background: var(--demo-wash); overflow: hidden; }
+.demo-chapters .bar span { display: block; height: 100%; border-radius: inherit; background: var(--demo-accent); }
+.demo-chapters button[aria-current="step"] { background: var(--demo-card); border-color: var(--demo-line); color: var(--demo-ink); }
+.demo-chapters button[aria-current="step"] .n { background: var(--demo-accent); color: #fff; }
+.demo-play {
+  display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px 0 12px; margin-left: 12px;
+  border: none; border-radius: 19px; background: var(--demo-ink); color: #fff;
+  font: inherit; font-size: 14px; cursor: pointer;
+}
+.demo-play svg { width: 16px; height: 16px; }
+
+/* The finger: a tap dot with a ripple. */
+.demo-finger { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 50; opacity: 0; }
+.demo-finger .dot {
+  position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(28, 30, 33, 0.82); border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.demo-finger .ripple { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--demo-accent); opacity: 0; }
+
+/* The phone around the site. */
+.demo-screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.demo-bar {
+  flex: none; height: 52px; display: flex; align-items: center; padding: 0 12px; box-sizing: border-box;
+  background: #f4f4f2; border-bottom: 1px solid #deded9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+.demo-url {
+  flex: 1; min-width: 0; height: 34px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0 12px; border-radius: 10px; background: #e6e6e2; color: #2b2b2b; font-size: 13.5px; white-space: nowrap;
+}
+.demo-url span { overflow: hidden; text-overflow: ellipsis; }
+.demo-url .ph { color: #8a8a8e; }
+.demo-url svg { flex: none; width: 13px; height: 13px; color: #6b6b6b; }
+.demo-url.on { background: #fff; box-shadow: 0 0 0 2px #4a90e2; justify-content: flex-start; }
+.demo-app { flex: 1; text-align: center; font-weight: 600; font-size: 16px; color: #1c1c1e; }
+.demo-view { position: relative; flex: 1; overflow: hidden; }
+.demo-caret {
+  display: inline-block; width: 2px; height: 1.1em; margin-left: 1px; vertical-align: text-bottom;
+  background: #2f6fdd; animation: demo-blink 1s steps(1) infinite;
+}
+@keyframes demo-blink { 50% { opacity: 0; } }
+.demo-sheet-wrap { position: absolute; inset: 0; z-index: 30; background: rgba(0, 0, 0, 0.28); display: flex; align-items: flex-end; }
+.demo-sheet {
+  width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 8px 16px 26px; box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; color: #1c1c1e;
+}
+.demo-sheet-grab { width: 38px; height: 5px; border-radius: 3px; background: #d1d1d6; margin: 0 auto 12px; }
+.demo-sheet-title { font-weight: 600; font-size: 16px; text-align: center; margin-bottom: 14px; }
+.demo-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.demo-photos img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.demo-options { display: grid; }
+.demo-options div { padding: 13px 4px; border-top: 1px solid #ececec; font-size: 16px; }
+.demo-options .on { color: #2f6fdd; font-weight: 600; }
+.demo-bubble {
+  position: absolute; z-index: 20; padding: 8px 14px; border-radius: 9px; background: #262626; color: #fff;
+  font: 500 14px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+}
+.demo-banner {
+  position: absolute; z-index: 40; left: 10px; right: 10px; top: 10px; padding: 11px 14px 12px; border-radius: 16px;
+  background: rgba(250, 250, 250, 0.97); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  font: 14px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; color: #1c1c1e;
+}
+.demo-banner-app { font-size: 12px; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 3px; }
+.demo-banner strong { display: block; margin-bottom: 2px; }
+.demo-hl { box-shadow: 0 0 0 3px var(--demo-accent); transition: none; }
+
+@media (max-width: 820px) {
+  .demo { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "stage" "nav"; }
+  .demo-stage { max-width: 344px; margin: 0 auto; }
+  .demo-nav { margin-top: 16px; gap: 12px; }
+  .demo-chapters button { padding: 7px 10px 8px; }
+}

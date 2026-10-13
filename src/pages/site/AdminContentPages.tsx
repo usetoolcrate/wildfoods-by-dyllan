@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { buttonStyle, secondaryButtonStyle } from "@/pages/site/AdminRecipesPage";
-import { AdminShell, adminPost, badge, card, field, labelStyle, uploadImage } from "@/pages/site/AdminKit";
+import { AdminShell, adminPost, badge, card, field, labelStyle, muted, small, uploadImage } from "@/pages/site/AdminKit";
 
 /* /admin and the content pages Dyllan edits himself:
    signature plates, reviews, and private dining inquiries. */
-
-const small: React.CSSProperties = { ...secondaryButtonStyle, padding: "5px 10px", fontSize: 11 };
-const muted: React.CSSProperties = { color: "var(--ink-soft)", fontSize: 14 };
 
 function useArea<T>(area: string) {
   const [data, setData] = useState<T | null>(null);
@@ -36,6 +33,7 @@ function SummaryCards() {
     ["/admin/reviews", "Reviews", data ? `${data.reviews} on the site` : "…"],
     ["/admin/recipes", "Recipes", "Add and edit recipes"],
     ["/admin/questions", "Questionnaire", "Answers from setup"],
+    ["/admin/how", "How-to videos", "Short walkthroughs of each page"],
   ];
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 14 }}>
@@ -51,7 +49,7 @@ function SummaryCards() {
 
 export function AdminHomePage() {
   return (
-    <AdminShell title="Wild Foods admin" home>
+    <AdminShell title="Wild Foods admin" home help="getting-in">
       <h1 style={{ fontSize: 28, marginTop: 0 }}>Wild Foods admin</h1>
       <p style={{ ...muted, marginTop: -6, marginBottom: 24 }}>Everything on the site you can change yourself.</p>
       <SummaryCards />
@@ -126,16 +124,24 @@ function PlateForm({ initial, onDone }: { initial: PlateDraft; onDone: () => voi
       <input style={field} value={d.alt} onChange={(e) => setD({ ...d, alt: e.target.value })} placeholder="Sliced duck breast over wild rice with chutney and sage" />
       <label style={labelStyle}>The story — a short heading and a few sentences each (empty ones are hidden)</label>
       {d.rows.map((r, i) => (
-        <div key={`row-${i}`} style={{ display: "grid", gridTemplateColumns: "140px 1fr auto", gap: 10, alignItems: "start" }}>
-          <input style={field} value={r.label} onChange={(e) => setD({ ...d, rows: d.rows.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })} />
+        <div key={`row-${i}`} style={{ borderLeft: "3px solid var(--line)", paddingLeft: 12, marginBottom: 6 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "start" }}>
+            <input
+              style={{ ...field, maxWidth: 220, marginBottom: 8 }}
+              value={r.label}
+              aria-label={`Heading ${i + 1}`}
+              onChange={(e) => setD({ ...d, rows: d.rows.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })}
+            />
+            <button type="button" style={{ ...small, marginTop: 6 }} onClick={() => setD({ ...d, rows: d.rows.filter((_, j) => j !== i) })}>
+              Remove
+            </button>
+          </div>
           <textarea
             style={{ ...field, minHeight: 64 }}
             value={r.text}
+            aria-label={`${r.label || `Line ${i + 1}`} text`}
             onChange={(e) => setD({ ...d, rows: d.rows.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })}
           />
-          <button type="button" style={{ ...small, marginBottom: 14 }} onClick={() => setD({ ...d, rows: d.rows.filter((_, j) => j !== i) })}>
-            Remove
-          </button>
         </div>
       ))}
       {d.rows.length < 5 ? (
@@ -168,7 +174,7 @@ export function AdminPlatesPage() {
   }
 
   return (
-    <AdminShell title="Signature plates">
+    <AdminShell title="Signature plates" help="plates">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 28, margin: 0 }}>Signature plates</h1>
         <button type="button" style={buttonStyle} onClick={() => setEditing({ ...NEW_PLATE, rows: NEW_PLATE.rows.map((r) => ({ ...r })) })}>
@@ -247,7 +253,7 @@ export function AdminReviewsPage() {
   const shownCount = data?.reviews.filter((r) => r.shown).length ?? 0;
 
   return (
-    <AdminShell title="Reviews">
+    <AdminShell title="Reviews" help="reviews">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 28, margin: 0 }}>Reviews</h1>
         <button type="button" style={buttonStyle} onClick={() => setEditing({ ...NEW_REVIEW })}>
@@ -414,7 +420,7 @@ export function AdminInquiriesPage() {
   const list = (data?.inquiries ?? []).filter((q) => (filter === "open" ? q.status === "new" || q.status === "replied" : filter === "all" ? true : q.status === filter));
 
   return (
-    <AdminShell title="Inquiries">
+    <AdminShell title="Inquiries" help="inquiries">
       <h1 style={{ fontSize: 28, margin: 0 }}>Private dining inquiries</h1>
       <p style={{ ...muted, marginBottom: 18 }}>From the form on the Private Chef page. Each one is also emailed to you; reply to that email to answer the guest.</p>
       {error ? <p style={{ color: "var(--rust-deep)" }}>{error}</p> : null}

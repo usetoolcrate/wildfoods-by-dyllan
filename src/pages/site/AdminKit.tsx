@@ -25,6 +25,18 @@ export function badge(bg: string): React.CSSProperties {
 
 export { labelStyle };
 
+export const small: React.CSSProperties = { ...secondaryButtonStyle, padding: "5px 10px", fontSize: 11 };
+export const muted: React.CSSProperties = { color: "var(--ink-soft)", fontSize: 14 };
+
+/** Link to this page's walkthrough on /admin/how. */
+export function HowLink({ to }: { to: string }) {
+  return (
+    <a href={`/admin/how#${to}`} style={{ ...labelStyle, display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 0, color: "var(--rust-deep)", textDecoration: "none" }}>
+      ▶ How-to video
+    </a>
+  );
+}
+
 export async function adminPost(body: unknown): Promise<{ ok: boolean; error?: string }> {
   const res = await fetch("/api/admin/content", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
@@ -65,7 +77,7 @@ export async function uploadImage(file: File, folder: "plates" | "recipes"): Pro
   return data.url as string;
 }
 
-export function AdminShell({ title, children, wide, home }: { title: string; children: ReactNode; wide?: boolean; home?: boolean }) {
+export function AdminShell({ title, children, wide, home, help }: { title: string; children: ReactNode; wide?: boolean; home?: boolean; help?: string }) {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -104,16 +116,19 @@ export function AdminShell({ title, children, wide, home }: { title: string; chi
               ← All admin
             </a>
           )}
-          <button
-            type="button"
-            style={{ ...secondaryButtonStyle, padding: "4px 10px" }}
-            onClick={async () => {
-              await fetch("/api/admin/logout", { method: "POST" });
-              window.location.href = "/admin";
-            }}
-          >
-            Log out
-          </button>
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            {help ? <HowLink to={help} /> : null}
+            <button
+              type="button"
+              style={{ ...secondaryButtonStyle, padding: "4px 10px" }}
+              onClick={async () => {
+                await fetch("/api/admin/logout", { method: "POST" });
+                window.location.href = "/admin";
+              }}
+            >
+              Log out
+            </button>
+          </div>
         </div>
         {children}
       </div>

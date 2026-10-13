@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router";
 import { PublicLandingPage } from "@/pages/PublicLandingPage";
 import { StoryPage } from "@/pages/site/StoryPage";
@@ -14,6 +15,9 @@ import { AdminTicketsPage } from "@/pages/site/AdminTicketsPage";
 import { AdminHomePage, AdminInquiriesPage, AdminPlatesPage, AdminReviewsPage } from "@/pages/site/AdminContentPages";
 import { TicketPage, TicketThanksPage } from "@/pages/site/TicketPages";
 import { GiftPage, GiftThanksPage } from "@/pages/site/GiftPages";
+
+// The walkthroughs are the only page that needs the demo player, so they load on their own.
+const AdminHowPage = lazy(() => import("@/pages/site/AdminHowPage").then((m) => ({ default: m.AdminHowPage })));
 
 function PublicShell() {
   return (
@@ -47,6 +51,14 @@ export function PublicAppRoutes() {
         <Route path="/admin/plates" element={<AdminPlatesPage />} />
         <Route path="/admin/reviews" element={<AdminReviewsPage />} />
         <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+        <Route
+          path="/admin/how"
+          element={
+            <Suspense fallback={null}>
+              <AdminHowPage />
+            </Suspense>
+          }
+        />
         <Route path="/tickets/thanks" element={<TicketThanksPage />} />
         <Route path="/tickets/:slug" element={<TicketPage />} />
         <Route path="/gift-certificates" element={<GiftPage />} />

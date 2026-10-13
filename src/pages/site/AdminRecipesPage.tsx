@@ -50,7 +50,7 @@ export const wrapStyle: React.CSSProperties = {
   color: "var(--ink)",
 };
 
-const inputStyle: React.CSSProperties = {
+export const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   border: "1px solid var(--paper-dark)",
@@ -348,6 +348,14 @@ export function AdminRecipesPage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: SITE_STYLES }} />
       <div style={wrapStyle}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 10 }}>
+          <a href="/admin" style={{ ...labelStyle, display: "inline", textDecoration: "none" }}>
+            ← All admin
+          </a>
+          <a href="/admin/how#recipes" style={{ ...labelStyle, display: "inline", color: "var(--rust-deep)", textDecoration: "none" }}>
+            ▶ How-to video
+          </a>
+        </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <h1 style={{ fontSize: 28 }}>Recipe Admin</h1>
           <button type="button" style={secondaryButtonStyle} onClick={handleLogout}>
@@ -386,10 +394,10 @@ export function AdminRecipesPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--ink)" }}>
-                <th style={{ ...labelStyle, textAlign: "left", padding: "8px 6px" }}>Title</th>
-                <th style={{ ...labelStyle, textAlign: "left", padding: "8px 6px" }}>Category</th>
-                <th style={{ ...labelStyle, textAlign: "left", padding: "8px 6px" }}>Status</th>
-                <th style={{ ...labelStyle, textAlign: "left", padding: "8px 6px" }}></th>
+                <th style={{ ...labelStyle, display: "table-cell", textAlign: "left", padding: "8px 6px" }}>Title</th>
+                <th style={{ ...labelStyle, display: "table-cell", textAlign: "left", padding: "8px 6px" }}>Category</th>
+                <th style={{ ...labelStyle, display: "table-cell", textAlign: "left", padding: "8px 6px" }}>Status</th>
+                <th style={{ ...labelStyle, display: "table-cell", textAlign: "left", padding: "8px 6px" }}></th>
               </tr>
             </thead>
             <tbody>

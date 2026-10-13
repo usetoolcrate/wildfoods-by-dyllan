@@ -430,7 +430,10 @@ export function AdminTicketsPage() {
           Dinners &amp; tickets
           {data?.mode === "test" ? <span style={badge("#8a6d1d")}>Stripe test mode</span> : null}
         </h1>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+          <a href="/admin/how#dinners" style={{ ...labelStyle, display: "inline", marginBottom: 0, color: "var(--rust-deep)", textDecoration: "none" }}>
+            ▶ How-to video
+          </a>
           <button type="button" style={secondaryButtonStyle} onClick={load}>
             Refresh
           </button>

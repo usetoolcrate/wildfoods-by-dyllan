@@ -3,7 +3,8 @@
 // HTML shell per public page with that page's title, description, link and
 // share image; vercel.json's cleanUrls serves /private-chef from
 // private-chef.html before the SPA rewrite kicks in.
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 
 // Switch to https://wildfoodsbydyllan.com when the domain moves over.
 const SITE = "https://wildfoods-by-dyllan.vercel.app";
@@ -66,6 +67,15 @@ const PAGES = [
     description: "Call, text, or email Chef Dyllan Dale about farm dinners, private chef nights, catering, foraging walks, and classes.",
     image: "contact",
   },
+  {
+    // Texted to Dyllan, so it needs a real preview; kept out of search.
+    file: "admin/how.html",
+    path: "/admin/how",
+    title: "How to use your admin — Wild Foods by Dyllan",
+    description: "Short walkthroughs for inquiries, partner dinners, signature plates, reviews and recipes.",
+    image: "admin-how",
+    noindex: true,
+  },
 ];
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -92,8 +102,9 @@ for (const p of PAGES) {
     <meta name="twitter:title" content="${esc(p.title)}" />
     <meta name="twitter:description" content="${esc(p.description)}" />
     <meta name="twitter:image" content="${image}" />
-    <meta name="theme-color" content="#1f3327" />
+    <meta name="theme-color" content="#1f3327" />${p.noindex ? '\n    <meta name="robots" content="noindex" />' : ""}
     <!-- /share -->`;
+  mkdirSync(dirname(`dist/${p.file}`), { recursive: true });
   writeFileSync(`dist/${p.file}`, shell.replace(block, tags));
 }
 console.log(`share-pages: wrote ${PAGES.length} page shells`);
