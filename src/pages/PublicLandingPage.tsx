@@ -9,6 +9,7 @@ import {
   PRIVATE_CHEF_TIERS,
 } from "@/pages/v2";
 import { PlateGallery } from "@/pages/site/PlateGallery";
+import { Reviews } from "@/pages/site/Reviews";
 
 const HERO = `${renderHeader("/")}
 
@@ -90,7 +91,7 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
       <div class="menu-foot">
         Five-guest minimum · 50% deposit reserves your date<br>
         Menu, sourcing, cooking, service &amp; cleanup included
-        <div><a class="tlink" href="/private-chef">Plan a private dinner</a></div>
+        <div><a class="tlink" href="/private-chef#inquire">Check your date</a></div>
       </div>
     </div>
   </div>
@@ -110,26 +111,9 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
       <a class="tlink" href="/story">Read his story</a>
     </div>
   </div>
-</section>
+</section>`;
 
-<section class="sec s-sage">
-  <div class="c">
-    <div class="qmark" aria-hidden="true">“</div>
-    <div class="label center">From the table</div>
-    <div class="quotes">
-      <blockquote>
-        <p>“I was skeptical at first — I couldn't pronounce any of the dishes on the menu. I couldn't believe how incredibly good the food tasted. A 10 out of 10 night.”</p>
-        <cite>Noah H.</cite>
-      </blockquote>
-      <blockquote>
-        <p>“A wonderful, quiet evening of meeting new friends and enjoying an artfully prepared, wild foraged, six-course dinner. I will be returning as often as possible.”</p>
-        <cite>Jobeth S.</cite>
-      </blockquote>
-    </div>
-  </div>
-</section>
-
-<section class="sec s-white">
+const BOTTOM_AFTER_REVIEWS = `<section class="sec s-white">
   <div class="c">
     ${renderRolls()}
   </div>
@@ -193,6 +177,8 @@ export function PublicLandingPage() {
       <Html html={WORK} />
       <PlateGallery />
       <Html html={BOTTOM} />
+      <Reviews />
+      <Html html={BOTTOM_AFTER_REVIEWS} />
     </V2Page>
   );
 }

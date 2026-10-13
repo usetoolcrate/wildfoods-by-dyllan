@@ -128,3 +128,72 @@ export async function ensureTicketSchema() {
     )
   `;
 }
+
+// Partner dinners live next to Dyllan's own events: same table, but tickets are
+// sold by the partner (ticket_links), so price and capacity are optional.
+export async function ensureEventExtras() {
+  const sql = getSql();
+  await ensureTicketSchema();
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'dinner'`;
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS partner TEXT`;
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS ticket_links JSONB NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`ALTER TABLE ticket_events ALTER COLUMN price_cents DROP NOT NULL`;
+  await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
+}
+
+// Content Dyllan edits from /admin: signature plates, reviews, private dining
+// inquiries, and a few site settings (e.g. the Google reviews link).
+export async function ensureContentSchema() {
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS plates (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      image_url TEXT,
+      image_alt TEXT NOT NULL DEFAULT '',
+      rows JSONB NOT NULL DEFAULT '[]'::jsonb,
+      position INTEGER NOT NULL DEFAULT 0,
+      published BOOLEAN NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      text TEXT NOT NULL,
+      rating INTEGER,
+      source TEXT NOT NULL DEFAULT 'google',
+      review_date DATE,
+      shown BOOLEAN NOT NULL DEFAULT true,
+      position INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS inquiries (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      event_date TEXT,
+      guests INTEGER,
+      experience TEXT,
+      location TEXT,
+      details TEXT,
+      status TEXT NOT NULL DEFAULT 'new',
+      notified BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL DEFAULT '',
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+}

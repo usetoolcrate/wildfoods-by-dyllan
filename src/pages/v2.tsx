@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { EVENTS, HOSTS, PARTNERS } from "@/pages/site-shared";
+import { HOSTS, PARTNERS } from "@/pages/site-shared";
 
 /* The site's design system: calm, bright, photo-led, with each section on
    its own surface (paper, white, sand, sage, pine, earth) so the page reads
@@ -301,6 +301,7 @@ export const V2_STYLES = String.raw`
     line-height:1.35;
     margin:0 0 20px;
   }
+  .v2 .quotes .stars{color:var(--accent);font-size:16px;letter-spacing:0.18em;margin-bottom:12px;}
   .v2 .quotes cite{font-style:normal;font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-2);}
 
   /* ---------- hosts & partners ---------- */
@@ -500,6 +501,9 @@ export const V2_STYLES = String.raw`
   .v2 .field > span{display:block;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);margin-bottom:7px;}
   .v2 .field input, .v2 .field textarea{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);background:var(--white);color:var(--ink);border-radius:0;}
   .v2 .field input:focus, .v2 .field textarea:focus{outline:none;border-color:var(--ink);}
+  .v2 .field select{width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);background:var(--white);color:var(--ink);border-radius:0;}
+  .v2 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;}
+  .v2 .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;}
   .v2 .amounts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
   .v2 .amounts button{font:inherit;font-size:15px;padding:10px 16px;border:1px solid var(--line);background:var(--white);color:var(--ink);cursor:pointer;}
   .v2 .amounts button.on{background:var(--ink);border-color:var(--ink);color:var(--white);}
@@ -620,6 +624,7 @@ export const V2_STYLES = String.raw`
     .v2 .products, .v2 .recipe-grid{grid-template-columns:minmax(0,1fr);}
     .v2 .recipe-detail{padding:32px 22px;}
     .v2 .tk-card{padding:28px 22px 24px;}
+    .v2 .form-grid{grid-template-columns:minmax(0,1fr);}
     .v2 .guest{grid-template-columns:24px minmax(0,1fr);}
     .v2 .guest .field:last-child{grid-column:2;}
     .v2 .cert{padding:44px 22px 36px;}
@@ -751,58 +756,30 @@ export function renderRates(rows: { name: string; price: string; note?: string }
     </div>`;
 }
 
-/* Upcoming dates. Past ones drop off on their own; dinners lead. Partner
-   dinners link straight to the partner's ticket page; Dyllan's own ticketed
-   events (from /api/tickets) link to their ticket page on this site. */
-export type OwnEvent = {
+/* Upcoming dates, from /admin/tickets (via /api/tickets). The API only returns
+   upcoming, published events; dinners lead. Partner dinners link straight to
+   the partner's ticket page; Dyllan's own link to their ticket page here. */
+export type SiteEvent = {
   slug: string;
   name: string;
   date: string;
   time: string;
   location: string;
   about: string;
-  priceCents: number;
+  priceCents: number | null;
   status: "on_sale" | "closed";
-  seatsLeft: number;
+  seatsLeft: number | null;
+  kind: "dinner" | "workshop";
+  partner: string | null;
+  ticketLinks: { label: string; url: string }[];
 };
 
-type Row = {
-  date: string;
-  dinner: boolean;
-  kind: string;
-  name: string;
-  details: string;
-  price: string;
-  sold: string;
-  links: { label: string; url: string; external: boolean }[];
-};
-
-export function renderDinnerList(opts?: { dinnersOnly?: boolean; own?: OwnEvent[] }): string {
-  const today = new Date().toLocaleDateString("en-CA");
-  const partner: Row[] = EVENTS.filter((e) => e.date >= today && (!opts?.dinnersOnly || e.kind === "dinner")).map((e) => ({
-    date: e.date,
-    dinner: e.kind === "dinner",
-    kind: e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "",
-    name: e.name,
-    details: `${e.time} · ${e.about}`,
-    price: e.price ?? "",
-    sold: !e.partner ? "" : e.tickets.length > 1 ? `Tickets from ${e.partner}, by diet:` : `Sold by ${e.partner}`,
-    links: e.tickets.map((t) => ({ ...t, external: true })),
-  }));
-  const own: Row[] = (opts?.own ?? []).map((e) => {
-    const out = e.status !== "on_sale" || e.seatsLeft < 1;
-    return {
-      date: e.date,
-      dinner: true,
-      kind: "Hosted by Dyllan",
-      name: e.name,
-      details: [e.time, e.location, e.about].filter(Boolean).join(" · "),
-      price: `$${(e.priceCents / 100).toLocaleString("en-US")} per person`,
-      sold: out ? (e.seatsLeft < 1 ? "Sold out" : "Sales closed") : e.seatsLeft <= 10 ? `${e.seatsLeft} seat${e.seatsLeft === 1 ? "" : "s"} left` : "",
-      links: [{ label: out ? "Details" : "Buy tickets", url: `/tickets/${e.slug}`, external: false }],
-    };
-  });
-  const rows = [...partner, ...own].sort((a, b) => (a.dinner === b.dinner ? a.date.localeCompare(b.date) : a.dinner ? -1 : 1));
+export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEvent[] | null }): string {
+  if (opts.events === null) return `<ol class="dl"><li><div></div><div><p>Loading dates…</p></div></li></ol>`;
+  const money = (c: number) => `$${(c / 100).toLocaleString("en-US")} per person`;
+  const rows = opts.events
+    .filter((e) => !opts.dinnersOnly || e.kind === "dinner")
+    .sort((a, b) => (a.kind === b.kind ? a.date.localeCompare(b.date) : a.kind === "dinner" ? -1 : 1));
   if (!rows.length) {
     return `<ol class="dl"><li><div></div><div><h3>New dates coming soon</h3><p>The next dinners are being set with our farm hosts. Call or email to hear first.</p></div></li></ol>`;
   }
@@ -812,33 +789,43 @@ export function renderDinnerList(opts?: { dinnersOnly?: boolean; own?: OwnEvent[
             const d = new Date(`${e.date}T12:00:00`);
             const month = d.toLocaleDateString("en-US", { month: "short" });
             const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
-            const links = e.links
-              .map((t) => `<a class="tlink" href="${t.url}"${t.external ? ' target="_blank" rel="noopener"' : ""}>${t.label}</a>`)
-              .join("");
+            const kind = e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "Hosted by Dyllan";
+            const details = [e.time, e.location, e.about].filter(Boolean).join(" · ");
+            let sold = "";
+            let links = "";
+            if (e.partner) {
+              sold = e.status === "closed" ? "Sold out" : e.ticketLinks.length > 1 ? `Tickets from ${e.partner}:` : `Sold by ${e.partner}`;
+              if (e.status !== "closed") {
+                links = e.ticketLinks.map((t) => `<a class="tlink" href="${t.url}" target="_blank" rel="noopener">${t.label}</a>`).join("");
+              }
+            } else {
+              const out = e.status !== "on_sale" || (e.seatsLeft ?? 0) < 1;
+              sold = out ? ((e.seatsLeft ?? 0) < 1 ? "Sold out" : "Sales closed") : (e.seatsLeft ?? 99) <= 10 ? `${e.seatsLeft} seat${e.seatsLeft === 1 ? "" : "s"} left` : "";
+              links = `<a class="tlink" href="/tickets/${e.slug}">${out ? "Details" : "Buy tickets"}</a>`;
+            }
             return `<li>
           <div><span class="d">${d.getDate()}</span><span class="m">${month}<span class="wd"> · ${weekday}</span></span></div>
-          <div>${e.kind ? `<span class="kind">${e.kind}</span>` : ""}<h3>${e.name}</h3><p>${e.details}</p></div>
-          <div class="dl-side">${e.price ? `<span class="price">${e.price}</span>` : ""}<span class="sold">${e.sold}</span><div class="tix">${links}</div></div>
+          <div><span class="kind">${kind}</span><h3>${e.name}</h3><p>${details}</p></div>
+          <div class="dl-side">${e.priceCents ? `<span class="price">${money(e.priceCents)}</span>` : ""}<span class="sold">${sold}</span><div class="tix">${links}</div></div>
         </li>`;
           })
           .join("\n        ")}
       </ol>`;
 }
 
-// The same list, plus Dyllan's own on-sale events once they load.
 export function DinnerList({ dinnersOnly }: { dinnersOnly?: boolean }) {
-  const [own, setOwn] = useState<OwnEvent[]>([]);
+  const [events, setEvents] = useState<SiteEvent[] | null>(null);
   useEffect(() => {
     let live = true;
     fetch("/api/tickets?action=events")
       .then((r) => (r.ok ? r.json() : { events: [] }))
-      .then((d) => live && setOwn(d.events ?? []))
-      .catch(() => {});
+      .then((d) => live && setEvents(d.events ?? []))
+      .catch(() => live && setEvents([]));
     return () => {
       live = false;
     };
   }, []);
-  return <Html html={renderDinnerList({ dinnersOnly, own })} />;
+  return <Html html={renderDinnerList({ dinnersOnly, events })} />;
 }
 
 export function renderRolls(): string {

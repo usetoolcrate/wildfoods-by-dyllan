@@ -1,4 +1,5 @@
 import { V2Page, Html, renderHeader, renderFooter, renderPageHero, renderBook, PRIVATE_CHEF_TIERS } from "@/pages/v2";
+import { InquiryForm } from "@/pages/site/InquiryForm";
 
 const BODY = `${renderHeader("/private-chef")}
 
@@ -8,6 +9,7 @@ ${renderPageHero({
   sub: "Small-farm proteins, seasonal produce, and wild foods when you want them — every course cooked, plated, and served at your table.",
   image: { src: "/images/g-private-residence.jpg", alt: "Dyllan plating a wild game dinner in a private home kitchen", position: "center 35%" },
   surface: "s-sand",
+  cta: `<a class="btn" href="#inquire">Check your date</a>`,
 })}
 
 <section class="sec s-white">
@@ -87,9 +89,9 @@ ${renderPageHero({
       </ol>
     </div>
   </div>
-</section>
+</section>`;
 
-${renderBook({
+const END = `${renderBook({
   title: "Let's plan your dinner.",
   sub: "Farm-to-table, wild, or a blend of both — crafted for your table. Five-guest minimum, 50% deposit to reserve your date.",
 })}
@@ -99,6 +101,8 @@ export function PrivateChefPage() {
   return (
     <V2Page title="Private Chef Services — Wild Foods by Dyllan">
       <Html html={BODY} />
+      <InquiryForm />
+      <Html html={END} />
     </V2Page>
   );
 }

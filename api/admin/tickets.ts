@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { isAuthedRequest } from "../_lib/auth.js";
-import { ensureTicketSchema, getSql } from "../_lib/db.js";
+import { getSql } from "../_lib/db.js";
+import { ensureContent } from "../_lib/content.js";
 import { dashboardUrl, isTestMode, stripe } from "../_lib/stripe.js";
 import {
   type AddOn,
@@ -16,7 +17,7 @@ import {
 
 /* Admin side of ticket sales (behind the existing admin login).
    GET                → events with seat counts, every order, gift certificates and credits
-   POST saveEvent     → create or update an event
+   POST saveEvent     → create or update an event — Dyllan's own (tickets here) or a partner dinner (tickets at the partner's link)
    POST credit        → issue a one-time credit code for an order (the "credit instead of refund" option) */
 
 const STATUSES = new Set(["draft", "on_sale", "closed"]);
@@ -45,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   try {
-    await ensureTicketSchema();
+    await ensureContent();
     const sql = getSql();
     const action = clean(req.body?.action, 20);
 
@@ -95,12 +96,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const id = Number(e.id) || null;
       const name = clean(e.name, 120);
       const date = clean(e.date, 10);
-      const price = cents(e.price);
-      const capacity = Math.floor(Number(e.capacity));
+      const partner = clean(e.partner, 120) || null;
+      const kind = e.kind === "workshop" ? "workshop" : "dinner";
+      const links = (Array.isArray(e.ticketLinks) ? e.ticketLinks : [])
+        .map((l: { label?: unknown; url?: unknown }) => ({ label: clean(l?.label, 40) || "Tickets", url: clean(l?.url, 500) }))
+        .filter((l: { url: string }) => /^https:\/\//.test(l.url))
+        .slice(0, 6);
+      const price = String(e.price ?? "").trim() ? cents(e.price) : null;
+      const capacity = partner ? null : Math.floor(Number(e.capacity));
       const maxPerOrder = Math.floor(Number(e.maxPerOrder)) || 8;
       const status = clean(e.status, 10);
-      if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !(price >= 100) || !(capacity >= 1) || !STATUSES.has(status)) {
-        res.status(400).json({ error: "Name, date, a price of at least $1, and a capacity are required." });
+      if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !STATUSES.has(status)) {
+        res.status(400).json({ error: "A name and date are required." });
+        return;
+      }
+      if (partner && !links.length) {
+        res.status(400).json({ error: "Add the partner's ticket link (it must start with https://)." });
+        return;
+      }
+      if (!partner && (!(price != null && price >= 100) || !(capacity != null && capacity >= 1))) {
+        res.status(400).json({ error: "Your own events need a price of at least $1 and a number of seats." });
         return;
       }
       const addOns: AddOn[] = (Array.isArray(e.addOns) ? e.addOns : [])
@@ -121,7 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           UPDATE ticket_events SET name = ${fields.name}, event_date = ${fields.date}::date, time_label = ${fields.time},
             location = ${fields.location}, about = ${fields.about}, price_cents = ${price}, capacity = ${capacity},
             max_per_order = ${maxPerOrder}, add_ons = ${JSON.stringify(addOns)}::text::jsonb, status = ${status}, test = ${fields.test},
-            updated_at = now()
+            kind = ${kind}, partner = ${partner}, ticket_links = ${JSON.stringify(links)}::text::jsonb, updated_at = now()
           WHERE id = ${id}
         `;
       } else {
@@ -129,9 +144,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const taken = (await sql`SELECT slug FROM ticket_events WHERE slug LIKE ${`${slug}%`}`) as { slug: string }[];
         if (taken.some((t) => t.slug === slug)) slug = `${slug}-${taken.length + 1}`;
         await sql`
-          INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, add_ons, status, test)
+          INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, add_ons, status, test,
+            kind, partner, ticket_links)
           VALUES (${slug}, ${fields.name}, ${fields.date}::date, ${fields.time}, ${fields.location}, ${fields.about}, ${price}, ${capacity},
-            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test})
+            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test}, ${kind}, ${partner}, ${JSON.stringify(links)}::text::jsonb)
         `;
       }
       res.status(200).json({ ok: true });

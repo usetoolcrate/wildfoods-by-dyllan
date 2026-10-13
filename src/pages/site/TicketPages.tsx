@@ -13,12 +13,14 @@ type TicketEvent = {
   time: string;
   location: string;
   about: string;
-  priceCents: number;
+  priceCents: number | null;
   maxPerOrder: number;
   addOns: AddOn[];
   status: "on_sale" | "closed";
-  seatsLeft: number;
+  seatsLeft: number | null;
   test: boolean;
+  partner: string | null;
+  ticketLinks: { label: string; url: string }[];
 };
 type Guest = { name: string; diet: string };
 type Order = {
@@ -95,7 +97,7 @@ export function TicketPage() {
     const data = await res.json();
     setMode(data.mode);
     setEvent(data.event);
-    setSeats((s) => Math.max(1, Math.min(s, data.event.seatsLeft, data.event.maxPerOrder)));
+    setSeats((s) => Math.max(1, Math.min(s, data.event.seatsLeft ?? 1, data.event.maxPerOrder)));
   }, [slug]);
 
   useEffect(() => {
@@ -105,9 +107,10 @@ export function TicketPage() {
     })();
   }, [load, released]);
 
-  const maxSeats = event ? Math.min(event.maxPerOrder, event.seatsLeft) : 1;
+  const left = event?.seatsLeft ?? 0;
+  const maxSeats = event ? Math.min(event.maxPerOrder, left) : 1;
   const addOnTotal = event ? event.addOns.reduce((n, a) => n + (adds[a.key] ?? 0) * a.price_cents, 0) : 0;
-  const total = event ? seats * event.priceCents + addOnTotal : 0;
+  const total = event ? seats * (event.priceCents ?? 0) + addOnTotal : 0;
 
   function changeSeats(n: number) {
     setSeats(n);
@@ -134,7 +137,7 @@ export function TicketPage() {
     }
   }
 
-  const closed = event && (event.status !== "on_sale" || event.seatsLeft < 1);
+  const closed = event && (event.status !== "on_sale" || left < 1);
 
   return (
     <V2Page title={event ? `${event.name} — Tickets — Wild Foods by Dyllan` : "Tickets — Wild Foods by Dyllan"}>
@@ -165,25 +168,42 @@ export function TicketPage() {
                 </div>
                 <p className="tk-about">{event.about}</p>
               </div>
+              {event.partner ? (
+                <div className="tk-card">
+                  <div className="label">With {event.partner}</div>
+                  {event.priceCents ? (
+                    <div className="tk-price" style={{ marginTop: 12 }}>
+                      {money(event.priceCents)}
+                      <small>per guest</small>
+                    </div>
+                  ) : null}
+                  <p className="tk-about" style={{ margin: "16px 0 22px" }}>
+                    Tickets for this dinner are sold by {event.partner}.
+                  </p>
+                  {event.ticketLinks.map((l) => (
+                    <a key={l.url} className="btn full" href={l.url} target="_blank" rel="noopener" style={{ marginBottom: 10 }}>
+                      {event.ticketLinks.length > 1 ? `Tickets — ${l.label}` : `Get tickets from ${event.partner}`}
+                    </a>
+                  ))}
+                </div>
+              ) : (
               <div className="tk-card">
                 {released ? <p className="notice">Checkout canceled — your seats were released.</p> : null}
                 {error ? <p className="notice err">{error}</p> : null}
                 <div className="tk-price">
-                  {money(event.priceCents)}
+                  {money(event.priceCents ?? 0)}
                   <small>per guest</small>
                 </div>
                 {closed ? (
                   <>
-                    <p className="tk-left">{event.seatsLeft < 1 ? "Sold out." : "Ticket sales are closed."}</p>
+                    <p className="tk-left">{left < 1 ? "Sold out." : "Ticket sales are closed."}</p>
                     <p className="tk-note">
                       Call or text <a href="tel:14174039265">417-403-9265</a> to ask about openings.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="tk-left">
-                      {event.seatsLeft <= 10 ? `${event.seatsLeft} seat${event.seatsLeft === 1 ? "" : "s"} left` : "Seats available"}
-                    </p>
+                    <p className="tk-left">{left <= 10 ? `${left} seat${left === 1 ? "" : "s"} left` : "Seats available"}</p>
                     <div className="tk-row">
                       <div className="what">
                         Seats
@@ -220,6 +240,7 @@ export function TicketPage() {
                   </>
                 )}
               </div>
+              )}
             </div>
           )}
         </div>

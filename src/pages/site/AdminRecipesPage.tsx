@@ -39,6 +39,10 @@ const EMPTY_FORM: FormState = {
 };
 
 export const wrapStyle: React.CSSProperties = {
+  // Full width + border-box so a wide table scrolls inside its box on phones
+  // instead of stretching the page (the layout's <main> is a flex container).
+  width: "100%",
+  boxSizing: "border-box",
   maxWidth: 880,
   margin: "0 auto",
   padding: "48px 24px 80px",

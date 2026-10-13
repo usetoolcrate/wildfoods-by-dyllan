@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ensureTicketSchema, getSql } from "./_lib/db.js";
+import { getSql } from "./_lib/db.js";
+import { ensureContent } from "./_lib/content.js";
 import { isTestMode, stripe } from "./_lib/stripe.js";
 import {
   type EventRow,
@@ -28,6 +29,7 @@ const GIFT_MIN = 1500;
 const GIFT_MAX = 15000;
 
 function publicEvent(e: EventRow, taken: number) {
+  const partner = Boolean(e.partner);
   return {
     slug: e.slug,
     name: e.name,
@@ -39,8 +41,11 @@ function publicEvent(e: EventRow, taken: number) {
     maxPerOrder: e.max_per_order,
     addOns: e.add_ons,
     status: e.status,
-    seatsLeft: Math.max(0, e.capacity - taken),
+    seatsLeft: partner ? null : Math.max(0, (e.capacity ?? 0) - taken),
     test: e.test,
+    kind: e.kind,
+    partner: e.partner,
+    ticketLinks: partner ? e.ticket_links : [],
   };
 }
 
@@ -88,14 +93,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Cache-Control", "no-store");
   const mode = isTestMode() ? "test" : "live";
   try {
-    await ensureTicketSchema();
+    await ensureContent();
     const sql = getSql();
     const action = clean(req.query.action ?? req.body?.action, 20);
 
     if (req.method === "GET" && action === "events") {
       const events = await listPublicEvents();
       const out = [];
-      for (const e of events) out.push(publicEvent(e, await seatsTaken(e.id)));
+      for (const e of events) out.push(publicEvent(e, e.partner ? 0 : await seatsTaken(e.id)));
       res.status(200).json({ mode, events: out });
       return;
     }
@@ -106,18 +111,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(404).json({ error: "Event not found" });
         return;
       }
-      res.status(200).json({ mode, event: publicEvent(e, await seatsTaken(e.id)) });
+      res.status(200).json({ mode, event: publicEvent(e, e.partner ? 0 : await seatsTaken(e.id)) });
       return;
     }
 
     if (req.method === "POST" && action === "checkout") {
       const body = req.body ?? {};
       const e = await getEvent(clean(body.slug, 80));
-      if (!e || e.status !== "on_sale") {
-        res.status(409).json({ error: "Tickets for this event aren't on sale." });
+      if (!e || e.status !== "on_sale" || e.partner || e.price_cents == null || e.capacity == null) {
+        res.status(409).json({ error: "Tickets for this event aren't on sale here." });
         return;
       }
       const seats = Math.floor(Number(body.seats));
+      const price = e.price_cents;
       const left = e.capacity - (await seatsTaken(e.id));
       if (!Number.isFinite(seats) || seats < 1 || seats > e.max_per_order) {
         res.status(400).json({ error: `Choose between 1 and ${e.max_per_order} seats.` });
@@ -139,7 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         {
           price_data: {
             currency: "usd",
-            unit_amount: e.price_cents,
+            unit_amount: price,
             product_data: { name: `${e.name} — ${when}`, description: [e.time_label, e.location].filter(Boolean).join(" · ") || undefined },
           },
           quantity: seats,

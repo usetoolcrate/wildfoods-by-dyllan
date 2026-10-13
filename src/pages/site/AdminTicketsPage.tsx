@@ -16,12 +16,15 @@ type AdminEvent = {
   time_label: string;
   location: string;
   about: string;
-  price_cents: number;
-  capacity: number;
+  price_cents: number | null;
+  capacity: number | null;
   max_per_order: number;
   add_ons: AddOn[];
   status: "draft" | "on_sale" | "closed";
   test: boolean;
+  kind: "dinner" | "workshop";
+  partner: string | null;
+  ticket_links: { label: string; url: string }[];
   sold: number;
   held: number;
   revenue: number;
@@ -72,6 +75,10 @@ type Draft = {
   status: "draft" | "on_sale" | "closed";
   test: boolean;
   addOns: { name: string; price: string }[];
+  kind: "dinner" | "workshop";
+  sellsHere: boolean;
+  partner: string;
+  ticketLinks: { label: string; url: string }[];
 };
 
 const EMPTY: Draft = {
@@ -86,6 +93,10 @@ const EMPTY: Draft = {
   status: "draft",
   test: false,
   addOns: [],
+  kind: "dinner",
+  sellsHere: true,
+  partner: "",
+  ticketLinks: [{ label: "Tickets", url: "" }],
 };
 
 const STATUS_LABEL = { draft: "Draft (hidden)", on_sale: "On sale", closed: "Closed" };
@@ -103,12 +114,16 @@ function toDraft(e: AdminEvent): Draft {
     time: e.time_label,
     location: e.location,
     about: e.about,
-    price: String(e.price_cents / 100),
-    capacity: String(e.capacity),
+    price: e.price_cents != null ? String(e.price_cents / 100) : "",
+    capacity: e.capacity != null ? String(e.capacity) : "",
     maxPerOrder: String(e.max_per_order),
     status: e.status,
     test: e.test,
     addOns: e.add_ons.map((a) => ({ name: a.name, price: String(a.price_cents / 100) })),
+    kind: e.kind,
+    sellsHere: !e.partner,
+    partner: e.partner ?? "",
+    ticketLinks: e.ticket_links.length ? e.ticket_links.map((l) => ({ ...l })) : [{ label: "Tickets", url: "" }],
   };
 }
 
@@ -126,7 +141,7 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
     const res = await fetch("/api/admin/tickets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "saveEvent", event: d }),
+      body: JSON.stringify({ action: "saveEvent", event: { ...d, partner: d.sellsHere ? "" : d.partner } }),
     });
     setBusy(false);
     if (!res.ok) return setError((await res.json()).error || "Couldn't save.");
@@ -137,9 +152,64 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
     <form onSubmit={save} style={{ border: "1px solid var(--line)", background: "#fff", padding: 24, margin: "20px 0 36px" }}>
       <h2 style={{ fontSize: 22, marginTop: 0 }}>{d.id ? "Edit event" : "New event"}</h2>
       {error ? <p style={{ color: "var(--rust-deep)" }}>{error}</p> : null}
+      <label style={labelStyle}>Who sells the tickets?</label>
+      <div style={{ display: "flex", gap: 18, flexWrap: "wrap", fontSize: 15, marginBottom: 16 }}>
+        <label>
+          <input type="radio" checked={d.sellsHere} onChange={() => setD({ ...d, sellsHere: true })} /> I do — tickets on this site
+        </label>
+        <label>
+          <input type="radio" checked={!d.sellsHere} onChange={() => setD({ ...d, sellsHere: false })} /> A partner (farm, venue) — link to their tickets
+        </label>
+      </div>
       <label style={labelStyle}>Name</label>
-      <input style={field} value={d.name} onChange={set("name")} required />
+      <input style={field} value={d.name} onChange={set("name")} required placeholder="Fall Harvest Dinner" />
+      {!d.sellsHere ? (
+        <>
+          <label style={labelStyle}>Partner</label>
+          <input style={field} value={d.partner} onChange={set("partner")} required placeholder="Finley Farms" />
+          <label style={labelStyle}>Their ticket link{d.ticketLinks.length > 1 ? "s (e.g. one per menu)" : ""}</label>
+          {d.ticketLinks.map((l, i) => (
+            <div key={`link-${i}`} style={{ display: "flex", gap: 10 }}>
+              {d.ticketLinks.length > 1 ? (
+                <input
+                  style={{ ...field, flex: 1 }}
+                  placeholder="Vegetarian"
+                  value={l.label}
+                  onChange={(e) => setD({ ...d, ticketLinks: d.ticketLinks.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })}
+                />
+              ) : null}
+              <input
+                style={{ ...field, flex: 3 }}
+                placeholder="https://…"
+                value={l.url}
+                onChange={(e) => setD({ ...d, ticketLinks: d.ticketLinks.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)) })}
+              />
+              {d.ticketLinks.length > 1 ? (
+                <button type="button" style={{ ...secondaryButtonStyle, marginBottom: 14 }} onClick={() => setD({ ...d, ticketLinks: d.ticketLinks.filter((_, j) => j !== i) })}>
+                  Remove
+                </button>
+              ) : null}
+            </div>
+          ))}
+          <button
+            type="button"
+            style={{ ...secondaryButtonStyle, marginBottom: 18 }}
+            onClick={() =>
+              setD({ ...d, ticketLinks: [...d.ticketLinks.map((l) => ({ ...l, label: l.label === "Tickets" ? "" : l.label })), { label: "", url: "" }] })
+            }
+          >
+            + Another ticket link
+          </button>
+        </>
+      ) : null}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: "0 16px" }}>
+        <div>
+          <label style={labelStyle}>Type</label>
+          <select style={field} value={d.kind} onChange={set("kind")}>
+            <option value="dinner">Dinner</option>
+            <option value="workshop">Workshop / class</option>
+          </select>
+        </div>
         <div>
           <label style={labelStyle}>Date</label>
           <input style={field} type="date" value={d.date} onChange={set("date")} required />
@@ -153,22 +223,26 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           <input style={field} value={d.location} onChange={set("location")} placeholder="Seymour, MO" />
         </div>
         <div>
-          <label style={labelStyle}>Price per guest ($)</label>
-          <input style={field} inputMode="decimal" value={d.price} onChange={set("price")} required />
+          <label style={labelStyle}>{d.sellsHere ? "Price per guest ($)" : "Price to show ($, optional)"}</label>
+          <input style={field} inputMode="decimal" value={d.price} onChange={set("price")} required={d.sellsHere} />
         </div>
-        <div>
-          <label style={labelStyle}>Seats</label>
-          <input style={field} inputMode="numeric" value={d.capacity} onChange={set("capacity")} required />
-        </div>
-        <div>
-          <label style={labelStyle}>Max per order</label>
-          <input style={field} inputMode="numeric" value={d.maxPerOrder} onChange={set("maxPerOrder")} />
-        </div>
+        {d.sellsHere ? (
+          <>
+            <div>
+              <label style={labelStyle}>Seats</label>
+              <input style={field} inputMode="numeric" value={d.capacity} onChange={set("capacity")} required />
+            </div>
+            <div>
+              <label style={labelStyle}>Max per order</label>
+              <input style={field} inputMode="numeric" value={d.maxPerOrder} onChange={set("maxPerOrder")} />
+            </div>
+          </>
+        ) : null}
       </div>
       <label style={labelStyle}>About this dinner</label>
       <textarea style={{ ...field, minHeight: 90 }} value={d.about} onChange={set("about")} />
-      <label style={labelStyle}>Add-ons (optional — e.g. a wine pairing)</label>
-      {d.addOns.map((a, i) => (
+      {d.sellsHere ? <label style={labelStyle}>Add-ons (optional — e.g. a wine pairing)</label> : null}
+      {!d.sellsHere ? null : d.addOns.map((a, i) => (
         <div key={`addon-${i}`} style={{ display: "flex", gap: 10 }}>
           <input
             style={{ ...field, flex: 3 }}
@@ -188,9 +262,11 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           </button>
         </div>
       ))}
-      <button type="button" style={{ ...secondaryButtonStyle, marginBottom: 18 }} onClick={() => setD({ ...d, addOns: [...d.addOns, { name: "", price: "" }] })}>
-        + Add-on
-      </button>
+      {d.sellsHere ? (
+        <button type="button" style={{ ...secondaryButtonStyle, marginBottom: 18 }} onClick={() => setD({ ...d, addOns: [...d.addOns, { name: "", price: "" }] })}>
+          + Add-on
+        </button>
+      ) : null}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "center", marginBottom: 18 }}>
         <label>
           <span style={labelStyle}>Status</span>
@@ -203,8 +279,8 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           </select>
         </label>
         <label style={{ fontSize: 14 }}>
-          <input type="checkbox" checked={d.test} onChange={(e) => setD({ ...d, test: e.target.checked })} /> Test event — hidden from the public
-          lists, reachable by its link
+          <input type="checkbox" checked={d.test} onChange={(e) => setD({ ...d, test: e.target.checked })} /> Test event — hidden from the
+          public lists, reachable by its link
         </label>
       </div>
       <button type="submit" style={buttonStyle} disabled={busy}>
@@ -299,7 +375,7 @@ export function AdminTicketsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    document.title = "Tickets — Wild Foods by Dyllan";
+    document.title = "Dinners & tickets — Wild Foods admin";
     fetch("/api/admin/session")
       .then((r) => r.json())
       .then((d) => setAuthed(Boolean(d.authed)))
@@ -348,7 +424,10 @@ export function AdminTicketsPage() {
     <div style={{ ...wrapStyle, maxWidth: 1000 }}>
       <div className="no-print" style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", alignItems: "baseline" }}>
         <h1 style={{ fontSize: 28, margin: 0 }}>
-          Tickets
+          <a href="/admin" style={{ ...labelStyle, display: "block", textDecoration: "none", marginBottom: 10 }}>
+            ← All admin
+          </a>
+          Dinners &amp; tickets
           {data?.mode === "test" ? <span style={badge("#8a6d1d")}>Stripe test mode</span> : null}
         </h1>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -378,7 +457,8 @@ export function AdminTicketsPage() {
       <div className="no-print">
         <h2 style={{ fontSize: 22, marginTop: 28 }}>Your events</h2>
         <p style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: -8 }}>
-          Partner dinners aren't here — the partner sells those tickets. Discount codes and refunds are made in Stripe.
+          Your own events sell tickets here; partner dinners link to the partner's tickets. Past dates drop off the site on their own. Discount
+          codes and refunds are made in Stripe.
         </p>
         {!data ? (
           <p>Loading…</p>
@@ -408,14 +488,18 @@ export function AdminTicketsPage() {
                   </td>
                   <td style={cell}>{STATUS_LABEL[e.status]}</td>
                   <td style={cell}>
-                    {e.sold} / {e.capacity}
+                    {e.partner ? `Sold by ${e.partner}` : `${e.sold} / ${e.capacity}`}
                     {e.held ? <span style={{ color: "var(--ink-soft)" }}> (+{e.held} in checkout)</span> : null}
                   </td>
-                  <td style={cell}>{money(e.revenue)}</td>
+                  <td style={cell}>{e.partner ? "—" : money(e.revenue)}</td>
                   <td style={{ ...cell, whiteSpace: "nowrap" }}>
-                    <button type="button" style={secondaryButtonStyle} onClick={() => setViewing(e.id)}>
-                      Guest list
-                    </button>{" "}
+                    {e.partner ? null : (
+                      <>
+                        <button type="button" style={secondaryButtonStyle} onClick={() => setViewing(e.id)}>
+                          Guest list
+                        </button>{" "}
+                      </>
+                    )}
                     <button type="button" style={secondaryButtonStyle} onClick={() => setEditing(toDraft(e))}>
                       Edit
                     </button>

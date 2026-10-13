@@ -30,11 +30,11 @@ const BODY = `${renderHeader("/contact")}
         <p>Ticketed dinners at Ozarks farms, ranches, and orchards — plus catering and hosting.</p>
         <span class="tlink">See dates</span>
       </a>
-      <a href="/private-chef">
+      <a href="/private-chef#inquire">
         <div class="label">Private chef</div>
         <h3>A dinner in your home</h3>
-        <p>Buffet, family style, or plated — a custom menu for five guests or more.</p>
-        <span class="tlink">See options</span>
+        <p>Buffet, family style, or plated — send your date, guest count, and what you're picturing.</p>
+        <span class="tlink">Check your date</span>
       </a>
       <a href="/learn">
         <div class="label">Learn</div>
