@@ -1,5 +1,498 @@
 {
   "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:y(\\d{4})/:m(\\d{2})/:slug",
+      "destination": "/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-watercress-kimchi",
+      "destination": "/recipes?r=watercress-kimchi",
+      "permanent": true
+    },
+    {
+      "source": "/watercress-kimchi",
+      "destination": "/recipes?r=watercress-kimchi",
+      "permanent": true
+    },
+    {
+      "source": "/spruce-tip-custard-tart",
+      "destination": "/recipes?r=spruce-tip-custard-tart",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-spruce-tip-custard-tart",
+      "destination": "/recipes?r=spruce-tip-custard-tart",
+      "permanent": true
+    },
+    {
+      "source": "/wild-garlic-capers",
+      "destination": "/recipes?r=wild-garlic-capers",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-wild-garlic-capers",
+      "destination": "/recipes?r=wild-garlic-capers",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-mulberry-pastry-creme",
+      "destination": "/recipes?r=mulberry-pastry-creme",
+      "permanent": true
+    },
+    {
+      "source": "/mulberry-pastry-creme",
+      "destination": "/recipes?r=mulberry-pastry-creme",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-stinging-nettle-pasta-dough",
+      "destination": "/recipes?r=stinging-nettle-pasta-dough",
+      "permanent": true
+    },
+    {
+      "source": "/stinging-nettle-pasta-dough",
+      "destination": "/recipes?r=stinging-nettle-pasta-dough",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-mulberry-horchata",
+      "destination": "/recipes?r=mulberry-horchata",
+      "permanent": true
+    },
+    {
+      "source": "/mulberry-horchata",
+      "destination": "/recipes?r=mulberry-horchata",
+      "permanent": true
+    },
+    {
+      "source": "/spruce-tip-sugar",
+      "destination": "/recipes?r=spruce-tip-sugar",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-spruce-tip-sugar",
+      "destination": "/recipes?r=spruce-tip-sugar",
+      "permanent": true
+    },
+    {
+      "source": "/sprucetip-and-almond-candied-woods-ear-mushroom",
+      "destination": "/recipes?r=sprucetip-and-almond-candied-woods-ear-mushroom",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-sprucetip-and-almond-candied-woods-ear-mushroom",
+      "destination": "/recipes?r=sprucetip-and-almond-candied-woods-ear-mushroom",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pickled-daylily-buds",
+      "destination": "/recipes?r=pickled-daylily-buds",
+      "permanent": true
+    },
+    {
+      "source": "/pickled-daylily-buds",
+      "destination": "/recipes?r=pickled-daylily-buds",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pickled-purslane",
+      "destination": "/recipes?r=pickled-purslane",
+      "permanent": true
+    },
+    {
+      "source": "/pickled-purslane",
+      "destination": "/recipes?r=pickled-purslane",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pickled-gooseberries",
+      "destination": "/recipes?r=pickled-gooseberries",
+      "permanent": true
+    },
+    {
+      "source": "/pickled-gooseberries",
+      "destination": "/recipes?r=pickled-gooseberries",
+      "permanent": true
+    },
+    {
+      "source": "/wild-black-raspberry-curd-tart",
+      "destination": "/recipes?r=wild-black-raspberry-curd-tart",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-wild-black-raspberry-curd-tart",
+      "destination": "/recipes?r=wild-black-raspberry-curd-tart",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-plum-jam",
+      "destination": "/recipes?r=plum-jam",
+      "permanent": true
+    },
+    {
+      "source": "/plum-jam",
+      "destination": "/recipes?r=plum-jam",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pawpaw-curd",
+      "destination": "/recipes?r=pawpaw-curd",
+      "permanent": true
+    },
+    {
+      "source": "/pawpaw-curd",
+      "destination": "/recipes?r=pawpaw-curd",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-persimmon-cookies",
+      "destination": "/recipes?r=persimmon-cookies",
+      "permanent": true
+    },
+    {
+      "source": "/persimmon-cookies",
+      "destination": "/recipes?r=persimmon-cookies",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-acorn-pasta",
+      "destination": "/recipes?r=acorn-pasta",
+      "permanent": true
+    },
+    {
+      "source": "/acorn-pasta",
+      "destination": "/recipes?r=acorn-pasta",
+      "permanent": true
+    },
+    {
+      "source": "/acorn-brioche-bread",
+      "destination": "/recipes?r=acorn-brioche-bread",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-acorn-brioche-bread",
+      "destination": "/recipes?r=acorn-brioche-bread",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-no-bake-rose-hip-cr-me-br-l-e",
+      "destination": "/recipes?r=no-bake-rose-hip-cr-me-br-l-e",
+      "permanent": true
+    },
+    {
+      "source": "/no-bake-rose-hip-cr-me-br-l-e",
+      "destination": "/recipes?r=no-bake-rose-hip-cr-me-br-l-e",
+      "permanent": true
+    },
+    {
+      "source": "/pawpaw-jezebel-sauce",
+      "destination": "/recipes?r=pawpaw-jezebel-sauce",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pawpaw-jezebel-sauce",
+      "destination": "/recipes?r=pawpaw-jezebel-sauce",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pawpaw-honey-bread",
+      "destination": "/recipes?r=pawpaw-honey-bread",
+      "permanent": true
+    },
+    {
+      "source": "/pawpaw-honey-bread",
+      "destination": "/recipes?r=pawpaw-honey-bread",
+      "permanent": true
+    },
+    {
+      "source": "/pickled-hen-of-the-woods",
+      "destination": "/recipes?r=pickled-hen-of-the-woods",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-pickled-hen-of-the-woods",
+      "destination": "/recipes?r=pickled-hen-of-the-woods",
+      "permanent": true
+    },
+    {
+      "source": "/no-bake-rose-hip-creme-brulee",
+      "destination": "/recipes?r=no-bake-rose-hip-cr-me-br-l-e",
+      "permanent": true
+    },
+    {
+      "source": "/watercresskimchi",
+      "destination": "/recipes?r=watercress-kimchi",
+      "permanent": true
+    },
+    {
+      "source": "/pickled-purselane",
+      "destination": "/recipes?r=pickled-purslane",
+      "permanent": true
+    },
+    {
+      "source": "/spruc",
+      "destination": "/recipes?r=spruce-tip-custard-tart",
+      "permanent": true
+    },
+    {
+      "source": "/mulberry-pastry-cream",
+      "destination": "/recipes?r=mulberry-pastry-creme",
+      "permanent": true
+    },
+    {
+      "source": "/wprm-mulberry-pastry-cream",
+      "destination": "/recipes?r=mulberry-pastry-creme",
+      "permanent": true
+    },
+    {
+      "source": "/elementor-1205",
+      "destination": "/recipes?r=watercress-kimchi",
+      "permanent": true
+    },
+    {
+      "source": "/elementor-1269",
+      "destination": "/recipes?r=wild-garlic-capers",
+      "permanent": true
+    },
+    {
+      "source": "/elementor-1911",
+      "destination": "/recipes?r=plum-jam",
+      "permanent": true
+    },
+    {
+      "source": "/elementor-1929",
+      "destination": "/recipes?r=pawpaw-curd",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/recipes",
+      "permanent": true
+    },
+    {
+      "source": "/home-3",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/my-story",
+      "destination": "/story",
+      "permanent": true
+    },
+    {
+      "source": "/about",
+      "destination": "/story",
+      "permanent": true
+    },
+    {
+      "source": "/private-chef-services",
+      "destination": "/private-chef",
+      "permanent": true
+    },
+    {
+      "source": "/booking",
+      "destination": "/private-chef",
+      "permanent": true
+    },
+    {
+      "source": "/catering",
+      "destination": "/private-chef",
+      "permanent": true
+    },
+    {
+      "source": "/services",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/consultation-services",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/instructor-services",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/foraging",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/event-venues",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/event-organizers",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/pop-up-dinner-partnership",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/venue-dashboard",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/organizer-dashboard",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/submit-venue-form",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/submit-organizer-form",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/mchf",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/gallery",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/photos",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/testimonials",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/404-2",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/newsletter",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/cart",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/checkout",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/my-account/:path*",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/tickets-checkout",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/tickets-order",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/services/:path+",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/feed/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/comments/feed",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/event/:slug(cooking-with[^/]*|foraging-cooking[^/]*|wild-fermentation[^/]*)",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/event/:path*",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/events/category/classes/:path*",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/events/:path*",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/product/gift-certificate",
+      "destination": "/gift-certificates",
+      "permanent": true
+    },
+    {
+      "source": "/product/private-chef-services",
+      "destination": "/private-chef",
+      "permanent": true
+    },
+    {
+      "source": "/product/wild-foods-by-dyllan-newsletter-subscription",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/product/:slug([^/]*t-shirt|unisex-classic-tee)",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/product/:slug(cooking-with[^/]*|foraging-cooking[^/]*|wild-fermentation[^/]*)",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/product/:path*",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/classes/:path*",
+      "destination": "/learn",
+      "permanent": true
+    },
+    {
+      "source": "/product-category/:path*",
+      "destination": "/farm-to-table",
+      "permanent": true
+    },
+    {
+      "source": "/product-tag/:path*",
+      "destination": "/shop",
+      "permanent": true
+    }
+  ],
   "crons": [
     {
       "path": "/api/admin/content?area=cron",

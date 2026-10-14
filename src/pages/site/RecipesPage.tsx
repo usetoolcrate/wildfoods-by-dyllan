@@ -290,7 +290,12 @@ function printRecipe(recipe: Recipe) {
 export function RecipesPage() {
   const [activeTag, setActiveTag] = useState("All");
   const [query, setQuery] = useState("");
-  const [openId, setOpenId] = useState<string | null>(null);
+  // /recipes?r=<slug> opens that recipe, so each one has a link (old WordPress recipe URLs redirect here).
+  const [openId, setOpenId] = useState<string | null>(() => new URLSearchParams(window.location.search).get("r"));
+  const show = (id: string | null) => {
+    setOpenId(id);
+    window.history.replaceState(null, "", id ? `/recipes?r=${encodeURIComponent(id)}` : "/recipes");
+  };
   const [dbRecipes, setDbRecipes] = useState<Recipe[] | null>(null);
   const [loadError, setLoadError] = useState(false);
 
@@ -372,7 +377,7 @@ export function RecipesPage() {
               <div className="recipe-empty">Loading recipes…</div>
             ) : openRecipe ? (
               <div className="recipe-detail">
-                <button className="rd-close" onClick={() => setOpenId(null)} type="button">
+                <button className="rd-close" onClick={() => show(null)} type="button">
                   &larr; Back to all recipes
                 </button>
                 {openRecipe.imageUrl ? (
@@ -424,7 +429,7 @@ export function RecipesPage() {
                     <div className="rc-body">
                       <p>{r.teaser}</p>
                       <div className="rc-actions">
-                        <button className="rc-view" type="button" onClick={() => setOpenId(r.id)}>
+                        <button className="rc-view" type="button" onClick={() => show(r.id)}>
                           View Recipe
                         </button>
                         <button className="rc-print" type="button" onClick={() => printRecipe(r)}>
