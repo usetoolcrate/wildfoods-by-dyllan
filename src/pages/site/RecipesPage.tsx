@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { V2Page, Html, renderHeader, renderFooter, renderPageHero } from "@/pages/v2";
 
 const HEAD = `${renderHeader("/recipes")}
@@ -334,6 +334,12 @@ export function RecipesPage() {
 
   const openRecipe = openId ? allRecipes.find((r) => r.id === openId) ?? null : null;
 
+  // Bring an opened recipe (or one arrived at by link) into view.
+  const detailRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (openRecipe) detailRef.current?.scrollIntoView({ block: "start" });
+  }, [openRecipe]);
+
   return (
     <V2Page title="Recipes — Wild Foods by Dyllan">
       <Html html={HEAD} />
@@ -376,7 +382,7 @@ export function RecipesPage() {
             {isLoading ? (
               <div className="recipe-empty">Loading recipes…</div>
             ) : openRecipe ? (
-              <div className="recipe-detail">
+              <div className="recipe-detail" ref={detailRef} style={{ scrollMarginTop: 24 }}>
                 <button className="rd-close" onClick={() => show(null)} type="button">
                   &larr; Back to all recipes
                 </button>
