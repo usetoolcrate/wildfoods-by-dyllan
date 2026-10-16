@@ -3,36 +3,25 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "www.wildfoodsbydyllan.com"
         }
       ],
-      "destination": "https://wildfoodsbydyllan.com/:path*",
+      "destination": "https://wildfoodsbydyllan.com/",
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/:path+",
       "has": [
         {
           "type": "host",
-          "value": "wildfoodsbydylan.com"
+          "value": "www.wildfoodsbydyllan.com"
         }
       ],
-      "destination": "https://wildfoodsbydyllan.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.wildfoodsbydylan.com"
-        }
-      ],
-      "destination": "https://wildfoodsbydyllan.com/:path*",
+      "destination": "https://wildfoodsbydyllan.com/:path+",
       "permanent": true
     },
     {

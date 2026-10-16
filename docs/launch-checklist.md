@@ -12,20 +12,19 @@ records change. Email is Microsoft 365, billed by Microsoft. Its records are nev
 - [x] Share tags and sitemap use https://wildfoodsbydyllan.com
 - [x] Test-mode Stripe can't sell on the real domain ("call or text to buy" until live keys)
 - [x] /shop links to /gift-certificates, not the old store
-- [x] www and the one-L domain (wildfoodsbydylan.com) redirect to the main domain
+- [x] www redirects to the main domain (vercel.json)
 - [x] Domains added to the Vercel project
 
 ## The switch (GoDaddy → DNS for wildfoodsbydyllan.com)
-- [ ] A @ 157.230.94.88 → replace with A @ 216.198.79.1 and A @ 64.29.17.1
-- [ ] A www 157.230.94.88 → replace with CNAME www → a5a00162951abc63.vercel-dns-017.com
-- [ ] Leave alone: MX, TXT (SPF, MS=), autodiscover / lyncdiscover / sip /
+- [x] A @ 157.230.94.88 → replaced with A @ 216.198.79.1 and A @ 64.29.17.1 (2026-10-16)
+- [x] A www 157.230.94.88 → A www 216.198.79.1 (GoDaddy can't change a record's type in place; Vercel accepts the A record)
+- [x] Left alone: MX, TXT (SPF, MS=), autodiscover / lyncdiscover / sip /
       enterpriseenrollment / enterpriseregistration CNAMEs, SRV records, NS, SOA
 - [ ] Old-host leftovers (_acme-challenge*, _cf-custom-hostname*) can go after launch
 
 ## wildfoodsbydylan.com (one L)
-- [ ] A @ (parked) → A @ 216.198.79.1 and A @ 64.29.17.1
-- [ ] CNAME www → a5a00162951abc63.vercel-dns-017.com
-- [ ] Keep its Microsoft records as they are
+- [x] Already forwards (301, HTTPS) to https://wildfoodsbydyllan.com via GoDaddy Forwarding, so no DNS change.
+      Its A records belong to the forwarding service; leave them.
 
 ## After the switch
 - [ ] `vercel domains verify` passes for all four names; HTTPS certificates issued
