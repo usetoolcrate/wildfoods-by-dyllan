@@ -12,7 +12,7 @@ import { buttonStyle, inputStyle, labelStyle, secondaryButtonStyle, wrapStyle } 
 import { renderDinnerList, type SiteEvent } from "@/pages/v2";
 import { excerpt, sentences } from "@/lib/sentences";
 
-const HOST = "wildfoods-by-dyllan.vercel.app";
+const HOST = "wildfoodsbydyllan.com";
 const PAPER = "var(--paper)";
 const page: CSSProperties = { ...wrapStyle, padding: "18px 24px 40px" };
 const btn = (s: CSSProperties, extra?: CSSProperties): CSSProperties => ({ ...s, display: "inline-block", ...extra });

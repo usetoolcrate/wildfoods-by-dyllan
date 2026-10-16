@@ -27,11 +27,11 @@ records change. Email is Microsoft 365, billed by Microsoft. Its records are nev
       Its A records belong to the forwarding service; leave them.
 
 ## After the switch
-- [ ] `vercel domains verify` passes for all four names; HTTPS certificates issued
-- [ ] https://wildfoodsbydyllan.com, www and the one-L domain all land on the new site
-- [ ] Every page returns 200, old WordPress URLs redirect, share previews show the new domain
-- [ ] MX / SPF / autodiscover unchanged (email still flows)
-- [ ] Inquiry form, recipes, dinner list, admin login work on the real domain
+- [x] `vercel domains verify` passes for wildfoodsbydyllan.com and www; HTTPS works (2026-10-16)
+- [x] https://wildfoodsbydyllan.com, www (308) and the one-L domain (GoDaddy 301) all land on the new site
+- [x] Every page returns 200, old WordPress URLs redirect, share previews show the new domain, real domain is indexable
+- [x] MX / SPF / autodiscover unchanged (checked on Google and Cloudflare DNS)
+- [x] Recipes, dinner list, reviews and admin pages load on the real domain; sales show "call or text to buy"
 - [ ] Tell Dyllan: new admin address, and to verify the email GoDaddy sent
 - [ ] Tell Kyle the site has moved; keep his server up ~2 weeks, then he can shut it down
 
@@ -39,5 +39,5 @@ records change. Email is Microsoft 365, billed by Microsoft. Its records are nev
 - Stripe live keys (Dyllan's account), which reopens online gift certificates and tickets
 - Google reviews: add https://wildfoodsbydyllan.com/api/admin/content as an OAuth redirect URI
 - Vercel Pro for the team (Hobby is non-commercial)
-- Registrant contact info at GoDaddy (Dyllan's email, phone, Seymour address, "Dyllan" spelling)
-- Auto-renew / renewal for both domains (expire 2026-11-14)
+- Registrant contact for wildfoodsbydyllan.com still spencer@bradan.co / KC address (the one-L domain is updated to Dyllan's Gmail and is pending his WHOIS verification)
+- Renew wildfoodsbydyllan.com (expires 2026-11-14; the one-L domain is renewed to 2027)

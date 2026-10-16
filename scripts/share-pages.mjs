@@ -8,7 +8,7 @@ import { dirname } from "node:path";
 
 // The live domain since 2026-10-16 (the vercel.app address still works but isn't indexed).
 const SITE = "https://wildfoodsbydyllan.com";
-const IMAGE_VERSION = "2"; // bump when the share images change, so apps refetch them
+const IMAGE_VERSION = "3"; // bump when the share images change, so apps refetch them
 
 const PAGES = [
   {
