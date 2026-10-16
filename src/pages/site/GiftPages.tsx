@@ -5,7 +5,8 @@ import { NoIndex, TestBar, money } from "@/pages/site/TicketPages";
 
 /* Gift certificates sold on the site: pay with Stripe Checkout, get a one-time
    code worth the amount, redeemable at checkout for Dyllan's own dinners and
-   workshops. Unlinked while in test mode — /shop still points at WordPress. */
+   workshops. While Stripe is in test mode the real domain shows a "call to buy"
+   note instead of the form (the API reports mode "closed"). */
 
 const PRESETS = [2500, 5000, 7500, 10000, 15000];
 
@@ -67,6 +68,14 @@ export function GiftPage() {
               entered at checkout for tickets to Dyllan's dinners and workshops on this site.
             </p>
           </div>
+          {mode === "closed" ? (
+            <div className="tk-card">
+              <p className="tk-about" style={{ marginTop: 0 }}>
+                Online gift certificates are coming soon. To buy one now, call or text Dyllan at{" "}
+                <a href="tel:+14174039265">417-403-9265</a> or email <a href="mailto:dyllan@wildfoodsbydyllan.com">dyllan@wildfoodsbydyllan.com</a>.
+              </p>
+            </div>
+          ) : (
           <form className="tk-card" onSubmit={buy}>
             {error ? <p className="notice err">{error}</p> : null}
             <div className="field">
@@ -114,6 +123,7 @@ export function GiftPage() {
               {busy ? "Opening checkout…" : "Continue to payment"}
             </button>
           </form>
+          )}
         </div>
       </section>
       <Html html={renderFooter()} />

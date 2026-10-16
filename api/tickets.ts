@@ -91,7 +91,12 @@ async function eventById(id: number): Promise<EventRow | null> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Cache-Control", "no-store");
-  const mode = isTestMode() ? "test" : "live";
+  // Test-mode Stripe can't take real cards, so on the real domain sales stay closed
+  // until Dyllan's live key is in. Staging (vercel.app, localhost) keeps test checkout.
+  const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "").split(",")[0].trim();
+  const staging = /\.vercel\.app$|^localhost(:\d+)?$|^127\.0\.0\.1(:\d+)?$/.test(host);
+  const mode = !isTestMode() ? "live" : staging ? "test" : "closed";
+  const CLOSED = "Online sales open soon. To buy now, call or text 417-403-9265.";
   try {
     await ensureContent();
     const sql = getSql();
@@ -112,6 +117,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
       }
       res.status(200).json({ mode, event: publicEvent(e, e.partner ? 0 : await seatsTaken(e.id)) });
+      return;
+    }
+
+    if (req.method === "POST" && (action === "checkout" || action === "gift") && mode === "closed") {
+      res.status(409).json({ error: CLOSED });
       return;
     }
 

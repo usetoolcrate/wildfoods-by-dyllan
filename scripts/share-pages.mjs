@@ -6,8 +6,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
-// Switch to https://wildfoodsbydyllan.com when the domain moves over.
-const SITE = "https://wildfoods-by-dyllan.vercel.app";
+// The live domain since 2026-10-16 (the vercel.app address still works but isn't indexed).
+const SITE = "https://wildfoodsbydyllan.com";
 const IMAGE_VERSION = "2"; // bump when the share images change, so apps refetch them
 
 const PAGES = [
