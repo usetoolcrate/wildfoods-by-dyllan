@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { VercelRequest } from "@vercel/node";
 import { getSql } from "./db.js";
-import { stripe, StripeError } from "./stripe.js";
+import { isTestMode, stripe, StripeError } from "./stripe.js";
 
 /* Ticket sales without webhooks: every order and gift certificate keeps its
    Stripe Checkout Session id, and we ask Stripe for the session's state when
@@ -139,8 +139,12 @@ async function promoCodeFor(session: { total_details?: { breakdown?: { discounts
 }
 
 // Bring one order in line with its Checkout Session.
+// Records made under the other Stripe mode (test orders after the switch to live, or the reverse)
+// don't exist for the current key, so they're left alone instead of erroring.
+const otherMode = (row: { livemode: boolean }) => row.livemode === isTestMode();
+
 export async function reconcileOrder(order: OrderRow): Promise<OrderRow> {
-  if (!order.session_id || order.status === "paid" || order.status === "expired" || order.status === "refunded") return order;
+  if (!order.session_id || order.status === "paid" || order.status === "expired" || order.status === "refunded" || otherMode(order)) return order;
   const sql = getSql();
   const s = await stripe("GET", `checkout/sessions/${order.session_id}`, { expand: ["total_details.breakdown"] });
   const paid = s.status === "complete" && (s.payment_status === "paid" || s.payment_status === "no_payment_required");
@@ -172,7 +176,7 @@ export async function reconcileOrder(order: OrderRow): Promise<OrderRow> {
 
 // Paid orders: pick up refunds made in the Stripe dashboard. A full refund frees the seats.
 export async function refreshRefund(order: OrderRow): Promise<OrderRow> {
-  if (order.status !== "paid" || !order.payment_intent) return order;
+  if (order.status !== "paid" || !order.payment_intent || otherMode(order)) return order;
   const pi = await stripe("GET", `payment_intents/${order.payment_intent}`, { expand: ["latest_charge"] });
   const refunded = Number(pi.latest_charge?.amount_refunded ?? 0);
   if (refunded === order.amount_refunded) return order;
@@ -223,7 +227,7 @@ export async function issueCode(opts: { seed: string; amountCents: number; label
 }
 
 export async function reconcileGift(gift: GiftRow): Promise<GiftRow> {
-  if (gift.kind !== "gift" || !gift.session_id || gift.status !== "open") return gift;
+  if (gift.kind !== "gift" || !gift.session_id || gift.status !== "open" || otherMode(gift)) return gift;
   const sql = getSql();
   const s = await stripe("GET", `checkout/sessions/${gift.session_id}`);
   if (s.status === "complete" && s.payment_status === "paid") {
