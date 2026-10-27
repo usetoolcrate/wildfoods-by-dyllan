@@ -137,6 +137,7 @@ export async function ensureEventExtras() {
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'dinner'`;
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS partner TEXT`;
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS ticket_links JSONB NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS host_logo TEXT`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN price_cents DROP NOT NULL`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
 }

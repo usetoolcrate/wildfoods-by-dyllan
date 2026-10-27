@@ -57,7 +57,7 @@ const PAGES = [
     file: "story.html",
     path: "/story",
     title: "My Story — Chef Dyllan Dale, Wild Foods by Dyllan",
-    description: "How a kid from the Ozarks countryside became the chef behind farm-to-table dinners — with a forager's eye on every plate.",
+    description: "The journey from a childhood spent exploring the Ozarks to a chef devoted to the land, its ingredients, and the people who call it home.",
     image: "story",
   },
   {

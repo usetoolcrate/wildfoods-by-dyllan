@@ -21,6 +21,7 @@ type TicketEvent = {
   test: boolean;
   partner: string | null;
   ticketLinks: { label: string; url: string }[];
+  hostLogo: string | null;
 };
 type Guest = { name: string; diet: string };
 type Order = {
@@ -159,6 +160,7 @@ export function TicketPage() {
           ) : (
             <div className="tk">
               <div>
+                {event.hostLogo ? <img className="tk-host" src={event.hostLogo} alt="Host logo" /> : null}
                 <div className="label">{event.test ? "Test event" : "Tickets"}</div>
                 <h1>{event.name}</h1>
                 <div className="tk-meta">

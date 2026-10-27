@@ -46,6 +46,7 @@ function publicEvent(e: EventRow, taken: number) {
     kind: e.kind,
     partner: e.partner,
     ticketLinks: partner ? e.ticket_links : [],
+    hostLogo: e.host_logo,
   };
 }
 

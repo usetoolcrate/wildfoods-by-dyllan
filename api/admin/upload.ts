@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const ext = mime.split("/")[1] || "jpg";
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
-  const folder = body.folder === "plates" ? "plates" : "recipes";
+  const folder = body.folder === "plates" || body.folder === "hosts" ? body.folder : "recipes";
   const key = `${folder}/${Date.now()}-${safeName}.${ext}`;
 
   try {

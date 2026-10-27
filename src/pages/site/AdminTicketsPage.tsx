@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SITE_STYLES } from "@/pages/site-shared";
 import { LoginForm, buttonStyle, labelStyle, secondaryButtonStyle, wrapStyle } from "@/pages/site/AdminRecipesPage";
 import { money } from "@/pages/site/TicketPages";
+import { uploadImage } from "@/pages/site/AdminKit";
 
 /* /admin/tickets — Dyllan's own events: create and edit them, see who's coming
    (with allergies), print the guest list, and issue credit codes. Refunds and
@@ -25,6 +26,7 @@ type AdminEvent = {
   kind: "dinner" | "workshop";
   partner: string | null;
   ticket_links: { label: string; url: string }[];
+  host_logo: string | null;
   sold: number;
   held: number;
   revenue: number;
@@ -79,6 +81,7 @@ type Draft = {
   sellsHere: boolean;
   partner: string;
   ticketLinks: { label: string; url: string }[];
+  hostLogo: string;
 };
 
 const EMPTY: Draft = {
@@ -97,6 +100,7 @@ const EMPTY: Draft = {
   sellsHere: true,
   partner: "",
   ticketLinks: [{ label: "Tickets", url: "" }],
+  hostLogo: "",
 };
 
 const STATUS_LABEL = { draft: "Draft (hidden)", on_sale: "On sale", closed: "Closed" };
@@ -124,12 +128,14 @@ function toDraft(e: AdminEvent): Draft {
     sellsHere: !e.partner,
     partner: e.partner ?? "",
     ticketLinks: e.ticket_links.length ? e.ticket_links.map((l) => ({ ...l })) : [{ label: "Tickets", url: "" }],
+    hostLogo: e.host_logo ?? "",
   };
 }
 
 function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) {
   const [d, setD] = useState<Draft>(initial);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const set = (k: keyof Draft) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setD({ ...d, [k]: e.target.value });
@@ -238,6 +244,35 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
             </div>
           </>
         ) : null}
+      </div>
+      <label style={labelStyle}>Host logo (optional — the venue or farm hosting it)</label>
+      <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {d.hostLogo ? <img src={d.hostLogo} alt="" style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--line)" }} /> : null}
+        <input
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setUploading(true);
+            setError("");
+            try {
+              const url = await uploadImage(file, "hosts");
+              setD((cur) => ({ ...cur, hostLogo: url }));
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Upload failed.");
+            } finally {
+              setUploading(false);
+            }
+          }}
+        />
+        {d.hostLogo ? (
+          <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, hostLogo: "" })}>
+            Remove logo
+          </button>
+        ) : null}
+        {uploading ? <span style={{ fontSize: 14 }}>Uploading…</span> : null}
       </div>
       <label style={labelStyle}>About this dinner</label>
       <textarea style={{ ...field, minHeight: 90 }} value={d.about} onChange={set("about")} />

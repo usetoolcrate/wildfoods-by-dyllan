@@ -106,6 +106,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const capacity = partner ? null : Math.floor(Number(e.capacity));
       const maxPerOrder = Math.floor(Number(e.maxPerOrder)) || 8;
       const status = clean(e.status, 10);
+      const hostLogo = clean(e.hostLogo, 500);
+      const logo = /^(https:\/\/|\/images\/)[^"'<>\s]+$/.test(hostLogo) ? hostLogo : null;
       if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !STATUSES.has(status)) {
         res.status(400).json({ error: "A name and date are required." });
         return;
@@ -136,7 +138,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           UPDATE ticket_events SET name = ${fields.name}, event_date = ${fields.date}::date, time_label = ${fields.time},
             location = ${fields.location}, about = ${fields.about}, price_cents = ${price}, capacity = ${capacity},
             max_per_order = ${maxPerOrder}, add_ons = ${JSON.stringify(addOns)}::text::jsonb, status = ${status}, test = ${fields.test},
-            kind = ${kind}, partner = ${partner}, ticket_links = ${JSON.stringify(links)}::text::jsonb, updated_at = now()
+            kind = ${kind}, partner = ${partner}, ticket_links = ${JSON.stringify(links)}::text::jsonb, host_logo = ${logo}, updated_at = now()
           WHERE id = ${id}
         `;
       } else {
@@ -145,9 +147,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (taken.some((t) => t.slug === slug)) slug = `${slug}-${taken.length + 1}`;
         await sql`
           INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, add_ons, status, test,
-            kind, partner, ticket_links)
+            kind, partner, ticket_links, host_logo)
           VALUES (${slug}, ${fields.name}, ${fields.date}::date, ${fields.time}, ${fields.location}, ${fields.about}, ${price}, ${capacity},
-            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test}, ${kind}, ${partner}, ${JSON.stringify(links)}::text::jsonb)
+            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test}, ${kind}, ${partner}, ${JSON.stringify(links)}::text::jsonb, ${logo})
         `;
       }
       res.status(200).json({ ok: true });
