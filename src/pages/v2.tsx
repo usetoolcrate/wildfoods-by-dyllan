@@ -153,7 +153,8 @@ export const V2_STYLES = String.raw`
   .v2 .dl .kind{display:block;font-size:11.5px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
   .v2 .dl h3{font-size:31px;line-height:1.12;}
   .v2 .dl p{margin:10px 0 0;color:var(--ink-2);font-size:16px;max-width:36em;}
-  .v2 .dl-logo{display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+  .v2 .dl-logos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .v2 .dl-logo{display:block;width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid var(--line);}
   .v2 .dl-side{text-align:right;padding-top:4px;}
   .v2 .dl-side .price{display:block;font-size:15px;margin-bottom:12px;}
   .v2 .dl-side .sold{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:8px;}
@@ -477,7 +478,8 @@ export const V2_STYLES = String.raw`
   .v2 .testbar{background:#f3e3a8;color:#43360a;font-size:13.5px;text-align:center;padding:9px 16px;}
   .v2 .tk{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:72px;align-items:start;}
   .v2 .tk h1{font-size:clamp(40px,5vw,66px);line-height:1.02;margin:22px 0 22px;}
-  .v2 .tk-host{display:block;width:76px;height:76px;border-radius:50%;object-fit:cover;margin-bottom:22px;}
+  .v2 .tk-logos{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px;}
+  .v2 .tk-logo{display:block;width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid var(--line);}
   .v2 .tk-meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--ink-2);margin:0 0 26px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
   .v2 .tk-about{color:var(--ink-2);max-width:34em;margin:0;white-space:pre-line;}
   .v2 .tk-card{background:var(--white);border:1px solid var(--line);padding:34px 32px 30px;}
@@ -774,7 +776,7 @@ export type SiteEvent = {
   kind: "dinner" | "workshop";
   partner: string | null;
   ticketLinks: { label: string; url: string }[];
-  hostLogo?: string | null;
+  logos?: { src: string; name: string }[];
 };
 
 export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEvent[] | null }): string {
@@ -808,7 +810,7 @@ export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEven
             }
             return `<li>
           <div><span class="d">${d.getDate()}</span><span class="m">${month}<span class="wd"> · ${weekday}</span></span></div>
-          <div>${e.hostLogo ? `<img class="dl-logo" src="${e.hostLogo}" alt="Host logo">` : ""}<span class="kind">${kind}</span><h3>${e.name}</h3><p>${details}</p></div>
+          <div>${e.logos?.length ? `<div class="dl-logos">${e.logos.map((l) => `<img class="dl-logo" src="${l.src}" alt="${l.name || "Logo"}">`).join("")}</div>` : ""}<span class="kind">${kind}</span><h3>${e.name}</h3><p>${details}</p></div>
           <div class="dl-side">${e.priceCents ? `<span class="price">${money(e.priceCents)}</span>` : ""}<span class="sold">${sold}</span><div class="tix">${links}</div></div>
         </li>`;
           })

@@ -9,6 +9,7 @@ import { uploadImage } from "@/pages/site/AdminKit";
    discount codes are done in Stripe; this page picks the refunds up. */
 
 type AddOn = { key: string; name: string; price_cents: number };
+type Logo = { src: string; name: string };
 type AdminEvent = {
   id: number;
   slug: string;
@@ -26,7 +27,7 @@ type AdminEvent = {
   kind: "dinner" | "workshop";
   partner: string | null;
   ticket_links: { label: string; url: string }[];
-  host_logo: string | null;
+  logos: Logo[];
   sold: number;
   held: number;
   revenue: number;
@@ -81,7 +82,7 @@ type Draft = {
   sellsHere: boolean;
   partner: string;
   ticketLinks: { label: string; url: string }[];
-  hostLogo: string;
+  logos: Logo[];
 };
 
 const EMPTY: Draft = {
@@ -100,7 +101,7 @@ const EMPTY: Draft = {
   sellsHere: true,
   partner: "",
   ticketLinks: [{ label: "Tickets", url: "" }],
-  hostLogo: "",
+  logos: [],
 };
 
 const STATUS_LABEL = { draft: "Draft (hidden)", on_sale: "On sale", closed: "Closed" };
@@ -128,7 +129,7 @@ function toDraft(e: AdminEvent): Draft {
     sellsHere: !e.partner,
     partner: e.partner ?? "",
     ticketLinks: e.ticket_links.length ? e.ticket_links.map((l) => ({ ...l })) : [{ label: "Tickets", url: "" }],
-    hostLogo: e.host_logo ?? "",
+    logos: e.logos.map((l) => ({ ...l })),
   };
 }
 
@@ -245,35 +246,47 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           </>
         ) : null}
       </div>
-      <label style={labelStyle}>Host logo (optional — the venue or farm hosting it)</label>
-      <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
-        {d.hostLogo ? <img src={d.hostLogo} alt="" style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--line)" }} /> : null}
-        <input
-          type="file"
-          accept="image/*"
-          disabled={uploading}
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            setUploading(true);
-            setError("");
-            try {
-              const url = await uploadImage(file, "hosts");
-              setD((cur) => ({ ...cur, hostLogo: url }));
-            } catch (err) {
-              setError(err instanceof Error ? err.message : "Upload failed.");
-            } finally {
-              setUploading(false);
-            }
-          }}
-        />
-        {d.hostLogo ? (
-          <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, hostLogo: "" })}>
-            Remove logo
+      <label style={labelStyle}>Logos (optional — the venue or farm hosting it, a wine partner…)</label>
+      {d.logos.map((l, i) => (
+        <div key={`logo-${i}`} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <img src={l.src} alt="" style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--line)", marginBottom: 14, flex: "none" }} />
+          <input
+            style={{ ...field, flex: 1 }}
+            placeholder="Whose logo? e.g. Pennington Wines"
+            value={l.name}
+            onChange={(e) => setD({ ...d, logos: d.logos.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)) })}
+          />
+          <button type="button" style={{ ...secondaryButtonStyle, marginBottom: 14 }} onClick={() => setD({ ...d, logos: d.logos.filter((_, j) => j !== i) })}>
+            Remove
           </button>
-        ) : null}
-        {uploading ? <span style={{ fontSize: 14 }}>Uploading…</span> : null}
-      </div>
+        </div>
+      ))}
+      {d.logos.length < 4 ? (
+        <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={async (e) => {
+              const input = e.target;
+              const file = input.files?.[0];
+              if (!file) return;
+              setUploading(true);
+              setError("");
+              try {
+                const url = await uploadImage(file, "hosts");
+                setD((cur) => ({ ...cur, logos: [...cur.logos, { src: url, name: "" }] }));
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Upload failed.");
+              } finally {
+                setUploading(false);
+                input.value = "";
+              }
+            }}
+          />
+          {uploading ? <span style={{ fontSize: 14 }}>Uploading…</span> : null}
+        </div>
+      ) : null}
       <label style={labelStyle}>About this dinner</label>
       <textarea style={{ ...field, minHeight: 90 }} value={d.about} onChange={set("about")} />
       {d.sellsHere ? <label style={labelStyle}>Add-ons (optional — e.g. a wine pairing)</label> : null}

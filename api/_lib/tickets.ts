@@ -31,8 +31,8 @@ export type EventRow = {
   // Set for partner dinners: the partner sells the tickets at these links.
   partner: string | null;
   ticket_links: { label: string; url: string }[];
-  // Optional logo of the venue or farm hosting the event.
-  host_logo: string | null;
+  // Optional logos: the venue or farm hosting it, a wine partner…
+  logos: { src: string; name: string }[];
 };
 
 export type OrderRow = {
@@ -83,7 +83,7 @@ export async function getEvent(slug: string): Promise<EventRow | null> {
   const sql = getSql();
   const rows = (await sql`
     SELECT id, slug, name, to_char(event_date, 'YYYY-MM-DD') AS date, time_label, location, about,
-      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, host_logo
+      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, logos
     FROM ticket_events WHERE slug = ${slug}
   `) as EventRow[];
   return rows[0] ?? null;
@@ -94,7 +94,7 @@ export async function listAllEvents(): Promise<EventRow[]> {
   const sql = getSql();
   return (await sql`
     SELECT id, slug, name, to_char(event_date, 'YYYY-MM-DD') AS date, time_label, location, about,
-      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, host_logo
+      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, logos
     FROM ticket_events ORDER BY event_date DESC, id DESC
   `) as EventRow[];
 }
@@ -104,7 +104,7 @@ export async function listPublicEvents(): Promise<EventRow[]> {
   const sql = getSql();
   return (await sql`
     SELECT id, slug, name, to_char(event_date, 'YYYY-MM-DD') AS date, time_label, location, about,
-      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, host_logo
+      price_cents, capacity, max_per_order, add_ons, status, test, kind, partner, ticket_links, logos
     FROM ticket_events
     WHERE status IN ('on_sale', 'closed') AND NOT test AND event_date >= (now() AT TIME ZONE 'America/Chicago')::date
     ORDER BY event_date ASC, id ASC

@@ -21,7 +21,7 @@ type TicketEvent = {
   test: boolean;
   partner: string | null;
   ticketLinks: { label: string; url: string }[];
-  hostLogo: string | null;
+  logos: { src: string; name: string }[];
 };
 type Guest = { name: string; diet: string };
 type Order = {
@@ -160,7 +160,13 @@ export function TicketPage() {
           ) : (
             <div className="tk">
               <div>
-                {event.hostLogo ? <img className="tk-host" src={event.hostLogo} alt="Host logo" /> : null}
+                {event.logos?.length ? (
+                  <div className="tk-logos">
+                    {event.logos.map((l) => (
+                      <img key={l.src} className="tk-logo" src={l.src} alt={l.name || "Logo"} title={l.name || undefined} />
+                    ))}
+                  </div>
+                ) : null}
                 <div className="label">{event.test ? "Test event" : "Tickets"}</div>
                 <h1>{event.name}</h1>
                 <div className="tk-meta">

@@ -106,8 +106,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const capacity = partner ? null : Math.floor(Number(e.capacity));
       const maxPerOrder = Math.floor(Number(e.maxPerOrder)) || 8;
       const status = clean(e.status, 10);
-      const hostLogo = clean(e.hostLogo, 500);
-      const logo = /^(https:\/\/|\/images\/)[^"'<>\s]+$/.test(hostLogo) ? hostLogo : null;
+      const logos = (Array.isArray(e.logos) ? e.logos : [])
+        .map((l: { src?: unknown; name?: unknown }) => ({ src: clean(l?.src, 500), name: clean(l?.name, 80).replace(/["<>]/g, "") }))
+        .filter((l: { src: string }) => /^(https:\/\/|\/images\/)[^"'<>\s]+$/.test(l.src))
+        .slice(0, 4);
       if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !STATUSES.has(status)) {
         res.status(400).json({ error: "A name and date are required." });
         return;
@@ -138,7 +140,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           UPDATE ticket_events SET name = ${fields.name}, event_date = ${fields.date}::date, time_label = ${fields.time},
             location = ${fields.location}, about = ${fields.about}, price_cents = ${price}, capacity = ${capacity},
             max_per_order = ${maxPerOrder}, add_ons = ${JSON.stringify(addOns)}::text::jsonb, status = ${status}, test = ${fields.test},
-            kind = ${kind}, partner = ${partner}, ticket_links = ${JSON.stringify(links)}::text::jsonb, host_logo = ${logo}, updated_at = now()
+            kind = ${kind}, partner = ${partner}, ticket_links = ${JSON.stringify(links)}::text::jsonb,
+            logos = ${JSON.stringify(logos)}::text::jsonb, host_logo = NULL, updated_at = now()
           WHERE id = ${id}
         `;
       } else {
@@ -147,9 +150,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (taken.some((t) => t.slug === slug)) slug = `${slug}-${taken.length + 1}`;
         await sql`
           INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, add_ons, status, test,
-            kind, partner, ticket_links, host_logo)
+            kind, partner, ticket_links, logos)
           VALUES (${slug}, ${fields.name}, ${fields.date}::date, ${fields.time}, ${fields.location}, ${fields.about}, ${price}, ${capacity},
-            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test}, ${kind}, ${partner}, ${JSON.stringify(links)}::text::jsonb, ${logo})
+            ${maxPerOrder}, ${JSON.stringify(addOns)}::text::jsonb, ${status}, ${fields.test}, ${kind}, ${partner}, ${JSON.stringify(links)}::text::jsonb, ${JSON.stringify(logos)}::text::jsonb)
         `;
       }
       res.status(200).json({ ok: true });

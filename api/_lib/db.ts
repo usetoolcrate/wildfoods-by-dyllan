@@ -138,6 +138,12 @@ export async function ensureEventExtras() {
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS partner TEXT`;
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS ticket_links JSONB NOT NULL DEFAULT '[]'::jsonb`;
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS host_logo TEXT`;
+  // Logos replaced the single host_logo; carry an old one over the first time.
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS logos JSONB NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`
+    UPDATE ticket_events SET logos = jsonb_build_array(jsonb_build_object('src', host_logo, 'name', ''))
+    WHERE host_logo IS NOT NULL AND logos = '[]'::jsonb
+  `;
   await sql`ALTER TABLE ticket_events ALTER COLUMN price_cents DROP NOT NULL`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
 }
