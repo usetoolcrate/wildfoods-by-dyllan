@@ -1,13 +1,15 @@
 import crypto from "node:crypto";
 import type { VercelRequest } from "@vercel/node";
 import { getSql } from "./db.js";
+import { emailDyllan } from "./email.js";
 import { isTestMode, stripe, StripeError } from "./stripe.js";
 
 /* Ticket sales without webhooks: every order and gift certificate keeps its
    Stripe Checkout Session id, and we ask Stripe for the session's state when
    it matters (the thank-you page, seat counts, the admin page). At under 10
    events a year that's a handful of calls, and nothing has to be configured
-   inside the Stripe account. */
+   inside the Stripe account. A 10-minute cron (sweep) settles checkouts whose
+   buyer never came back to the thank-you page. */
 
 export type AddOn = { key: string; name: string; price_cents: number };
 export type OrderAddOn = { key: string; name: string; qty: number; price_cents: number };
@@ -56,6 +58,7 @@ export type OrderRow = {
   payment_intent: string | null;
   livemode: boolean;
   expires_at: string | null;
+  notified_at: string | null;
   created_at: string;
 };
 
@@ -76,6 +79,7 @@ export type GiftRow = {
   order_id: number | null;
   note: string | null;
   livemode: boolean;
+  notified_at: string | null;
   created_at: string;
 };
 
@@ -173,7 +177,9 @@ export async function reconcileOrder(order: OrderRow): Promise<OrderRow> {
   } else if (s.status === "expired") {
     rows = (await sql`UPDATE ticket_orders SET status = 'expired', updated_at = now() WHERE id = ${order.id} RETURNING *`) as OrderRow[];
   }
-  return rows[0] ?? order;
+  const next = rows[0] ?? order;
+  await notifyOrder(next);
+  return next;
 }
 
 // Paid orders: pick up refunds made in the Stripe dashboard. A full refund frees the seats.
@@ -246,13 +252,120 @@ export async function reconcileGift(gift: GiftRow): Promise<GiftRow> {
         livemode = ${Boolean(s.livemode)}, updated_at = now()
       WHERE id = ${gift.id} RETURNING *
     `) as GiftRow[];
-    return rows[0] ?? gift;
+    const next = rows[0] ?? gift;
+    await notifyGift(next);
+    return next;
   }
   if (s.status === "expired") {
     const rows = (await sql`UPDATE gift_certificates SET status = 'expired', updated_at = now() WHERE id = ${gift.id} RETURNING *`) as GiftRow[];
     return rows[0] ?? gift;
   }
   return gift;
+}
+
+/* Sale emails to Dyllan, once per paid order or gift certificate. Live mode only:
+   test checkouts on staging share this database. If the email can't go out, the
+   claim is released so the next settle (or the sweep) tries again. */
+
+const usd = (c: number | null) => (c == null ? "—" : (c / 100).toLocaleString("en-US", { style: "currency", currency: "USD" }));
+const ADMIN_URL = "https://wildfoodsbydyllan.com/admin/tickets";
+
+export async function notifyOrder(order: OrderRow): Promise<void> {
+  if (order.status !== "paid" || !order.livemode || order.notified_at) return;
+  const sql = getSql();
+  let claimed = false;
+  try {
+    claimed = ((await sql`UPDATE ticket_orders SET notified_at = now() WHERE id = ${order.id} AND notified_at IS NULL RETURNING id`) as unknown[]).length > 0;
+    if (!claimed) return;
+    const [e] = (await sql`
+      SELECT name, to_char(event_date, 'YYYY-MM-DD') AS date, time_label, location, capacity, test FROM ticket_events WHERE id = ${order.event_id}
+    `) as Pick<EventRow, "name" | "date" | "time_label" | "location" | "capacity" | "test">[];
+    const [count] = (await sql`
+      SELECT COALESCE(SUM(seats), 0)::int AS sold FROM ticket_orders
+      WHERE event_id = ${order.event_id} AND status IN ('paid', 'processing') AND livemode = true
+    `) as { sold: number }[];
+    const seats = `${order.seats} seat${order.seats === 1 ? "" : "s"}`;
+    const buyer = order.buyer_name || order.buyer_email || "Someone";
+    const event = e?.name ?? "an event";
+    const lines = [
+      `${buyer} bought ${seats} for ${event}.`,
+      "",
+      `When: ${e ? [formatDate(e.date), e.time_label].filter(Boolean).join(", ") : "—"}`,
+      `Where: ${e?.location || "—"}`,
+      `Seats: ${order.seats}`,
+      ...order.add_ons.map((a) => `Add-on: ${a.qty} × ${a.name}`),
+      `Paid: ${usd(order.amount_total)}${order.amount_discount ? ` (${usd(order.amount_discount)} off with code ${order.promo_code ?? "—"})` : ""}`,
+      "",
+      `Name: ${order.buyer_name || "—"}`,
+      `Email: ${order.buyer_email || "—"}`,
+      `Phone: ${order.buyer_phone || "—"}`,
+      "",
+      ...(e?.capacity ? [`Seats sold so far: ${count?.sold ?? order.seats} of ${e.capacity}.`] : []),
+      `Guest names and allergies show up at ${ADMIN_URL} once they fill in the form.`,
+      "Reply to this email to reach the buyer.",
+    ];
+    const sent = await emailDyllan({
+      subject: `${e?.test ? "[Test event] " : ""}Ticket sale: ${seats} for ${event} — ${buyer}`,
+      text: lines.join("\n"),
+      replyTo: order.buyer_email,
+      idempotencyKey: `sale-order-${order.id}`,
+    });
+    if (!sent) throw new Error("Resend did not accept the email");
+  } catch (err) {
+    console.error("sale email failed", order.id, err);
+    if (claimed) await sql`UPDATE ticket_orders SET notified_at = NULL WHERE id = ${order.id}`;
+  }
+}
+
+export async function notifyGift(gift: GiftRow): Promise<void> {
+  if (gift.kind !== "gift" || gift.status !== "issued" || !gift.livemode || gift.notified_at) return;
+  const sql = getSql();
+  let claimed = false;
+  try {
+    claimed = ((await sql`UPDATE gift_certificates SET notified_at = now() WHERE id = ${gift.id} AND notified_at IS NULL RETURNING id`) as unknown[]).length > 0;
+    if (!claimed) return;
+    const buyer = gift.buyer_name || gift.buyer_email || "Someone";
+    const lines = [
+      `${buyer} bought a ${usd(gift.amount_cents)} gift certificate.`,
+      "",
+      `Code: ${gift.code ?? "—"}`,
+      `For: ${gift.recipient_name || "—"}`,
+      `From: ${gift.from_name || "—"}`,
+      ...(gift.message ? [`Message: ${gift.message}`] : []),
+      "",
+      `Name: ${gift.buyer_name || "—"}`,
+      `Email: ${gift.buyer_email || "—"}`,
+      "",
+      `The code works as a discount at any ticket checkout. All gift certificates: ${ADMIN_URL}`,
+      "Reply to this email to reach the buyer.",
+    ];
+    const sent = await emailDyllan({
+      subject: `Gift certificate sale: ${usd(gift.amount_cents)}${gift.recipient_name ? ` for ${gift.recipient_name}` : ""} — ${buyer}`,
+      text: lines.join("\n"),
+      replyTo: gift.buyer_email,
+      idempotencyKey: `sale-gift-${gift.id}`,
+    });
+    if (!sent) throw new Error("Resend did not accept the email");
+  } catch (err) {
+    console.error("gift sale email failed", gift.id, err);
+    if (claimed) await sql`UPDATE gift_certificates SET notified_at = NULL WHERE id = ${gift.id}`;
+  }
+}
+
+// The sweep: Stripe checkouts completed in the last hour (sessions live 30 minutes).
+// Most runs find none and never wake the database.
+export async function recentCheckouts(): Promise<string[]> {
+  const since = Math.floor(Date.now() / 1000) - 60 * 60;
+  const list = await stripe("GET", "checkout/sessions", { status: "complete", created: { gte: since }, limit: 100 });
+  return (list.data ?? []).map((s: { id: string }) => s.id);
+}
+
+export async function settleCheckouts(sessionIds: string[]): Promise<void> {
+  const sql = getSql();
+  const orders = (await sql`SELECT * FROM ticket_orders WHERE session_id = ANY(${sessionIds})`) as OrderRow[];
+  for (const o of orders) await notifyOrder(await reconcileOrder(o));
+  const gifts = (await sql`SELECT * FROM gift_certificates WHERE session_id = ANY(${sessionIds})`) as GiftRow[];
+  for (const g of gifts) await notifyGift(await reconcileGift(g));
 }
 
 export function makeRef(): string {

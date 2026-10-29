@@ -1,4 +1,5 @@
 import { ensureContentSchema, ensureEventExtras, getSql } from "./db.js";
+import { emailDyllan } from "./email.js";
 
 /* Site content Dyllan edits in /admin. The first time it runs, it copies what
    used to be hard-coded (signature plates, testimonials, upcoming partner
@@ -156,14 +157,7 @@ export async function setSetting(key: string, value: string) {
   `;
 }
 
-// Inquiry emails go out through Resend from the already-verified schottky.com
-// domain (Dyllan's own domain isn't set up for sending yet). Reply-To is the
-// guest, so Dyllan can just hit reply.
 export async function notifyInquiry(i: InquiryRow): Promise<boolean> {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return false;
-  const to = process.env.INQUIRY_TO || "dyllan@wildfoodsbydyllan.com";
-  const from = process.env.INQUIRY_FROM || "Wild Foods website <wildfoods@schottky.com>";
   const lines = [
     `New private dining inquiry from ${i.name}`,
     "",
@@ -178,16 +172,10 @@ export async function notifyInquiry(i: InquiryRow): Promise<boolean> {
     "",
     "Reply to this email to answer them directly. All inquiries: /admin/inquiries on the website.",
   ];
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": `inquiry-${i.id}` },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      reply_to: i.email,
-      subject: `Private dining inquiry: ${i.name}${i.event_date ? ` — ${i.event_date}` : ""}${i.guests ? `, ${i.guests} guests` : ""}`,
-      text: lines.join("\n"),
-    }),
+  return emailDyllan({
+    subject: `Private dining inquiry: ${i.name}${i.event_date ? ` — ${i.event_date}` : ""}${i.guests ? `, ${i.guests} guests` : ""}`,
+    text: lines.join("\n"),
+    replyTo: i.email,
+    idempotencyKey: `inquiry-${i.id}`,
   });
-  return res.ok;
 }

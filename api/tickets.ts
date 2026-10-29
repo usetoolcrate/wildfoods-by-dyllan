@@ -16,12 +16,14 @@ import {
   originFrom,
   reconcileGift,
   reconcileOrder,
+  recentCheckouts,
   seatsTaken,
+  settleCheckouts,
 } from "./_lib/tickets.js";
 
 /* Public ticket + gift certificate endpoint (one function, ?action=…, to stay
    under Vercel Hobby's function limit).
-   GET  events | event&slug | order&session | gift&session
+   GET  events | event&slug | order&session | gift&session | sweep (Vercel cron)
    POST checkout | release | guests | gift */
 
 const CHECKOUT_MINUTES = 30; // Stripe's minimum session lifetime; seats are held this long.
@@ -98,6 +100,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const staging = /\.vercel\.app$|^localhost(:\d+)?$|^127\.0\.0\.1(:\d+)?$/.test(host);
   const mode = !isTestMode() ? "live" : staging ? "test" : "closed";
   const CLOSED = "Online sales open soon. To buy now, call or text 417-403-9265.";
+
+  // Every 10 minutes: settle checkouts whose buyer closed the tab before coming back,
+  // so the seats count and Dyllan still gets the sale email. Vercel sends CRON_SECRET.
+  if (req.method === "GET" && req.query.action === "sweep") {
+    const secret = process.env.CRON_SECRET;
+    if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+    try {
+      const ids = await recentCheckouts();
+      if (ids.length) {
+        await ensureContent();
+        await settleCheckouts(ids);
+      }
+      res.status(200).json({ checked: ids.length });
+    } catch (err) {
+      console.error("sales sweep error", err);
+      res.status(500).json({ error: "Sweep failed" });
+    }
+    return;
+  }
+
   try {
     await ensureContent();
     const sql = getSql();
@@ -271,6 +296,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               quantity: 1,
             },
           ],
+          // Same 30-minute lifetime as tickets, so the sweep's one-hour look-back covers it.
+          expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_MINUTES * 60 + 30,
           metadata: { kind: "gift", ref },
           payment_intent_data: { description: `Gift certificate $${amount / 100}`, metadata: { kind: "gift", ref } },
           success_url: `${origin}/gift-certificates/thanks?session_id={CHECKOUT_SESSION_ID}`,

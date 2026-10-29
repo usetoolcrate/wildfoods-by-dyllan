@@ -145,6 +145,9 @@ export async function ensureEventExtras() {
     WHERE host_logo IS NOT NULL AND logos = '[]'::jsonb
   `;
   await sql`ALTER TABLE ticket_events ALTER COLUMN price_cents DROP NOT NULL`;
+  // Set once Dyllan has been emailed about the sale.
+  await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
 }
 
