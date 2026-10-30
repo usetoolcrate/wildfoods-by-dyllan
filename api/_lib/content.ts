@@ -1,4 +1,4 @@
-import { ensureContentSchema, ensureEventExtras, getSql } from "./db.js";
+import { ensureContentSchema, ensureEventExtras, ensureSchema, getSql } from "./db.js";
 import { emailDyllan } from "./email.js";
 
 /* Site content Dyllan edits in /admin. The first time it runs, it copies what
@@ -48,6 +48,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.reviews.v1", seedReviews);
     await seedOnce("seed.partner-events.v1", seedPartnerEvents);
     await seedOnce("seed.plates.walleye", seedWalleyePlate);
+    await seedOnce("seed.recipes.pawpaw-mustard", seedPawpawMustard);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -110,6 +111,38 @@ async function seedWalleyePlate() {
       ('Walleye almondine, butternut squash & sumac carrots', '/images/dish-walleye.webp',
         'Plates of walleye almondine from above: walleye topped with mousseline and toasted almonds over butternut squash and glazed carrots',
         ${JSON.stringify(rows)}::text::jsonb, (SELECT COALESCE(MAX(position), -1) + 1 FROM plates))
+  `;
+}
+
+// Dyllan's pawpaw mustard (emailed 2026-10-30). His intro and chef's notes are
+// folded into the teaser and the last steps, like the Jezebel sauce.
+async function seedPawpawMustard() {
+  await ensureSchema();
+  const sql = getSql();
+  const have = (await sql`SELECT COUNT(*)::int AS n FROM recipes WHERE slug = 'ozarks-pawpaw-mustard' OR title ILIKE '%pawpaw mustard%'`) as { n: number }[];
+  if (have[0]?.n) return;
+  const ingredients = [
+    "1 cup ripe pawpaw pulp, seeds and skin removed",
+    "½ cup whole-grain or Dijon mustard",
+    "¼ cup honey",
+    "2 tablespoons apple cider vinegar",
+    "A dash of paprika",
+    "Salt and freshly ground black pepper, to taste",
+  ];
+  const steps = [
+    "Add the pawpaw pulp, mustard, honey, and apple cider vinegar to a mixing bowl. Whole-grain mustard gives it a rustic texture; Dijon makes a smoother, more refined condiment.",
+    "Whisk everything together until thoroughly combined and smooth.",
+    "Add a dash of paprika, salt, and freshly ground black pepper.",
+    "Taste and adjust — a little more honey for sweetness, mustard for a sharper bite, or apple cider vinegar for extra acidity.",
+    "Transfer to a clean jar and refrigerate for at least one hour before serving to allow the flavors to come together.",
+    "Serve it anywhere you'd normally use mustard: grilled meats, sandwiches, or a charcuterie board.",
+    "Keep refrigerated in a sealed container and use within 3–4 days. This is a fresh mustard, not a shelf-stable canned product.",
+  ];
+  await sql`
+    INSERT INTO recipes (slug, title, tag, time, teaser, ingredients, steps, image_url)
+    VALUES ('ozarks-pawpaw-mustard', 'Ozarks Pawpaw Mustard', 'Foraged Fruit', '10 min + 1 hr chill',
+      'Native pawpaw — mango, banana, and a hint of pineapple — whisked with tangy mustard and local honey into a bright, sweet condiment.',
+      ${JSON.stringify(ingredients)}::text::jsonb, ${JSON.stringify(steps)}::text::jsonb, '/images/recipe-pawpaw-mustard.jpg')
   `;
 }
 
