@@ -47,6 +47,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.plates.v1", seedPlates);
     await seedOnce("seed.reviews.v1", seedReviews);
     await seedOnce("seed.partner-events.v1", seedPartnerEvents);
+    await seedOnce("seed.plates.walleye", seedWalleyePlate);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -84,6 +85,31 @@ async function seedPlates() {
         'Sliced seared duck breast over wild rice with apple chutney, sage, daikon, and baby chard', ${JSON.stringify(duck)}::text::jsonb, 0),
       ('Chicken roulade, chanterelle & pawpaw', '/images/dish-chanterelle-pawpaw.webp',
         'Chicken roulade with chanterelle mushrooms and a pawpaw glaze', ${JSON.stringify(roulade)}::text::jsonb, 1)
+  `;
+}
+
+// Dyllan's walleye plate (sent 2026-10-30), added after the gallery went live.
+// Goes last; he can reorder it in /admin/plates.
+async function seedWalleyePlate() {
+  const sql = getSql();
+  const have = (await sql`SELECT COUNT(*)::int AS n FROM plates WHERE name ILIKE '%walleye%'`) as { n: number }[];
+  if (have[0]?.n) return;
+  const rows = [
+    {
+      label: "The plate",
+      text: "A walleye fillet under a walleye mousseline and toasted slivered almonds, over mashed butternut squash, with sumac-glazed carrots — Dyllan's go-to accompaniment.",
+    },
+    {
+      label: "The fish",
+      text: "Walleye, also called yellow pickerel, live in lakes across the Ozarks and much of North America. They keep to the deep, cold pockets where the water is freshest and cleanest.",
+    },
+    { label: "Why walleye", text: "One of Dyllan's favorite fish to work with: “the flavors go so well with a variety of fresh produce.”" },
+  ];
+  await sql`
+    INSERT INTO plates (name, image_url, image_alt, rows, position) VALUES
+      ('Walleye almondine, butternut squash & sumac carrots', '/images/dish-walleye.webp',
+        'Plates of walleye almondine from above: walleye topped with mousseline and toasted almonds over butternut squash and glazed carrots',
+        ${JSON.stringify(rows)}::text::jsonb, (SELECT COALESCE(MAX(position), -1) + 1 FROM plates))
   `;
 }
 
