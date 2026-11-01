@@ -38,6 +38,8 @@ export async function ensureSchema() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  // Chef's notes: optional tips shown under the method, one per entry.
+  await sql`ALTER TABLE recipes ADD COLUMN IF NOT EXISTS notes JSONB NOT NULL DEFAULT '[]'::jsonb`;
 }
 
 // Answers from one-off questionnaires (e.g. /questions). One row per

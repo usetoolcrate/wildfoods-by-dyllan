@@ -10,6 +10,7 @@ type ApiRecipe = {
   teaser: string;
   ingredients: string[];
   steps: string[];
+  notes?: string[];
   image_url: string | null;
   published: boolean;
 };
@@ -22,6 +23,7 @@ type FormState = {
   teaser: string;
   ingredients: string; // newline-separated in the form
   steps: string; // newline-separated in the form
+  notes: string; // newline-separated in the form
   imageUrl: string | null;
   published: boolean;
 };
@@ -34,6 +36,7 @@ const EMPTY_FORM: FormState = {
   teaser: "",
   ingredients: "",
   steps: "",
+  notes: "",
   imageUrl: null,
   published: true,
 };
@@ -190,6 +193,7 @@ function RecipeForm({
       teaser: form.teaser,
       ingredients: form.ingredients.split("\n").map((s) => s.trim()).filter(Boolean),
       steps: form.steps.split("\n").map((s) => s.trim()).filter(Boolean),
+      notes: form.notes.split("\n").map((s) => s.trim()).filter(Boolean),
       imageUrl: form.imageUrl,
       published: form.published,
     };
@@ -247,6 +251,14 @@ function RecipeForm({
         style={{ ...inputStyle, minHeight: 120, fontFamily: "monospace", fontSize: 13 }}
         value={form.steps}
         onChange={(e) => setForm({ ...form, steps: e.target.value })}
+      />
+
+      <label style={labelStyle}>Chef's notes (optional, one per line)</label>
+      <textarea
+        style={{ ...inputStyle, minHeight: 90, fontFamily: "monospace", fontSize: 13 }}
+        value={form.notes}
+        onChange={(e) => setForm({ ...form, notes: e.target.value })}
+        placeholder="Tips, swaps, storage…"
       />
 
       <label style={labelStyle}>Photo</label>
@@ -419,6 +431,7 @@ export function AdminRecipesPage() {
                           teaser: r.teaser,
                           ingredients: r.ingredients.join("\n"),
                           steps: r.steps.join("\n"),
+                          notes: (r.notes ?? []).join("\n"),
                           imageUrl: r.image_url,
                           published: r.published,
                         })

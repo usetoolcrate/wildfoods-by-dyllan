@@ -472,6 +472,8 @@ export const V2_STYLES = String.raw`
   .v2 .recipe-detail h4{font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid var(--ink);}
   .v2 .recipe-detail ul, .v2 .recipe-detail ol{margin:0;padding-left:20px;color:var(--ink-2);}
   .v2 .recipe-detail li{margin-bottom:10px;}
+  .v2 .rd-notes{margin-top:44px;}
+  .v2 .rd-notes p{margin:0 0 12px;color:var(--ink-2);max-width:44em;}
   .v2 .rd-print{margin-top:36px;}
 
   /* ---------- tickets & gift certificates ---------- */

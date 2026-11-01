@@ -17,6 +17,7 @@ type Recipe = {
   teaser: string;
   ingredients: string[];
   steps: string[];
+  notes?: string[];
   imageUrl?: string | null;
 };
 
@@ -29,6 +30,7 @@ type ApiRecipe = {
   teaser: string;
   ingredients: string[];
   steps: string[];
+  notes?: string[];
   image_url: string | null;
   published: boolean;
 };
@@ -42,6 +44,7 @@ function apiRecipeToRecipe(r: ApiRecipe): Recipe {
     teaser: r.teaser,
     ingredients: r.ingredients,
     steps: r.steps,
+    notes: r.notes ?? [],
     imageUrl: r.image_url,
   };
 }
@@ -260,6 +263,7 @@ function printRecipe(recipe: Recipe) {
           h2{font-family:-apple-system,Helvetica,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.16em;border-bottom:1px solid #18211b;padding-bottom:8px;}
           ul,ol{padding-left:20px;color:#3d443e;}
           li{margin-bottom:8px;}
+          p{color:#3d443e;margin:0 0 8px;}
           .cols{display:flex;gap:36px;}
           .cols > div{flex:1;}
           footer{margin-top:40px;font-family:-apple-system,Helvetica,sans-serif;font-size:11px;color:#555c55;}
@@ -278,6 +282,7 @@ function printRecipe(recipe: Recipe) {
             <ol>${recipe.steps.map((s) => `<li>${s}</li>`).join("")}</ol>
           </div>
         </div>
+        ${recipe.notes?.length ? `<h2>Chef's notes</h2>${recipe.notes.map((n) => `<p>${n}</p>`).join("")}` : ""}
         <footer>Wild Foods by Dyllan · wildfoodsbydyllan.com</footer>
       </body>
     </html>
@@ -412,6 +417,14 @@ export function RecipesPage() {
                     </ol>
                   </div>
                 </div>
+                {openRecipe.notes?.length ? (
+                  <div className="rd-notes">
+                    <h4>Chef&rsquo;s notes</h4>
+                    {openRecipe.notes.map((n) => (
+                      <p key={n}>{n}</p>
+                    ))}
+                  </div>
+                ) : null}
                 <div className="rd-print">
                   <button className="rc-view" onClick={() => printRecipe(openRecipe)} type="button">
                     Print This Recipe

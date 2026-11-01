@@ -49,6 +49,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.partner-events.v1", seedPartnerEvents);
     await seedOnce("seed.plates.walleye", seedWalleyePlate);
     await seedOnce("seed.recipes.pawpaw-mustard", seedPawpawMustard);
+    await seedOnce("seed.recipes.pawpaw-mustard.notes", moveMustardNotes);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -114,8 +115,24 @@ async function seedWalleyePlate() {
   `;
 }
 
-// Dyllan's pawpaw mustard (emailed 2026-10-30). His intro and chef's notes are
-// folded into the teaser and the last steps, like the Jezebel sauce.
+// Dyllan's pawpaw mustard (emailed 2026-10-30), with his steps and chef's notes as written.
+const MUSTARD = {
+  teaser:
+    "Native pawpaw — mango, banana, and a hint of pineapple — whisked with tangy mustard and local honey into a bright, sweet condiment for grilled meats, sandwiches, and charcuterie boards.",
+  steps: [
+    "Add the pawpaw pulp, mustard, honey, and apple cider vinegar to a mixing bowl.",
+    "Whisk everything together until thoroughly combined and smooth.",
+    "Add a dash of paprika, salt, and freshly ground black pepper.",
+    "Taste and adjust the seasoning to your preference.",
+    "Transfer to a clean jar and refrigerate for at least one hour before serving to allow the flavors to come together.",
+  ],
+  notes: [
+    "Feel free to add a little more honey for sweetness, mustard for a sharper bite, or apple cider vinegar for extra acidity.",
+    "Whole-grain mustard gives this recipe a rustic texture, while Dijon creates a smoother, more refined condiment.",
+    "Storage: Keep refrigerated in a sealed container and use within 3–4 days. This is a fresh mustard, not a shelf-stable canned product.",
+  ],
+};
+
 async function seedPawpawMustard() {
   await ensureSchema();
   const sql = getSql();
@@ -129,20 +146,23 @@ async function seedPawpawMustard() {
     "A dash of paprika",
     "Salt and freshly ground black pepper, to taste",
   ];
-  const steps = [
-    "Add the pawpaw pulp, mustard, honey, and apple cider vinegar to a mixing bowl. Whole-grain mustard gives it a rustic texture; Dijon makes a smoother, more refined condiment.",
-    "Whisk everything together until thoroughly combined and smooth.",
-    "Add a dash of paprika, salt, and freshly ground black pepper.",
-    "Taste and adjust — a little more honey for sweetness, mustard for a sharper bite, or apple cider vinegar for extra acidity.",
-    "Transfer to a clean jar and refrigerate for at least one hour before serving to allow the flavors to come together.",
-    "Serve it anywhere you'd normally use mustard: grilled meats, sandwiches, or a charcuterie board.",
-    "Keep refrigerated in a sealed container and use within 3–4 days. This is a fresh mustard, not a shelf-stable canned product.",
-  ];
   await sql`
-    INSERT INTO recipes (slug, title, tag, time, teaser, ingredients, steps, image_url)
-    VALUES ('ozarks-pawpaw-mustard', 'Ozarks Pawpaw Mustard', 'Foraged Fruit', '10 min + 1 hr chill',
-      'Native pawpaw — mango, banana, and a hint of pineapple — whisked with tangy mustard and local honey into a bright, sweet condiment.',
-      ${JSON.stringify(ingredients)}::text::jsonb, ${JSON.stringify(steps)}::text::jsonb, '/images/recipe-pawpaw-mustard.jpg')
+    INSERT INTO recipes (slug, title, tag, time, teaser, ingredients, steps, notes, image_url)
+    VALUES ('ozarks-pawpaw-mustard', 'Ozarks Pawpaw Mustard', 'Foraged Fruit', '10 min + 1 hr chill', ${MUSTARD.teaser},
+      ${JSON.stringify(ingredients)}::text::jsonb, ${JSON.stringify(MUSTARD.steps)}::text::jsonb,
+      ${JSON.stringify(MUSTARD.notes)}::text::jsonb, '/images/recipe-pawpaw-mustard.jpg')
+  `;
+}
+
+// The first version went out before recipes had chef's notes, with the notes
+// folded into the steps. Move them over unless the recipe was edited since.
+async function moveMustardNotes() {
+  await ensureSchema();
+  const sql = getSql();
+  await sql`
+    UPDATE recipes SET teaser = ${MUSTARD.teaser}, steps = ${JSON.stringify(MUSTARD.steps)}::text::jsonb,
+      notes = ${JSON.stringify(MUSTARD.notes)}::text::jsonb, updated_at = now()
+    WHERE slug = 'ozarks-pawpaw-mustard' AND jsonb_array_length(steps) = 7 AND notes = '[]'::jsonb AND updated_at = created_at
   `;
 }
 

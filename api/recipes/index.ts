@@ -42,6 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const teaser = String(body.teaser ?? "");
       const ingredients = Array.isArray(body.ingredients) ? body.ingredients : [];
       const steps = Array.isArray(body.steps) ? body.steps : [];
+      const notes = Array.isArray(body.notes) ? body.notes : [];
       const imageUrl = body.imageUrl ? String(body.imageUrl) : null;
       const published = body.published === undefined ? true : Boolean(body.published);
 
@@ -52,8 +53,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const rows = await sql`
-        INSERT INTO recipes (slug, title, tag, time, teaser, ingredients, steps, image_url, published)
-        VALUES (${slug}, ${title}, ${tag}, ${time}, ${teaser}, ${JSON.stringify(ingredients)}::jsonb, ${JSON.stringify(steps)}::jsonb, ${imageUrl}, ${published})
+        INSERT INTO recipes (slug, title, tag, time, teaser, ingredients, steps, notes, image_url, published)
+        VALUES (${slug}, ${title}, ${tag}, ${time}, ${teaser}, ${JSON.stringify(ingredients)}::jsonb, ${JSON.stringify(steps)}::jsonb,
+          ${JSON.stringify(notes)}::text::jsonb, ${imageUrl}, ${published})
         RETURNING *
       `;
       res.status(201).json({ recipe: rows[0] });

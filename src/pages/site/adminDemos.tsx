@@ -910,7 +910,7 @@ const lines = (t: number, items: string[], from: number, gap: number) => items.f
 export const RECIPES_DEMO: Demo = {
   id: "recipes",
   title: "Adding a recipe",
-  text: "Recipes go on your Recipes page, searchable and printable. Put one ingredient or step on each line and the site lays them out for you.",
+  text: "Recipes go on your Recipes page, searchable and printable. Put one ingredient or step on each line and the site lays them out for you. Chef's notes are optional tips that show under the method.",
   duration: 20.5,
   chapters: [
     { at: 0, label: "Tap Add a recipe" },
@@ -950,7 +950,7 @@ export const RECIPES_DEMO: Demo = {
             </div>
           </Scene>
           <Scene t={t} from={2.8} to={16.9}>
-            <Scroll y={keyed(t, [[0, 0], [7.7, 290], [12.9, 640]], 0.9)}>
+            <Scroll y={keyed(t, [[0, 0], [7.7, 290], [12.9, 760]], 0.9)}>
               <div style={page}>
                 <RecipesHead />
                 <div style={{ border: "1px solid var(--paper-dark)", padding: 20, marginBottom: 32 }}>
@@ -973,6 +973,8 @@ export const RECIPES_DEMO: Demo = {
                   <Box base={inputStyle} tap="ingredients" h={120} style={mono} v={lines(t, INGREDIENTS, 8.6, 0.4)} focus={t >= 8.4 && t < 10.7} />
                   <Label>Steps (one per line)</Label>
                   <Box base={inputStyle} tap="steps" h={120} style={mono} v={lines(t, STEPS, 11.0, 0.5)} focus={t >= 10.8 && t < 12.6} />
+                  <Label>Chef&rsquo;s notes (optional, one per line)</Label>
+                  <Box base={inputStyle} h={90} style={mono} ph="Tips, swaps, storage…" v={t >= 12.6 ? "Keeps a week in the fridge under a thin layer of oil." : ""} />
                   <Label>Photo</Label>
                   <div style={{ marginBottom: 14 }}>
                     {uploaded ? <img src="/images/g-local-produce.jpg" alt="" style={{ maxWidth: 200, display: "block", marginBottom: 8, ...enter(prog(t, 15.5)) }} /> : null}

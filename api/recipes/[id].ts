@@ -40,6 +40,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const teaser = String(body.teaser ?? "");
       const ingredients = Array.isArray(body.ingredients) ? body.ingredients : [];
       const steps = Array.isArray(body.steps) ? body.steps : [];
+      // A save from an admin tab opened before notes existed leaves them alone.
+      const notes = Array.isArray(body.notes) ? JSON.stringify(body.notes) : null;
       const imageUrl = body.imageUrl !== undefined ? body.imageUrl : null;
       const published = body.published === undefined ? true : Boolean(body.published);
 
@@ -47,6 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         UPDATE recipes
         SET title = ${title}, tag = ${tag}, time = ${time}, teaser = ${teaser},
             ingredients = ${JSON.stringify(ingredients)}::jsonb, steps = ${JSON.stringify(steps)}::jsonb,
+            notes = COALESCE(${notes}::text::jsonb, notes),
             image_url = ${imageUrl}, published = ${published}, updated_at = now()
         WHERE id = ${id}
         RETURNING *
