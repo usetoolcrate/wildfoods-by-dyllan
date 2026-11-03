@@ -49,6 +49,7 @@ function publicEvent(e: EventRow, taken: number) {
     partner: e.partner,
     ticketLinks: partner ? e.ticket_links : [],
     logos: e.logos,
+    photo: e.photo,
   };
 }
 
@@ -166,7 +167,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
       }
       if (seats > left) {
-        res.status(409).json({ error: left > 0 ? `Only ${left} seat${left === 1 ? "" : "s"} left.` : "This dinner is sold out.", seatsLeft: Math.max(0, left) });
+        res.status(409).json({ error: left > 0 ? `Only ${left} seat${left === 1 ? "" : "s"} left.` : "This event is sold out.", seatsLeft: Math.max(0, left) });
         return;
       }
       const picked = (body.addOns ?? {}) as Record<string, unknown>;

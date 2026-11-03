@@ -28,6 +28,7 @@ type AdminEvent = {
   partner: string | null;
   ticket_links: { label: string; url: string }[];
   logos: Logo[];
+  photo: string | null;
   sold: number;
   held: number;
   revenue: number;
@@ -83,6 +84,7 @@ type Draft = {
   partner: string;
   ticketLinks: { label: string; url: string }[];
   logos: Logo[];
+  photo: string;
 };
 
 const EMPTY: Draft = {
@@ -102,6 +104,7 @@ const EMPTY: Draft = {
   partner: "",
   ticketLinks: [{ label: "Tickets", url: "" }],
   logos: [],
+  photo: "",
 };
 
 const STATUS_LABEL = { draft: "Draft (hidden)", on_sale: "On sale", closed: "Closed" };
@@ -130,6 +133,7 @@ function toDraft(e: AdminEvent): Draft {
     partner: e.partner ?? "",
     ticketLinks: e.ticket_links.length ? e.ticket_links.map((l) => ({ ...l })) : [{ label: "Tickets", url: "" }],
     logos: e.logos.map((l) => ({ ...l })),
+    photo: e.photo ?? "",
   };
 }
 
@@ -287,8 +291,41 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           {uploading ? <span style={{ fontSize: 14 }}>Uploading…</span> : null}
         </div>
       ) : null}
-      <label style={labelStyle}>About this dinner</label>
-      <textarea style={{ ...field, minHeight: 90 }} value={d.about} onChange={set("about")} />
+      <label style={labelStyle}>Photo (optional — shown on the ticket page)</label>
+      <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {d.photo ? (
+          <>
+            <img src={d.photo} alt="" style={{ width: 120, height: 90, objectFit: "cover", border: "1px solid var(--line)" }} />
+            <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, photo: "" })}>
+              Remove
+            </button>
+          </>
+        ) : (
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={async (e) => {
+              const input = e.target;
+              const file = input.files?.[0];
+              if (!file) return;
+              setUploading(true);
+              setError("");
+              try {
+                const url = await uploadImage(file, "events");
+                setD((cur) => ({ ...cur, photo: url }));
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Upload failed.");
+              } finally {
+                setUploading(false);
+                input.value = "";
+              }
+            }}
+          />
+        )}
+      </div>
+      <label style={labelStyle}>About (the first paragraph also shows in the list of dates)</label>
+      <textarea style={{ ...field, minHeight: 140 }} value={d.about} onChange={set("about")} />
       {d.sellsHere ? <label style={labelStyle}>Add-ons (optional — e.g. a wine pairing)</label> : null}
       {!d.sellsHere ? null : d.addOns.map((a, i) => (
         <div key={`addon-${i}`} style={{ display: "flex", gap: 10 }}>

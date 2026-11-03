@@ -50,6 +50,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.plates.walleye", seedWalleyePlate);
     await seedOnce("seed.recipes.pawpaw-mustard", seedPawpawMustard);
     await seedOnce("seed.recipes.pawpaw-mustard.notes", moveMustardNotes);
+    await seedOnce("seed.events.fermentation-2027", seedFermentationClass);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -163,6 +164,38 @@ async function moveMustardNotes() {
     UPDATE recipes SET teaser = ${MUSTARD.teaser}, steps = ${JSON.stringify(MUSTARD.steps)}::text::jsonb,
       notes = ${JSON.stringify(MUSTARD.notes)}::text::jsonb, updated_at = now()
     WHERE slug = 'ozarks-pawpaw-mustard' AND jsonb_array_length(steps) = 7 AND notes = '[]'::jsonb AND updated_at = created_at
+  `;
+}
+
+// Dyllan's own class, from his 11/3 email, word for word apart from the class
+// details block (date, time, place and price show above the text already).
+const FERMENTATION_ABOUT = `Discover the ancient art of fermentation with Chef Dyllan Dale of Wild Foods by Dyllan! Fermentation has been used for thousands of years to preserve food, develop complex flavors, and transform simple ingredients into something extraordinary. In this hands-on class, we’ll explore the fascinating world of beneficial microorganisms and learn how to harness their power in our own kitchens.
+
+With years of experience working with fermented foods, Chef Dyllan will guide participants through the science, techniques, and traditions behind fermentation, with an emphasis on seasonal, locally sourced ingredients.
+
+What you’ll learn:
+• The science behind fermentation and how it works
+• The difference between fermentation and pickling
+• Proper sanitation, equipment, and fermentation safety
+• Techniques for fermenting vegetables and other ingredients
+• How to develop unique flavors through fermentation
+• Tips for maintaining and troubleshooting ferments at home
+
+Participants will gain hands-on experience and the knowledge needed to confidently begin fermenting in their own kitchens. Whether you’re a complete beginner or looking to expand your culinary skills, this class offers an approachable introduction to one of the oldest and most fascinating methods of food preservation.
+
+With only 15 spots available, this intimate class allows for personalized instruction, hands-on learning, and plenty of opportunities to ask questions. The exact class location in Nixa, Missouri, will be provided upon ticket purchase.`;
+
+async function seedFermentationClass() {
+  const sql = getSql();
+  const found = (await sql`
+    SELECT 1 FROM ticket_events WHERE event_date = '2027-01-09'::date AND name ILIKE '%ferment%'
+  `) as unknown[];
+  if (found.length) return;
+  await sql`
+    INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, status, kind, photo)
+    VALUES ('the-art-of-fermentation-2027-01-09', 'The Art of Fermentation', '2027-01-09'::date, '2:00–4:00 PM', 'Nixa, MO',
+      ${FERMENTATION_ABOUT}, 3500, 15, 8, 'on_sale', 'workshop', '/images/events/fermentation-jars.jpg')
+    ON CONFLICT (slug) DO NOTHING
   `;
 }
 

@@ -1,6 +1,6 @@
-import { V2Page, Html, renderHeader, renderFooter, renderPageHero, renderBook, renderRates } from "@/pages/v2";
+import { V2Page, Html, ClassDates, renderHeader, renderFooter, renderPageHero, renderBook, renderRates } from "@/pages/v2";
 
-const BODY = `${renderHeader("/learn")}
+const TOP = `${renderHeader("/learn")}
 
 ${renderPageHero({
   label: "Learn",
@@ -8,9 +8,17 @@ ${renderPageHero({
   sub: "Hands-on identification in the field, one-on-one coaching, and classes for schools, restaurants, and community groups.",
   image: { src: "/images/creek-foraging.jpg", alt: "Dyllan foraging along a creek in the Ozarks with his dog", position: "center 45%" },
   surface: "s-sage",
-})}
+})}`;
 
-<section class="sec s-paper" id="foraging-walks">
+const CLASSES_HEAD = `    <div class="sh split">
+      <div>
+        <div class="label">Upcoming</div>
+        <h2>Classes</h2>
+      </div>
+      <p>Small, hands-on classes with Dyllan. Seats are limited, so book ahead — the details and tickets are on each date.</p>
+    </div>`;
+
+const BODY = `<section class="sec s-paper" id="foraging-walks">
   <div class="c">
     <div class="sh split">
       <div>
@@ -80,6 +88,8 @@ ${renderFooter()}`;
 export function LearnPage() {
   return (
     <V2Page title="Learn — Foraging, Consultations & Teaching — Wild Foods by Dyllan">
+      <Html html={TOP} />
+      <ClassDates head={CLASSES_HEAD} />
       <Html html={BODY} />
     </V2Page>
   );

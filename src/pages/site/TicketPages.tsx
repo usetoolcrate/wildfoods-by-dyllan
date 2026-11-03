@@ -22,6 +22,7 @@ type TicketEvent = {
   partner: string | null;
   ticketLinks: { label: string; url: string }[];
   logos: { src: string; name: string }[];
+  photo: string | null;
 };
 type Guest = { name: string; diet: string };
 type Order = {
@@ -152,9 +153,9 @@ export function TicketPage() {
           ) : event === null ? (
             <div className="sh">
               <div className="label">Tickets</div>
-              <h2>We couldn't find that dinner.</h2>
+              <h2>We couldn't find that event.</h2>
               <p>
-                It may have ended or moved. <Link to="/farm-to-table" className="tlink">See upcoming dinners</Link>
+                It may have ended or moved. <Link to="/farm-to-table" className="tlink">See upcoming dates</Link>
               </p>
             </div>
           ) : (
@@ -174,6 +175,13 @@ export function TicketPage() {
                   {event.time ? <span>{event.time}</span> : null}
                   {event.location ? <span>{event.location}</span> : null}
                 </div>
+                {/* On phones the ticket box sits below a long description; this jumps to it. */}
+                {!event.partner && !closed ? (
+                  <a className="tlink tk-jump" href="#buy">
+                    Buy tickets — {money(event.priceCents ?? 0)}
+                  </a>
+                ) : null}
+                {event.photo ? <img className="tk-photo" src={event.photo} alt={event.name} /> : null}
                 <p className="tk-about">{event.about}</p>
               </div>
               {event.partner ? (
@@ -195,7 +203,7 @@ export function TicketPage() {
                   ))}
                 </div>
               ) : (
-              <div className="tk-card">
+              <div className="tk-card" id="buy">
                 {released ? <p className="notice">Checkout canceled — your seats were released.</p> : null}
                 {error ? <p className="notice err">{error}</p> : null}
                 <div className="tk-price">

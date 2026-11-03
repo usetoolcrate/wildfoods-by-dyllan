@@ -151,6 +151,8 @@ export async function ensureEventExtras() {
   await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
+  // Optional photo shown on the ticket page.
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS photo TEXT`;
 }
 
 // Content Dyllan edits from /admin: signature plates, reviews, private dining

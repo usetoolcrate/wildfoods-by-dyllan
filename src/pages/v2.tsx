@@ -483,6 +483,8 @@ export const V2_STYLES = String.raw`
   .v2 .tk-logos{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px;}
   .v2 .tk-logo{display:block;width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid var(--line);}
   .v2 .tk-meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--ink-2);margin:0 0 26px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .v2 .tk-jump{display:none;}
+  .v2 .tk-photo{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;margin:0 0 26px;}
   .v2 .tk-about{color:var(--ink-2);max-width:34em;margin:0;white-space:pre-line;}
   .v2 .tk-card{background:var(--white);border:1px solid var(--line);padding:34px 32px 30px;}
   .v2 .tk-price{font-family:'Cormorant Garamond', Georgia, serif;font-size:44px;line-height:1;}
@@ -591,6 +593,7 @@ export const V2_STYLES = String.raw`
     .v2 .reach{grid-template-columns:minmax(0,1fr);}
     .v2 .rd-cols{grid-template-columns:minmax(0,1fr);gap:32px;}
     .v2 .tk{grid-template-columns:minmax(0,1fr);gap:40px;}
+    .v2 .tk-jump{display:inline-block;margin:0 0 26px;}
     .v2 .ft-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
     .v2 .ft-in > div:first-child{grid-column:1 / -1;}
     .v2 .sec, .v2 .book, .v2 .menu-sec{padding:84px 0;}
@@ -781,11 +784,11 @@ export type SiteEvent = {
   logos?: { src: string; name: string }[];
 };
 
-export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEvent[] | null }): string {
+export function renderDinnerList(opts: { dinnersOnly?: boolean; classesOnly?: boolean; events: SiteEvent[] | null }): string {
   if (opts.events === null) return `<ol class="dl"><li><div></div><div><p>Loading dates…</p></div></li></ol>`;
   const money = (c: number) => `$${(c / 100).toLocaleString("en-US")} per person`;
   const rows = opts.events
-    .filter((e) => !opts.dinnersOnly || e.kind === "dinner")
+    .filter((e) => (!opts.dinnersOnly || e.kind === "dinner") && (!opts.classesOnly || e.kind === "workshop"))
     .sort((a, b) => (a.kind === b.kind ? a.date.localeCompare(b.date) : a.kind === "dinner" ? -1 : 1));
   if (!rows.length) {
     return `<ol class="dl"><li><div></div><div><h3>New dates coming soon</h3><p>The next dinners are being set with our farm hosts. Call or email to hear first.</p></div></li></ol>`;
@@ -797,7 +800,8 @@ export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEven
             const month = d.toLocaleDateString("en-US", { month: "short" });
             const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
             const kind = e.kind === "workshop" ? "Workshop" : e.partner ? `With ${e.partner}` : "Hosted by Dyllan";
-            const details = [e.time, e.location, e.about].filter(Boolean).join(" · ");
+            // The ticket page has the full text; the list keeps to its first paragraph.
+            const details = [e.time, e.location, e.about.split(/\n\s*\n/)[0]].filter(Boolean).join(" · ");
             let sold = "";
             let links = "";
             if (e.partner) {
@@ -820,7 +824,7 @@ export function renderDinnerList(opts: { dinnersOnly?: boolean; events: SiteEven
       </ol>`;
 }
 
-export function DinnerList({ dinnersOnly }: { dinnersOnly?: boolean }) {
+function useSiteEvents(): SiteEvent[] | null {
   const [events, setEvents] = useState<SiteEvent[] | null>(null);
   useEffect(() => {
     let live = true;
@@ -832,7 +836,26 @@ export function DinnerList({ dinnersOnly }: { dinnersOnly?: boolean }) {
       live = false;
     };
   }, []);
+  return events;
+}
+
+export function DinnerList({ dinnersOnly }: { dinnersOnly?: boolean }) {
+  const events = useSiteEvents();
   return <Html html={renderDinnerList({ dinnersOnly, events })} />;
+}
+
+// Upcoming classes and workshops; the whole section stays hidden while there are none.
+export function ClassDates({ head }: { head: string }) {
+  const events = useSiteEvents();
+  if (!events?.some((e) => e.kind === "workshop")) return null;
+  return (
+    <section className="sec s-pine" id="classes">
+      <div className="c">
+        <Html html={head} />
+        <Html html={renderDinnerList({ classesOnly: true, events })} />
+      </div>
+    </section>
+  );
 }
 
 export function renderRolls(): string {

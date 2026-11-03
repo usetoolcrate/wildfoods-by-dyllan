@@ -65,7 +65,7 @@ export function resizeImage(file: File, max = 1800): Promise<string> {
   });
 }
 
-export async function uploadImage(file: File, folder: "plates" | "recipes" | "hosts"): Promise<string> {
+export async function uploadImage(file: File, folder: "plates" | "recipes" | "hosts" | "events"): Promise<string> {
   const dataUrl = await resizeImage(file, folder === "hosts" ? 600 : 1800);
   const res = await fetch("/api/admin/upload", {
     method: "POST",
