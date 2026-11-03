@@ -51,6 +51,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.recipes.pawpaw-mustard", seedPawpawMustard);
     await seedOnce("seed.recipes.pawpaw-mustard.notes", moveMustardNotes);
     await seedOnce("seed.events.fermentation-2027", seedFermentationClass);
+    await seedOnce("seed.events.fermentation-2027.photos", addFermentationPhotos);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -192,10 +193,21 @@ async function seedFermentationClass() {
   `) as unknown[];
   if (found.length) return;
   await sql`
-    INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, status, kind, photo)
+    INSERT INTO ticket_events (slug, name, event_date, time_label, location, about, price_cents, capacity, max_per_order, status, kind, photos)
     VALUES ('the-art-of-fermentation-2027-01-09', 'The Art of Fermentation', '2027-01-09'::date, '2:00–4:00 PM', 'Nixa, MO',
-      ${FERMENTATION_ABOUT}, 3500, 15, 8, 'on_sale', 'workshop', '/images/events/fermentation-jars.jpg')
+      ${FERMENTATION_ABOUT}, 3500, 15, 8, 'on_sale', 'workshop', ${JSON.stringify(FERMENTATION_PHOTOS)}::text::jsonb)
     ON CONFLICT (slug) DO NOTHING
+  `;
+}
+
+// All three photos from his email; the first live version had only the jars.
+const FERMENTATION_PHOTOS = ["/images/events/fermentation-jars.jpg", "/images/events/fermentation-class.jpg", "/images/events/foraging-dyllan.jpg"];
+
+async function addFermentationPhotos() {
+  const sql = getSql();
+  await sql`
+    UPDATE ticket_events SET photos = ${JSON.stringify(FERMENTATION_PHOTOS)}::text::jsonb, photo = NULL, updated_at = now()
+    WHERE slug = 'the-art-of-fermentation-2027-01-09' AND photos = '["/images/events/fermentation-jars.jpg"]'::jsonb
   `;
 }
 

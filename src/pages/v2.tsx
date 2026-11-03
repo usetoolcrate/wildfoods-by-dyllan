@@ -484,7 +484,14 @@ export const V2_STYLES = String.raw`
   .v2 .tk-logo{display:block;width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid var(--line);}
   .v2 .tk-meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--ink-2);margin:0 0 26px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
   .v2 .tk-jump{display:none;}
-  .v2 .tk-photo{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;margin:0 0 26px;}
+  .v2 .tk-photos{margin:0 0 26px;}
+  .v2 .tk-photo{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;}
+  .v2 .tk-photo.tall{object-fit:contain;background:var(--sand);}
+  .v2 .tk-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+  .v2 .tk-thumbs button{display:block;width:88px;aspect-ratio:4/3;padding:0;border:0;background:none;cursor:pointer;opacity:0.55;transition:opacity .2s;}
+  .v2 .tk-thumbs button:hover, .v2 .tk-thumbs button.on{opacity:1;}
+  .v2 .tk-thumbs button.on{outline:1px solid var(--ink);outline-offset:2px;}
+  .v2 .tk-thumbs img{display:block;width:100%;height:100%;object-fit:cover;}
   .v2 .tk-about{color:var(--ink-2);max-width:34em;margin:0;white-space:pre-line;}
   .v2 .tk-card{background:var(--white);border:1px solid var(--line);padding:34px 32px 30px;}
   .v2 .tk-price{font-family:'Cormorant Garamond', Georgia, serif;font-size:44px;line-height:1;}

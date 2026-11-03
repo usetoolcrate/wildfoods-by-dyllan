@@ -22,7 +22,8 @@ type TicketEvent = {
   partner: string | null;
   ticketLinks: { label: string; url: string }[];
   logos: { src: string; name: string }[];
-  photo: string | null;
+  photos: string[];
+  kind: "dinner" | "workshop";
 };
 type Guest = { name: string; diet: string };
 type Order = {
@@ -41,6 +42,34 @@ type Order = {
 };
 
 export const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0 })}`;
+
+// The event's photos: the main one large, the rest as thumbnails that swap in.
+function Photos({ photos, name }: { photos: string[]; name: string }) {
+  const [shown, setShown] = useState(0);
+  const [tall, setTall] = useState(false);
+  if (!photos.length) return null;
+  return (
+    <div className="tk-photos">
+      {/* Tall photos show whole, on a sand background, instead of cropped to the frame. */}
+      <img
+        key={photos[shown] ?? photos[0]}
+        className={tall ? "tk-photo tall" : "tk-photo"}
+        src={photos[shown] ?? photos[0]}
+        alt={name}
+        onLoad={(ev) => setTall(ev.currentTarget.naturalHeight > ev.currentTarget.naturalWidth)}
+      />
+      {photos.length > 1 ? (
+        <div className="tk-thumbs">
+          {photos.map((src, i) => (
+            <button key={src} type="button" className={i === shown ? "on" : ""} onClick={() => setShown(i)} aria-label={`Show photo ${i + 1} of ${photos.length}`}>
+              <img src={src} alt="" />
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export const longDate = (date: string) =>
   new Date(`${date}T12:00:00`).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
@@ -88,7 +117,7 @@ export function TicketPage() {
   const released = params.get("release");
   const [mode, setMode] = useState<string>();
   const [event, setEvent] = useState<TicketEvent | null>();
-  const [seats, setSeats] = useState(2);
+  const [seats, setSeats] = useState(0); // set on first load: 2 for dinners, 1 for classes
   const [adds, setAdds] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -99,7 +128,7 @@ export function TicketPage() {
     const data = await res.json();
     setMode(data.mode);
     setEvent(data.event);
-    setSeats((s) => Math.max(1, Math.min(s, data.event.seatsLeft ?? 1, data.event.maxPerOrder)));
+    setSeats((s) => Math.max(1, Math.min(s || (data.event.kind === "workshop" ? 1 : 2), data.event.seatsLeft ?? 1, data.event.maxPerOrder)));
   }, [slug]);
 
   useEffect(() => {
@@ -181,7 +210,7 @@ export function TicketPage() {
                     Buy tickets — {money(event.priceCents ?? 0)}
                   </a>
                 ) : null}
-                {event.photo ? <img className="tk-photo" src={event.photo} alt={event.name} /> : null}
+                <Photos photos={event.photos ?? []} name={event.name} />
                 <p className="tk-about">{event.about}</p>
               </div>
               {event.partner ? (

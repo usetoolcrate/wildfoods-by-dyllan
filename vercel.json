@@ -525,7 +525,15 @@
       "schedule": "*/10 * * * *"
     }
   ],
+  "functions": {
+    "api/ticket-page.ts": { "includeFiles": "dist/index.html" },
+    "api/ticket-image.ts": { "includeFiles": "api/_lib/og/**" }
+  },
   "rewrites": [
+    {
+      "source": "/tickets/:slug",
+      "destination": "/api/ticket-page?slug=:slug"
+    },
     {
       "source": "/((?!assets/|api/).*)",
       "destination": "/"

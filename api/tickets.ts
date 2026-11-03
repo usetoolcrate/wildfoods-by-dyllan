@@ -49,7 +49,7 @@ function publicEvent(e: EventRow, taken: number) {
     partner: e.partner,
     ticketLinks: partner ? e.ticket_links : [],
     logos: e.logos,
-    photo: e.photo,
+    photos: e.photos,
   };
 }
 

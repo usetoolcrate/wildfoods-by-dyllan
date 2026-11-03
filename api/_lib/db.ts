@@ -151,8 +151,11 @@ export async function ensureEventExtras() {
   await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
-  // Optional photo shown on the ticket page.
+  // Photos for the ticket page, the first one is the main photo and the share image.
+  // They replaced the single photo column on 11/3; an old one is carried over and nulled on save.
   await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS photo TEXT`;
+  await sql`ALTER TABLE ticket_events ADD COLUMN IF NOT EXISTS photos JSONB NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`UPDATE ticket_events SET photos = jsonb_build_array(photo) WHERE photo IS NOT NULL AND photos = '[]'::jsonb`;
 }
 
 // Content Dyllan edits from /admin: signature plates, reviews, private dining

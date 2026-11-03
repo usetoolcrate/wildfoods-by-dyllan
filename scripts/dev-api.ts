@@ -56,7 +56,8 @@ Bun.serve({
           return res;
         },
         send(data: unknown) {
-          done(new Response(typeof data === "string" ? data : JSON.stringify(data), { status, headers: out }));
+          const body = typeof data === "string" || data instanceof Uint8Array ? data : JSON.stringify(data);
+          done(new Response(body, { status, headers: out }));
           return res;
         },
         end(data?: string) {

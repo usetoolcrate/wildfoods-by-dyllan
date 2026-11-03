@@ -28,7 +28,7 @@ type AdminEvent = {
   partner: string | null;
   ticket_links: { label: string; url: string }[];
   logos: Logo[];
-  photo: string | null;
+  photos: string[];
   sold: number;
   held: number;
   revenue: number;
@@ -84,7 +84,7 @@ type Draft = {
   partner: string;
   ticketLinks: { label: string; url: string }[];
   logos: Logo[];
-  photo: string;
+  photos: string[];
 };
 
 const EMPTY: Draft = {
@@ -104,7 +104,7 @@ const EMPTY: Draft = {
   partner: "",
   ticketLinks: [{ label: "Tickets", url: "" }],
   logos: [],
-  photo: "",
+  photos: [],
 };
 
 const STATUS_LABEL = { draft: "Draft (hidden)", on_sale: "On sale", closed: "Closed" };
@@ -133,7 +133,7 @@ function toDraft(e: AdminEvent): Draft {
     partner: e.partner ?? "",
     ticketLinks: e.ticket_links.length ? e.ticket_links.map((l) => ({ ...l })) : [{ label: "Tickets", url: "" }],
     logos: e.logos.map((l) => ({ ...l })),
-    photo: e.photo ?? "",
+    photos: [...e.photos],
   };
 }
 
@@ -291,16 +291,24 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
           {uploading ? <span style={{ fontSize: 14 }}>Uploading…</span> : null}
         </div>
       ) : null}
-      <label style={labelStyle}>Photo (optional — shown on the ticket page)</label>
-      <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
-        {d.photo ? (
-          <>
-            <img src={d.photo} alt="" style={{ width: 120, height: 90, objectFit: "cover", border: "1px solid var(--line)" }} />
-            <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, photo: "" })}>
-              Remove
+      <label style={labelStyle}>Photos (optional — the first is the main photo and the picture when the link is shared)</label>
+      {d.photos.map((src, i) => (
+        <div key={src} style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
+          <img src={src} alt="" style={{ width: 96, height: 72, objectFit: "cover", border: "1px solid var(--line)", flex: "none" }} />
+          {i === 0 ? (
+            <span style={{ fontSize: 14 }}>Main photo</span>
+          ) : (
+            <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, photos: [src, ...d.photos.filter((x) => x !== src)] })}>
+              Make main
             </button>
-          </>
-        ) : (
+          )}
+          <button type="button" style={secondaryButtonStyle} onClick={() => setD({ ...d, photos: d.photos.filter((x) => x !== src) })}>
+            Remove
+          </button>
+        </div>
+      ))}
+      <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        {d.photos.length >= 8 ? null : (
           <input
             type="file"
             accept="image/*"
@@ -313,7 +321,7 @@ function EventForm({ initial, onDone }: { initial: Draft; onDone: () => void }) 
               setError("");
               try {
                 const url = await uploadImage(file, "events");
-                setD((cur) => ({ ...cur, photo: url }));
+                setD((cur) => ({ ...cur, photos: [...cur.photos, url] }));
               } catch (err) {
                 setError(err instanceof Error ? err.message : "Upload failed.");
               } finally {
