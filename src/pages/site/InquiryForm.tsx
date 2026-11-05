@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/track";
 
 /* Private dining inquiry: date, guests, the experience they want, and what
    they're picturing. Saved to /admin/inquiries and emailed to Dyllan. */
@@ -34,6 +35,7 @@ export function InquiryForm() {
       });
       const data = await res.json();
       if (!res.ok) return setError(data.error || "Couldn't send. Please try again, or call 417-403-9265.");
+      track("generate_lead", { form: "private_dining_inquiry", experience: f.experience });
       setSent(true);
     } catch {
       setError("Couldn't send. Please try again, or call 417-403-9265.");

@@ -6,6 +6,26 @@
     <link rel="icon" type="image/png" href="/favicon.png?v=2" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="google-site-verification" content="HsTSmAa62iLmnL3h44gg0QqMKhfD8Va1vj-7321ybwk" />
+    <!-- Google Analytics (account "Wild Foods by Dyllan"): visits, plus taps on the phone number,
+         text and email links. Sales and inquiries are reported from src/lib/track.ts. Only the real
+         domain reports, never the admin, local runs or the vercel.app copy. -->
+    <script>
+      if (/(^|\.)wildfoodsbydyllan\.com$/.test(location.hostname) && location.pathname.indexOf("/admin") !== 0) {
+        var ga = document.createElement("script");
+        ga.async = true;
+        ga.src = "https://www.googletagmanager.com/gtag/js?id=G-VNWM0C6GN8";
+        document.head.appendChild(ga);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag("js", new Date());
+        gtag("config", "G-VNWM0C6GN8");
+        document.addEventListener("click", function (e) {
+          var a = e.target.closest && e.target.closest('a[href^="tel:"], a[href^="sms:"], a[href^="mailto:"]');
+          if (a) gtag("event", { "tel:": "phone_click", "sms:": "text_click", "mailto:": "email_click" }[a.protocol]);
+        }, true);
+      }
+    </script>
     <!-- Typefaces: Cormorant Garamond (headings), Hanken Grotesk (text), Special Elite (admin pages and the questionnaire). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

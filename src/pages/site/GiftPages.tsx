@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { V2Page, Html, renderHeader, renderFooter } from "@/pages/v2";
 import { NoIndex, TestBar, money } from "@/pages/site/TicketPages";
+import { track, trackPurchase } from "@/lib/track";
 
 /* Gift certificates sold on the site: pay with Stripe Checkout, get a one-time
    code worth the amount, redeemable at checkout for Dyllan's own dinners and
@@ -45,6 +46,7 @@ export function GiftPage() {
       });
       const data = await res.json();
       if (!res.ok) return setError(data.error || "Couldn't start checkout. Please try again.");
+      track("begin_checkout", { currency: "USD", value: cents / 100, items: [{ item_name: "Gift certificate", quantity: 1 }] });
       window.location.href = data.url;
     } catch {
       setError("Couldn't start checkout. Please try again.");
@@ -146,6 +148,7 @@ export function GiftThanksPage() {
       const data = await res.json();
       setMode(data.mode);
       setGift(data.gift);
+      if (data.gift.status === "issued" && data.mode === "live") trackPurchase(session, data.gift.amountCents, "Gift certificate", 1);
       if (data.gift.status === "open" && tries++ < 15) timer = setTimeout(load, 2000);
     };
     load();

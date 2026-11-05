@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { V2Page, Html, renderHeader, renderFooter } from "@/pages/v2";
+import { track, trackPurchase } from "@/lib/track";
 
 /* Tickets for Dyllan's own events: /tickets/:slug → Stripe Checkout →
    /tickets/thanks, where buyers add each guest's name and dietary needs. */
@@ -160,6 +161,7 @@ export function TicketPage() {
         if (typeof data.seatsLeft === "number") load();
         return;
       }
+      track("begin_checkout", { currency: "USD", value: total / 100, items: [{ item_name: event.name, quantity: seats }] });
       window.location.href = data.url;
     } catch {
       setError("Couldn't start checkout. Please try again.");
@@ -316,6 +318,7 @@ export function TicketThanksPage() {
       const o: Order = data.order;
       setOrder(o);
       if (o.status === "paid") {
+        if (data.mode === "live") trackPurchase(session, o.total ?? 0, o.event?.name ?? "Tickets", o.seats);
         setSaved(o.guestsSaved);
         setGuests(
           Array.from({ length: o.seats }, (_, i) => o.guests[i] ?? { name: i === 0 ? (o.buyerName ?? "") : "", diet: "" }),
