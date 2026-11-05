@@ -57,6 +57,9 @@ export function InquiryForm() {
           <p className="tk-note" style={{ marginTop: 22 }}>
             Prefer to talk? Call or text <a href="tel:14174039265">417-403-9265</a>.
           </p>
+          <p className="tk-note" style={{ marginTop: 12 }}>
+            A 50% deposit reserves your date. All deposits are non-refundable.
+          </p>
         </div>
         {sent ? (
           <div className="tk-card">

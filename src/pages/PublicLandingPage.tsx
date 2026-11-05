@@ -89,7 +89,7 @@ const BOTTOM = `<section class="menu-sec" id="private-chef">
         ).join("\n        ")}
       </div>
       <div class="menu-foot">
-        Five-guest minimum · 50% deposit reserves your date<br>
+        Five-guest minimum · 50% non-refundable deposit reserves your date<br>
         Menu, sourcing, cooking, service &amp; cleanup included
         <div><a class="tlink" href="/private-chef#inquire">Check your date</a></div>
       </div>

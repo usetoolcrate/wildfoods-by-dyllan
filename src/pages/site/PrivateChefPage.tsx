@@ -34,7 +34,7 @@ ${renderPageHero({
         </div>`
         ).join("\n        ")}
       </div>
-      <div class="menu-foot">Five-guest minimum · 50% deposit reserves your date</div>
+      <div class="menu-foot">Five-guest minimum · 50% non-refundable deposit reserves your date</div>
     </div>
   </div>
 </section>
@@ -93,7 +93,7 @@ ${renderPageHero({
 
 const END = `${renderBook({
   title: "Let's plan your dinner.",
-  sub: "Farm-to-table, wild, or a blend of both — crafted for your table. Five-guest minimum, 50% deposit to reserve your date.",
+  sub: "Farm-to-table, wild, or a blend of both — crafted for your table. Five-guest minimum, 50% non-refundable deposit to reserve your date.",
 })}
 ${renderFooter()}`;
 

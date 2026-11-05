@@ -30,7 +30,7 @@ const BODY = `<section class="sec s-paper" id="foraging-walks">
     ${renderRates([
       { name: "Two-hour walk", price: "$100 per session", note: "On your property, identifying and using wild edibles." },
       { name: "Four-hour walk", price: "$200 per session", note: "Add a three-course foraged meal for $30 per person." },
-      { name: "Travel", price: "$5 per 10 miles", note: "Beyond 30 miles of Springfield. 50% deposit reserves your date." },
+      { name: "Travel", price: "$5 per 10 miles", note: "Beyond 30 miles of Springfield. 50% non-refundable deposit reserves your date." },
     ])}
   </div>
 </section>
