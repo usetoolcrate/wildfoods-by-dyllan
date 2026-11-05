@@ -52,6 +52,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.recipes.pawpaw-mustard.notes", moveMustardNotes);
     await seedOnce("seed.events.fermentation-2027", seedFermentationClass);
     await seedOnce("seed.events.fermentation-2027.photos", addFermentationPhotos);
+    await seedOnce("seed.settings.google-reviews-url", setGoogleReviewsUrl);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -265,6 +266,12 @@ async function seedPartnerEvents() {
       ON CONFLICT (slug) DO NOTHING
     `;
   }
+}
+
+// His Google listing, so "Read all reviews on Google" shows. Leaves a link
+// Dyllan already saved in /admin/reviews alone.
+async function setGoogleReviewsUrl() {
+  if (!(await getSetting("google_reviews_url"))) await setSetting("google_reviews_url", "https://maps.google.com/?cid=10728641359400384934");
 }
 
 export async function getSetting(key: string): Promise<string> {
