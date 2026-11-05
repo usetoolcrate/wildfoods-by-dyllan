@@ -52,7 +52,7 @@ export function ensureContent(): Promise<void> {
     await seedOnce("seed.recipes.pawpaw-mustard.notes", moveMustardNotes);
     await seedOnce("seed.events.fermentation-2027", seedFermentationClass);
     await seedOnce("seed.events.fermentation-2027.photos", addFermentationPhotos);
-    await seedOnce("seed.settings.google-reviews-url", setGoogleReviewsUrl);
+    await seedOnce("seed.settings.google-reviews-url.v2", setGoogleReviewsUrl);
   })().catch((err) => {
     ready = null;
     throw err;
@@ -268,10 +268,13 @@ async function seedPartnerEvents() {
   }
 }
 
-// His Google listing, so "Read all reviews on Google" shows. Leaves a link
-// Dyllan already saved in /admin/reviews alone.
+// "Read all reviews on Google" opens his reviews (by place ID). Replaces only
+// a blank or the first try (a Maps cid link that opens an empty card), so a
+// link Dyllan saved in /admin/reviews stays.
 async function setGoogleReviewsUrl() {
-  if (!(await getSetting("google_reviews_url"))) await setSetting("google_reviews_url", "https://maps.google.com/?cid=10728641359400384934");
+  const now = await getSetting("google_reviews_url");
+  if (!now || now === "https://maps.google.com/?cid=10728641359400384934")
+    await setSetting("google_reviews_url", "https://search.google.com/local/reviews?placeid=ChIJA0fK7cRijUkRNYA242XwKZw");
 }
 
 export async function getSetting(key: string): Promise<string> {
