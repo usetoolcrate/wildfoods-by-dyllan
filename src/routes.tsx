@@ -12,6 +12,7 @@ import { AdminRecipesPage } from "@/pages/site/AdminRecipesPage";
 import { QuestionsPage } from "@/pages/site/QuestionsPage";
 import { AdminQuestionsPage } from "@/pages/site/AdminQuestionsPage";
 import { AdminTicketsPage } from "@/pages/site/AdminTicketsPage";
+import { AdminReportsPage } from "@/pages/site/AdminReportsPage";
 import { AdminHomePage, AdminInquiriesPage, AdminPlatesPage, AdminReviewsPage } from "@/pages/site/AdminContentPages";
 import { TicketPage, TicketThanksPage } from "@/pages/site/TicketPages";
 import { GiftPage, GiftThanksPage } from "@/pages/site/GiftPages";
@@ -51,6 +52,7 @@ export function PublicAppRoutes() {
         <Route path="/admin/plates" element={<AdminPlatesPage />} />
         <Route path="/admin/reviews" element={<AdminReviewsPage />} />
         <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+        <Route path="/admin/reports" element={<AdminReportsPage />} />
         <Route
           path="/admin/how"
           element={

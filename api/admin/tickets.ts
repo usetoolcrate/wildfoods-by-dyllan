@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { isAuthedRequest } from "../_lib/auth.js";
 import { getSql } from "../_lib/db.js";
 import { ensureContent } from "../_lib/content.js";
+import { buildReport } from "../_lib/reports.js";
 import { dashboardUrl, isTestMode, stripe } from "../_lib/stripe.js";
 import {
   type AddOn,
@@ -17,6 +18,7 @@ import {
 
 /* Admin side of ticket sales (behind the existing admin login).
    GET                → events with seat counts, every order, gift certificates and credits
+   GET ?view=report   → every online sale (old WordPress shop + this site) for /admin/reports
    POST saveEvent     → create or update an event — Dyllan's own (tickets here) or a partner dinner (tickets at the partner's link)
    POST credit        → issue a one-time credit code for an order (the "credit instead of refund" option) */
 
@@ -49,6 +51,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await ensureContent();
     const sql = getSql();
     const action = clean(req.body?.action, 20);
+
+    if (req.method === "GET" && req.query.view === "report") {
+      res.status(200).json(await buildReport());
+      return;
+    }
 
     if (req.method === "GET") {
       // Settle anything still in flight, and pick up refunds made in Stripe.

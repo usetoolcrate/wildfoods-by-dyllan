@@ -151,6 +151,11 @@ export async function ensureEventExtras() {
   await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   // Sales tax Stripe added to the order (cents), for Dyllan's Missouri sales tax reports.
   await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS amount_tax INTEGER NOT NULL DEFAULT 0`;
+  // For /admin/reports: when the card was charged and Stripe's fee, filled the first time the report reads them.
+  await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE ticket_orders ADD COLUMN IF NOT EXISTS amount_fee INTEGER`;
+  await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS amount_fee INTEGER`;
   await sql`ALTER TABLE gift_certificates ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`;
   await sql`ALTER TABLE ticket_events ALTER COLUMN capacity DROP NOT NULL`;
   // Photos for the ticket page, the first one is the main photo and the share image.

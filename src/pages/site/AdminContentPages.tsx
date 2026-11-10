@@ -30,6 +30,7 @@ function SummaryCards() {
   const tiles: [string, string, string][] = [
     ["/admin/inquiries", "Inquiries", data ? (data.new_inquiries ? `${data.new_inquiries} new` : "None new") : "…"],
     ["/admin/tickets", "Dinners & tickets", data ? `${data.upcoming} upcoming` : "…"],
+    ["/admin/reports", "Reports", "Sales, tax and fees · spreadsheet"],
     ["/admin/plates", "Signature plates", data ? `${data.plates} on the site` : "…"],
     ["/admin/reviews", "Reviews", data ? `${data.reviews} on the site${data.new_reviews ? ` · ${data.new_reviews} new from Google` : ""}` : "…"],
     ["/admin/recipes", "Recipes", "Add and edit recipes"],
