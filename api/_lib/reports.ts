@@ -48,6 +48,18 @@ async function lookupCharge(sessionId: string, withFee: boolean): Promise<Lookup
   };
 }
 
+// Old-shop customer names, by order #. They live in the LEGACY_CUSTOMERS env var (sensitive,
+// production) rather than in git. Missing or unreadable: the report just shows no name.
+function legacyNames(): Record<string, string> {
+  try {
+    const parsed = JSON.parse(process.env.LEGACY_CUSTOMERS || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    console.error("report: LEGACY_CUSTOMERS isn't valid JSON");
+    return {};
+  }
+}
+
 const DAY = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", year: "numeric" });
 
 function scrub(message: string): string {
@@ -90,6 +102,7 @@ export async function buildReport(): Promise<{ mode: "test" | "live"; rows: Repo
   }
 
   const rows: ReportRow[] = [];
+  const names = legacyNames();
 
   for (const [order, via, paidAt, items, total, tax, discount, fee, refunded, refundedAt, promo] of LEGACY_ORDERS) {
     const notes: string[] = [];
@@ -101,7 +114,7 @@ export async function buildReport(): Promise<{ mode: "test" | "live"; rows: Repo
       site: "Old site",
       via,
       order: `#${order}`,
-      customer: null,
+      customer: typeof names[order] === "string" ? names[order] : null,
       items,
       kind: "sale",
       total,

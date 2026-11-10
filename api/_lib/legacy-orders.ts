@@ -1,7 +1,7 @@
 // Dyllan's old WordPress shop (WooCommerce), every paid 2026 order, read from the
 // site backup Kyle sent on Oct 8, 2026 (the newest order in it is Sep 23). Frozen:
 // the old server is gone, so these never change. Amounts are cents. Customer names
-// are left out on purpose (they're in WooPayments if ever needed).
+// aren't kept in git: they're in the LEGACY_CUSTOMERS env var ({"order #": "name"}).
 // [order #, paid via, paid at (UTC), items, total, sales tax, discount, fee (null = unknown), refunded, refunded at, promo code]
 
 export type LegacyOrder = [number, "WooPayments" | "PayPal", string, string, number, number, number, number | null, number, string | null, string | null];

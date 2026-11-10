@@ -32,7 +32,7 @@ function workbookNotes(label: string, feesMissing: boolean): string[] {
     ...(feesMissing ? ["Stripe fees for some of this site's sales weren't available when this file was made. Stripe's Payments page lists them."] : []),
     '"No sales tax" flags a sale with no sales tax charged. This site added 8.1% sales tax at checkout on Nov 10, 2026; sales before that had none. Gift certificates aren\'t taxed when sold.',
     "A refund is shown on the original sale's row (in the month it was sold), with the refund date in the Note column.",
-    "Old-site customer names aren't included. The order # matches the order in WooPayments.",
+    "Old-site order numbers match the orders in WooPayments.",
     "The By month tab totals the Sales tab by month. The totals row on the Sales tab follows the filter, so filtering the Flag column to \"No sales tax\" totals just those sales.",
     `Downloaded ${centralDay(new Date().toISOString())} from wildfoodsbydyllan.com/admin/reports.`,
   ];
