@@ -16,7 +16,8 @@ const RUST = "#a4471f";
 const FLAG_BG = "#fbeee6";
 
 const select: React.CSSProperties = { padding: "8px 10px", border: "1px solid var(--line)", background: "#fff", fontFamily: "Georgia, serif", fontSize: 15 };
-const th: React.CSSProperties = { ...labelStyle, textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--ink)", marginBottom: 0, whiteSpace: "nowrap" };
+// labelStyle is display:block, which would stack the header cells; keep them table cells.
+const th: React.CSSProperties = { ...labelStyle, display: "table-cell", textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--ink)", marginBottom: 0, whiteSpace: "nowrap" };
 const td: React.CSSProperties = { padding: "10px", borderBottom: "1px solid var(--line)", verticalAlign: "top", fontSize: 14 };
 const num: React.CSSProperties = { ...td, textAlign: "right", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" };
 
