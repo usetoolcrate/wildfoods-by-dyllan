@@ -1,7 +1,7 @@
 /* A small .xlsx writer: just enough for the admin's report download (text, numbers,
    dates, formulas with their values filled in, a few styles, frozen header, filter).
    An .xlsx file is a zip of XML files; this stores them uncompressed, which Excel,
-   Numbers and Google Sheets all open. No library, so nothing extra ships to the site. */
+   Numbers and Google Sheets all open. No library needed. */
 
 export const STYLE = {
   plain: 0,
@@ -214,16 +214,4 @@ export function buildXlsx(sheets: Sheet[]): Uint8Array {
     ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: sheetXml(s) })),
   ];
   return zip(files);
-}
-
-export function downloadBytes(bytes: Uint8Array, filename: string, type: string) {
-  const blob = new Blob([bytes as BlobPart], { type });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }

@@ -15,7 +15,7 @@ export type ReportRow = {
   id: string;
   paidAt: string;
   site: "Old site" | "This site";
-  via: "WooPayments" | "PayPal" | "Stripe";
+  via: "WooPayments" | "PayPal" | "GoDaddy Payments" | "Stripe";
   order: string;
   customer: string | null;
   items: string;
@@ -107,7 +107,7 @@ export async function buildReport(): Promise<{ mode: "test" | "live"; rows: Repo
   for (const [order, via, paidAt, items, total, tax, discount, fee, refunded, refundedAt, promo] of LEGACY_ORDERS) {
     const notes: string[] = [];
     if (refunded) notes.push(`${refunded >= total ? "Refunded" : "Partly refunded"}${refundedAt ? ` ${DAY.format(new Date(refundedAt))}` : ""}`);
-    if (fee == null) notes.push("PayPal fee not in the backup");
+    if (fee == null) notes.push(`${via} fee not in the backup`);
     rows.push({
       id: `wp-${order}`,
       paidAt,

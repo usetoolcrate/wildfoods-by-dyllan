@@ -1,12 +1,32 @@
 import { useEffect, useMemo, useState } from "react";
 import { MONTH_NAMES, centralDate, centralDay } from "@/lib/central";
-import type { ReportRow } from "@/lib/salesReport";
 import { AdminShell, badge, card, labelStyle, muted } from "@/pages/site/AdminKit";
 import { buttonStyle } from "@/pages/site/AdminRecipesPage";
 
 /* /admin/reports: every sale taken online (the old WordPress shop and this site),
    for Dyllan's CPA and his Missouri sales tax. Sales with no tax are flagged, and
-   the download is a real .xlsx built in the browser (src/lib/salesReport.ts). */
+   the download is a plain link to an .xlsx the server builds (api/_lib/salesReport.ts). */
+
+// Mirrors ReportRow in api/_lib/reports.ts.
+type ReportRow = {
+  id: string;
+  paidAt: string;
+  site: "Old site" | "This site";
+  via: "WooPayments" | "PayPal" | "GoDaddy Payments" | "Stripe";
+  order: string;
+  customer: string | null;
+  items: string;
+  kind: "sale" | "gift";
+  total: number;
+  tax: number;
+  fee: number | null;
+  discount: number;
+  refunded: number;
+  net: number | null;
+  promo: string | null;
+  noTax: boolean;
+  note: string | null;
+};
 
 type Report = { mode: "test" | "live"; rows: ReportRow[]; feesMissing: boolean };
 
@@ -21,23 +41,8 @@ const th: React.CSSProperties = { ...labelStyle, display: "table-cell", textAlig
 const td: React.CSSProperties = { padding: "10px", borderBottom: "1px solid var(--line)", verticalAlign: "top", fontSize: 14 };
 const num: React.CSSProperties = { ...td, textAlign: "right", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" };
 
-const GAP_NOTE = "The old site's records come from its backup taken Oct 8, 2026 (its last sale was Sep 23). Any sales from Oct 9 to Oct 16, when this site replaced it, aren't in the backup. WooPayments has them.";
-
-function workbookNotes(label: string, feesMissing: boolean): string[] {
-  return [
-    `Every sale taken online in ${label}, one row per order. Dates are Central time; amounts are US dollars.`,
-    "Old site = the WordPress shop (WooPayments and PayPal). This site = wildfoodsbydyllan.com ticket and gift certificate sales through Stripe, since Oct 16, 2026.",
-    GAP_NOTE,
-    "Order total is what the customer paid: after any discount, including sales tax. Net received = Order total − Fees − Refunded.",
-    "Fees are the card processing fees (WooPayments or Stripe). PayPal fees aren't in the old site's backup.",
-    ...(feesMissing ? ["Stripe fees for some of this site's sales weren't available when this file was made. Stripe's Payments page lists them."] : []),
-    '"No sales tax" flags a sale with no sales tax charged. This site added 8.1% sales tax at checkout on Nov 10, 2026; sales before that had none. Gift certificates aren\'t taxed when sold.',
-    "A refund is shown on the original sale's row (in the month it was sold), with the refund date in the Note column.",
-    "Old-site order numbers match the orders in WooPayments.",
-    "The By month tab totals the Sales tab by month. The totals row on the Sales tab follows the filter, so filtering the Flag column to \"No sales tax\" totals just those sales.",
-    `Downloaded ${centralDay(new Date().toISOString())} from wildfoodsbydyllan.com/admin/reports.`,
-  ];
-}
+const GAP_NOTE =
+  "The old site's records come from its backup taken Oct 8, 2026 (its first sale was Mar 1, 2024; its last, Sep 23, 2026). Any sales from Oct 9 to Oct 16, when this site replaced it, aren't in the backup. WooPayments has them.";
 
 export function AdminReportsPage() {
   return (
@@ -53,7 +58,6 @@ function Reports() {
   const [year, setYear] = useState(0);
   const [month, setMonth] = useState(0);
   const [onlyNoTax, setOnlyNoTax] = useState(false);
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/tickets?view=report")
@@ -97,17 +101,8 @@ function Reports() {
 
   const label = `${month ? `${MONTH_NAMES[month - 1]} ` : ""}${year}`;
 
-  async function download() {
-    setBusy(true);
-    try {
-      const [{ reportWorkbook }, { downloadBytes }] = await Promise.all([import("@/lib/salesReport"), import("@/lib/xlsx")]);
-      const bytes = reportWorkbook(shown, workbookNotes(`${label}${onlyNoTax ? " (only sales with no sales tax)" : ""}`, shown.some((r) => r.via === "Stripe" && r.fee == null)));
-      const name = `wild-foods-sales-${year}${month ? `-${String(month).padStart(2, "0")}` : ""}${onlyNoTax ? "-no-tax" : ""}.xlsx`;
-      downloadBytes(bytes, name, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    } finally {
-      setBusy(false);
-    }
-  }
+  // A plain link: the server builds the file and sends it as an attachment, which every browser downloads.
+  const downloadUrl = `/api/admin/tickets?view=report&format=xlsx&year=${year}${month ? `&month=${month}` : ""}${onlyNoTax ? "&noTax=1" : ""}`;
 
   if (error) return <p className="notice err">{error}</p>;
   if (!data) return <p style={muted}>Loading sales…</p>;
@@ -158,9 +153,11 @@ function Reports() {
           <input type="checkbox" checked={onlyNoTax} onChange={(e) => setOnlyNoTax(e.target.checked)} />
           Only sales with no sales tax
         </label>
-        <button type="button" style={{ ...buttonStyle, marginLeft: "auto" }} disabled={busy || !shown.length} onClick={download}>
-          {busy ? "Building…" : "Download spreadsheet"}
-        </button>
+        {shown.length ? (
+          <a href={downloadUrl} download style={{ ...buttonStyle, marginLeft: "auto", display: "inline-block", textDecoration: "none" }}>
+            Download spreadsheet
+          </a>
+        ) : null}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10, marginBottom: 14 }}>

@@ -1,36 +1,51 @@
-import { MONTHS, centralDate } from "@/lib/central";
-import { type Cell, type Sheet, STYLE, buildXlsx, excelDate } from "@/lib/xlsx";
+import { MONTHS, MONTH_NAMES, centralDate, centralDay } from "./central.js";
+import type { ReportRow } from "./reports.js";
+import { type Cell, type Sheet, STYLE, buildXlsx, excelDate } from "./xlsx.js";
 
-/* The /admin/reports data and its spreadsheet: one row per sale, a month-by-month
-   summary built from formulas over that sheet, and a notes tab for the CPA. */
-
-export type ReportRow = {
-  id: string;
-  paidAt: string;
-  site: "Old site" | "This site";
-  via: "WooPayments" | "PayPal" | "Stripe";
-  order: string;
-  customer: string | null;
-  items: string;
-  kind: "sale" | "gift";
-  total: number;
-  tax: number;
-  fee: number | null;
-  discount: number;
-  refunded: number;
-  net: number | null;
-  promo: string | null;
-  noTax: boolean;
-  note: string | null;
-};
+/* The /admin/reports spreadsheet, built on the server so the download is a plain
+   link that works in every browser (a blob download built in the page didn't in
+   Firefox). One row per sale, a month-by-month summary built from formulas over
+   that sheet, and a notes tab for the CPA. */
 
 const dollars = (cents: number) => Math.round(cents) / 100;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 const HEAD = ["Date", "Order #", "Sold on", "Paid via", "Customer", "Items", "Promo code", "Order total", "Sales tax", "Fees", "Discount", "Refunded", "Net received", "Flag", "Note"];
-const WIDTHS = [13, 11, 10, 13, 20, 56, 13, 12, 11, 10, 10, 10, 13, 13, 44];
+const WIDTHS = [13, 11, 10, 17, 20, 56, 13, 12, 11, 10, 10, 10, 13, 13, 44];
 
 export const NO_TAX_FLAG = "No sales tax";
+export const XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+export const GAP_NOTE =
+  "The old site's records come from its backup taken Oct 8, 2026 (its first sale was Mar 1, 2024; its last, Sep 23, 2026). Any sales from Oct 9 to Oct 16, when this site replaced it, aren't in the backup. WooPayments has them.";
+
+function notesFor(label: string, rows: ReportRow[]): string[] {
+  const stripeFeesMissing = rows.some((r) => r.via === "Stripe" && r.fee == null);
+  return [
+    `Every sale taken online in ${label}, one row per order. Dates are Central time; amounts are US dollars.`,
+    "Old site = the WordPress shop (WooPayments; GoDaddy Payments in 2024; one PayPal order). This site = wildfoodsbydyllan.com ticket and gift certificate sales through Stripe, since Oct 16, 2026.",
+    GAP_NOTE,
+    "Order total is what the customer paid: after any discount, including sales tax. Net received = Order total − Fees − Refunded.",
+    "Fees are the card processing fees. They're on record for WooPayments and Stripe; GoDaddy Payments and PayPal fees aren't in the old site's backup, so those rows have no fee or net.",
+    ...(stripeFeesMissing ? ["Stripe fees for some of this site's sales weren't available when this file was made. Stripe's Payments page lists them."] : []),
+    '"No sales tax" flags a sale with no sales tax charged. This site added 8.1% sales tax at checkout on Nov 10, 2026; sales before that had none. Gift certificates aren\'t taxed when sold.',
+    "A refund is shown on the original sale's row (in the month it was sold), with the refund date in the Note column.",
+    "Old-site order numbers match the orders in WooPayments.",
+    'The By month tab totals the Sales tab by month. The totals row on the Sales tab follows the filter, so filtering the Flag column to "No sales tax" totals just those sales.',
+    `Downloaded ${centralDay(new Date().toISOString())} from wildfoodsbydyllan.com/admin/reports.`,
+  ];
+}
+
+/** The rows for a year (and optionally a month, or only untaxed sales), as an .xlsx file. */
+export function reportFile(all: ReportRow[], opts: { year: number; month: number; noTax: boolean }): { bytes: Uint8Array; filename: string } {
+  const rows = all.filter((r) => {
+    const p = centralDate(r.paidAt);
+    return p.y === opts.year && (!opts.month || p.m === opts.month) && (!opts.noTax || r.noTax);
+  });
+  const label = `${opts.month ? `${MONTH_NAMES[opts.month - 1]} ` : ""}${opts.year}${opts.noTax ? " (only sales with no sales tax)" : ""}`;
+  const filename = `wild-foods-sales-${opts.year}${opts.month ? `-${String(opts.month).padStart(2, "0")}` : ""}${opts.noTax ? "-no-tax" : ""}.xlsx`;
+  return { bytes: reportWorkbook(rows, notesFor(label, rows)), filename };
+}
 
 export function reportWorkbook(rows: ReportRow[], notes: string[]): Uint8Array {
   const sorted = [...rows].sort((a, b) => a.paidAt.localeCompare(b.paidAt));
