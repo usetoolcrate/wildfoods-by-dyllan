@@ -116,7 +116,7 @@ function Reports() {
     ["Sales", String(t.count)],
     ["Order totals", money(t.total)],
     ["Sales tax", money(t.tax)],
-    ["Fees", money(t.fee), t.feeGaps ? `${t.feeGaps} without a fee yet` : undefined],
+    ["Fees", money(t.fee), t.feeGaps ? `${t.feeGaps} ${t.feeGaps === 1 ? "sale" : "sales"} with no fee on record` : undefined],
     ["Refunds", money(t.refunded)],
     ["Net received", money(t.net)],
   ];
