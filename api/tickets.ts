@@ -14,6 +14,8 @@ import {
   listPublicEvents,
   makeRef,
   originFrom,
+  SALES_TAX_PERCENT,
+  salesTaxRate,
   reconcileGift,
   reconcileOrder,
   recentCheckouts,
@@ -40,6 +42,8 @@ function publicEvent(e: EventRow, taken: number) {
     location: e.location,
     about: e.about,
     priceCents: e.price_cents,
+    // Partners sell their own tickets; only checkout here adds the tax.
+    taxPercent: partner ? null : SALES_TAX_PERCENT,
     maxPerOrder: e.max_per_order,
     addOns: e.add_ons,
     status: e.status,
@@ -60,6 +64,7 @@ function publicOrder(o: OrderRow, e: EventRow | null) {
     addOns: o.add_ons,
     subtotal: o.amount_subtotal,
     discount: o.amount_discount,
+    tax: o.amount_tax,
     total: o.amount_total,
     promoCode: o.promo_code,
     buyerName: o.buyer_name,
@@ -178,6 +183,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const ref = makeRef();
       const origin = originFrom(req);
       const when = formatDate(e.date);
+      const tax = [await salesTaxRate()];
       const lineItems = [
         {
           price_data: {
@@ -186,10 +192,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             product_data: { name: `${e.name} — ${when}`, description: [e.time_label, e.location].filter(Boolean).join(" · ") || undefined },
           },
           quantity: seats,
+          tax_rates: tax,
         },
         ...addOns.map((a) => ({
           price_data: { currency: "usd", unit_amount: a.price_cents, product_data: { name: `${a.name} — ${e.name}` } },
           quantity: a.qty,
+          tax_rates: tax,
         })),
       ];
       const session = await stripe(

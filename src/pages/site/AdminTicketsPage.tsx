@@ -32,6 +32,7 @@ type AdminEvent = {
   sold: number;
   held: number;
   revenue: number;
+  tax: number;
 };
 type AdminOrder = {
   id: number;
@@ -41,6 +42,7 @@ type AdminOrder = {
   add_ons: { name: string; qty: number }[];
   amount_total: number | null;
   amount_discount: number | null;
+  amount_tax: number;
   amount_refunded: number;
   promo_code: string | null;
   buyer_name: string | null;
@@ -416,6 +418,7 @@ function GuestList({ event, orders, onCredit }: { event: AdminEvent; orders: Adm
             </strong>
             <span style={{ fontSize: 14 }}>
               {money(o.amount_total ?? 0)} paid
+              {o.amount_tax ? ` (incl. ${money(o.amount_tax)} tax)` : ""}
               {o.amount_discount ? ` (−${money(o.amount_discount)}${o.promo_code ? ` ${o.promo_code}` : ""})` : ""}
               {o.amount_refunded ? ` · ${money(o.amount_refunded)} refunded` : ""}
             </span>
@@ -587,7 +590,10 @@ export function AdminTicketsPage() {
                     {e.partner ? `Sold by ${e.partner}` : `${e.sold} / ${e.capacity}`}
                     {e.held ? <span style={{ color: "var(--ink-soft)" }}> (+{e.held} in checkout)</span> : null}
                   </td>
-                  <td style={cell}>{e.partner ? "—" : money(e.revenue)}</td>
+                  <td style={cell}>
+                    {e.partner ? "—" : money(e.revenue)}
+                    {e.tax ? <span style={{ display: "block", fontSize: 13, color: "var(--ink-soft)" }}>incl. {money(e.tax)} sales tax</span> : null}
+                  </td>
                   <td style={{ ...cell, whiteSpace: "nowrap" }}>
                     {e.partner ? null : (
                       <>

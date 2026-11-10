@@ -15,6 +15,7 @@ type TicketEvent = {
   location: string;
   about: string;
   priceCents: number | null;
+  taxPercent: number | null;
   maxPerOrder: number;
   addOns: AddOn[];
   status: "on_sale" | "closed";
@@ -33,6 +34,7 @@ type Order = {
   addOns: { name: string; qty: number; price_cents: number }[];
   subtotal: number | null;
   discount: number | null;
+  tax: number;
   total: number | null;
   promoCode: string | null;
   buyerName: string | null;
@@ -142,7 +144,11 @@ export function TicketPage() {
   const left = event?.seatsLeft ?? 0;
   const maxSeats = event ? Math.min(event.maxPerOrder, left) : 1;
   const addOnTotal = event ? event.addOns.reduce((n, a) => n + (adds[a.key] ?? 0) * a.price_cents, 0) : 0;
-  const total = event ? seats * (event.priceCents ?? 0) + addOnTotal : 0;
+  // Stripe adds the sales tax per line, rounded to the cent; this matches it.
+  const rate = event?.taxPercent ?? 0;
+  const lineTax = (cents: number) => Math.round((cents * rate) / 100);
+  const tax = event ? lineTax(seats * (event.priceCents ?? 0)) + event.addOns.reduce((n, a) => n + lineTax((adds[a.key] ?? 0) * a.price_cents), 0) : 0;
+  const total = event ? seats * (event.priceCents ?? 0) + addOnTotal + tax : 0;
 
   function changeSeats(n: number) {
     setSeats(n);
@@ -239,7 +245,7 @@ export function TicketPage() {
                 {error ? <p className="notice err">{error}</p> : null}
                 <div className="tk-price">
                   {money(event.priceCents ?? 0)}
-                  <small>per guest</small>
+                  <small>per guest{rate ? " + tax" : ""}</small>
                 </div>
                 {closed ? (
                   <>
@@ -273,6 +279,12 @@ export function TicketPage() {
                         />
                       </div>
                     ))}
+                    {tax ? (
+                      <div className="tk-tax">
+                        <span>Sales tax ({rate}%)</span>
+                        <span>{money(tax)}</span>
+                      </div>
+                    ) : null}
                     <div className="tk-total">
                       <span>Total</span>
                       <strong>{money(total)}</strong>
@@ -403,6 +415,12 @@ export function TicketThanksPage() {
                     <li>
                       <span>Discount{order.promoCode ? ` (${order.promoCode})` : ""}</span>
                       <span>−{money(order.discount)}</span>
+                    </li>
+                  ) : null}
+                  {order.tax ? (
+                    <li>
+                      <span>Sales tax</span>
+                      <span>{money(order.tax)}</span>
                     </li>
                   ) : null}
                   <li>

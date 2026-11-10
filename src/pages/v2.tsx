@@ -504,6 +504,7 @@ export const V2_STYLES = String.raw`
   .v2 .stepper button{width:40px;height:40px;background:none;border:0;font:inherit;font-size:18px;line-height:1;cursor:pointer;color:var(--ink);}
   .v2 .stepper button:disabled{opacity:.25;cursor:default;}
   .v2 .stepper span{min-width:34px;text-align:center;font-variant-numeric:tabular-nums;}
+  .v2 .tk-tax{display:flex;justify-content:space-between;padding:14px 0;border-top:1px solid var(--line);font-size:15px;color:var(--ink-2);}
   .v2 .tk-total{display:flex;justify-content:space-between;align-items:baseline;padding:20px 0 24px;border-top:1px solid var(--ink);font-size:18px;}
   .v2 .tk-total strong{font-family:'Cormorant Garamond', Georgia, serif;font-size:32px;font-weight:500;}
   .v2 button.btn{font-family:inherit;border:0;cursor:pointer;}

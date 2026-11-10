@@ -48,6 +48,7 @@ export type OrderRow = {
   add_ons: OrderAddOn[];
   amount_subtotal: number | null;
   amount_discount: number | null;
+  amount_tax: number;
   amount_total: number | null;
   amount_refunded: number;
   promo_code: string | null;
@@ -145,6 +146,30 @@ async function promoCodeFor(session: { total_details?: { breakdown?: { discounts
   }
 }
 
+// Missouri sales tax, added on top of seat and add-on prices at checkout, the way the
+// old WooCommerce shop did it: the Springfield rate (4.225% state + 1.75% Greene County
+// + 2.125% city). Gift certificates aren't taxed when sold. A new percentage gets its
+// own Stripe tax rate (the live key needs "Tax Rates: Write").
+export const SALES_TAX_PERCENT = 8.1;
+
+export async function salesTaxRate(): Promise<string> {
+  const sql = getSql();
+  const key = `stripe.tax_rate.${isTestMode() ? "test" : "live"}.${SALES_TAX_PERCENT}`;
+  const rows = (await sql`SELECT value FROM site_settings WHERE key = ${key}`) as { value: string }[];
+  if (rows[0]?.value) return rows[0].value;
+  const rate = await stripe(
+    "POST",
+    "tax_rates",
+    { display_name: "Sales tax", description: "Missouri sales tax, Springfield rate", percentage: SALES_TAX_PERCENT, inclusive: false, country: "US", state: "MO", tax_type: "sales_tax" },
+    `tax-rate-${key}`,
+  );
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${key}, ${rate.id})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()
+  `;
+  return rate.id;
+}
+
 // Bring one order in line with its Checkout Session.
 // Records made under the other Stripe mode (test orders after the switch to live, or the reverse)
 // don't exist for the current key, so they're left alone instead of erroring.
@@ -164,6 +189,7 @@ export async function reconcileOrder(order: OrderRow): Promise<OrderRow> {
         status = ${paid ? "paid" : "processing"},
         amount_subtotal = ${s.amount_subtotal ?? null},
         amount_discount = ${s.total_details?.amount_discount ?? 0},
+        amount_tax = ${s.total_details?.amount_tax ?? 0},
         amount_total = ${s.amount_total ?? null},
         promo_code = ${promo},
         buyer_name = ${c.name ?? null},
@@ -296,6 +322,7 @@ export async function notifyOrder(order: OrderRow): Promise<void> {
       `Seats: ${order.seats}`,
       ...order.add_ons.map((a) => `Add-on: ${a.qty} × ${a.name}`),
       `Paid: ${usd(order.amount_total)}${order.amount_discount ? ` (${usd(order.amount_discount)} off with code ${order.promo_code ?? "—"})` : ""}`,
+      ...(order.amount_tax ? [`Sales tax collected: ${usd(order.amount_tax)}`] : []),
       "",
       `Name: ${order.buyer_name || "—"}`,
       `Email: ${order.buyer_email || "—"}`,

@@ -78,7 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const sold = mine.filter((o) => o.status === "paid").reduce((n, o) => n + o.seats, 0);
         const held = mine.filter((o) => o.status === "processing" || (o.status === "open" && o.expires_at && new Date(o.expires_at) > new Date())).reduce((n, o) => n + o.seats, 0);
         const revenue = mine.filter((o) => o.status === "paid").reduce((n, o) => n + Number(o.amount_total ?? 0) - Number(o.amount_refunded ?? 0), 0);
-        return { ...e, sold, held, revenue };
+        const tax = mine.filter((o) => o.status === "paid").reduce((n, o) => n + Number(o.amount_tax ?? 0), 0);
+        return { ...e, sold, held, revenue, tax };
       });
       res.status(200).json({
         mode: isTestMode() ? "test" : "live",
